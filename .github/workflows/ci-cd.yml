@@ -192,6 +192,10 @@ jobs:
           name: jacoco-coverage-report
           path: backend/target/site/jacoco
 
+      - name: 🏗️ Compile Backend for SonarQube
+        run: |
+          mvn -B -DskipTests compile -f backend/pom.xml
+
       - name: 🔍 Run SonarQube Scanner & Wait for Quality Gate
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -204,6 +208,7 @@ jobs:
             mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
               -Dsonar.host.url="${SONAR_HOST_URL}" \
               -Dsonar.token="${SONAR_TOKEN}" \
+              -Dsonar.java.binaries="backend/target/classes" \
               -Dsonar.coverage.jacoco.xmlReportPaths="backend/target/site/jacoco/jacoco.xml" \
               -Dsonar.qualitygate.wait=true
           fi
