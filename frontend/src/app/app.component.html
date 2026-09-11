@@ -1,0 +1,61 @@
+<div class="container">
+  <header class="header">
+    <div class="badge">SENAC Fullstack Extension 2026.2 &bull; Enterprise Starter</div>
+    <h1>{{ title() }}</h1>
+    <p class="subtitle">Scaffolding com Quality Gates no SonarQube & Pipelines GitHub Actions</p>
+  </header>
+
+  <main class="content-grid">
+    <!-- Hello World Card -->
+    <div class="card hello-card">
+      <div class="card-header">
+        <span class="dot online"></span>
+        <h2>🎉 Hello World API Integration</h2>
+      </div>
+      <div class="card-body">
+        <p class="hello-text">{{ helloMessage() }}</p>
+        <div class="endpoint-badge">GET /api/v1/hello &bull; HTTP 200 OK</div>
+      </div>
+    </div>
+
+    <!-- Backend Health Status Card -->
+    <div class="card status-card">
+      <div class="card-header">
+        <span class="dot" [class.online]="healthStatus()?.status === 'UP'"></span>
+        <h2>Status do Backend Spring Boot</h2>
+      </div>
+      @if (healthStatus(); as health) {
+        <div class="card-body">
+          <div class="metric-row">
+            <span class="label">Status:</span>
+            <span class="value" [class.badge-pass]="health.status === 'UP'">{{ health.status }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="label">Aplicação:</span>
+            <span class="value">{{ health.application }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="label">Ambiente:</span>
+            <span class="value">{{ health.environment }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="label">Uptime:</span>
+            <span class="value">{{ health.uptimeMillis }} ms</span>
+          </div>
+        </div>
+      } @else {
+        <p class="loading-text">Verificando conectividade com o Backend...</p>
+      }
+    </div>
+
+    <div class="card info-card">
+      <h2>Pilares de Engenharia & Qualidade</h2>
+      <ul class="features-list">
+        <li><strong>Backend:</strong> Java 21 LTS, Spring Boot 3.3, ArchUnit, JaCoCo</li>
+        <li><strong>Frontend:</strong> Angular 18 LTS (Signals, Standalone, OnPush, Vitest)</li>
+        <li><strong>Quality Gate:</strong> SonarQube em <a href="https://sonar.fchicout.dev" target="_blank">sonar.fchicout.dev</a></li>
+        <li><strong>CI/CD:</strong> GitHub Actions (Branch <code>development</code> &rarr; Staging, <code>main</code> &rarr; Produção)</li>
+      </ul>
+    </div>
+  </main>
+</div>

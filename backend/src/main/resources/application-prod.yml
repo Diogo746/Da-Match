@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: fullstack-api-damatch
+
+server:
+  port: 8080
+
+app:
+  environment: production
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
