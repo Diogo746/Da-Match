@@ -12,7 +12,7 @@
 | **Data de Emissão do Charter**          | 21 de Agosto de 2026                             |
 | **Repositório GitHub Oficial**          | `https://github.com/Diogo746/Projeto-Full-Stack` |
 
----
+----
 
 ##  2. Matriz de Papéis & Equipe de Desenvolvimento (Scrum Roles)
 
