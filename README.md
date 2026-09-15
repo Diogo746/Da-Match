@@ -94,7 +94,7 @@ O sistema não realizará investimentos, contratos ou movimentações financeira
 
 ### Responsabilidades
 
-#### Diogo Barbosa — Scrum Master / DevOps Lead
+#### Diogo Barbosa — Scrum Master / DevOps Lead:
 
 * Git Flow;
 * CI/CD;
@@ -102,7 +102,7 @@ O sistema não realizará investimentos, contratos ou movimentações financeira
 * Quality Gate;
 * SonarQube.
 
-#### Mário Brandão — Full Stack Lead / Back-End
+#### Mário Brandão — Full Stack Lead / Back-End:
 
 * Arquitetura REST;
 * Spring Boot;
@@ -110,7 +110,7 @@ O sistema não realizará investimentos, contratos ou movimentações financeira
 * LLDAP;
 * SQLite3.
 
-#### Davi Maia — Full Stack Lead / Front-End
+#### Davi Maia — Full Stack Lead / Front-End:
 
 * Angular Standalone;
 * RxJS;
@@ -118,7 +118,7 @@ O sistema não realizará investimentos, contratos ou movimentações financeira
 * Acessibilidade;
 * Interfaces.
 
-#### Christopher — Product Owner / Analyst
+#### Christopher — Product Owner / Analyst:
 
 * Product Backlog;
 * User Stories;
