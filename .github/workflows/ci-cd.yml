@@ -166,10 +166,10 @@ jobs:
         continue-on-error: true
 
   # =========================================================================
-  # 5. PHASE 3: SONARQUBE ANALYSIS & QUALITY GATE ENFORCEMENT
+  # 5A. PHASE 3A: SONARQUBE ANALYSIS - BACKEND (damatch-backend)
   # =========================================================================
-  sonar:
-    name: 🛡️ SonarQube Quality Gate
+  sonar-backend:
+    name: 🛡️ SonarQube Quality Gate - Backend
     needs: [test, sast-semgrep, secret-scanning, supply-chain]
     runs-on: ubuntu-latest
 
@@ -196,7 +196,7 @@ jobs:
         run: |
           mvn -B -DskipTests compile -f backend/pom.xml
 
-      - name: 🔍 Run SonarQube Scanner & Wait for Quality Gate
+      - name: 🔍 Run SonarQube Scanner (damatch-backend) & Wait for Quality Gate
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || 'https://sonar.fchicout.dev' }}
@@ -204,21 +204,61 @@ jobs:
           if [ -z "$SONAR_TOKEN" ]; then
             echo "⚠️ SONAR_TOKEN não configurado nos segredos do repositório. Análise SonarQube opcional concluída."
           else
-            echo "Iniciando análise estática e verificação do Quality Gate no SonarQube..."
+            echo "Iniciando análise estática e verificação do Quality Gate no SonarQube (damatch-backend)..."
             mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
               -Dsonar.host.url="${SONAR_HOST_URL}" \
               -Dsonar.token="${SONAR_TOKEN}" \
+              -Dsonar.projectKey="damatch-backend" \
+              -Dsonar.projectName="damatch-backend" \
               -Dsonar.java.binaries="target/classes" \
               -Dsonar.coverage.jacoco.xmlReportPaths="backend/target/site/jacoco/jacoco.xml" \
               -Dsonar.qualitygate.wait=true
           fi
 
   # =========================================================================
+  # 5B. PHASE 3B: SONARQUBE ANALYSIS - FRONTEND (damatch-frontend)
+  # =========================================================================
+  sonar-frontend:
+    name: 🛡️ SonarQube Quality Gate - Frontend
+    needs: [test, sast-semgrep, secret-scanning, supply-chain]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Setup Node.js 22 LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package.json'
+
+      - name: 🔍 Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci || npm install
+
+      - name: 🔍 Run SonarQube Scanner (damatch-frontend) & Wait for Quality Gate
+        uses: SonarSource/sonarqube-scan-action@v8
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || 'https://sonar.fchicout.dev' }}
+        with:
+          projectBaseDir: frontend
+          args: >
+            -Dsonar.projectKey=damatch-frontend
+            -Dsonar.projectName=damatch-frontend
+            -Dsonar.sources=src
+            -Dsonar.qualitygate.wait=true
+
+  # =========================================================================
   # 6. PHASE 4A: DAST FOR DEVELOPMENT/STAGING (ProjectDiscovery Nuclei)
   # =========================================================================
   dast-development-nuclei:
     name: ⚡ DAST Staging - Nuclei Scanner
-    needs: [sonar]
+    needs: [sonar-backend, sonar-frontend]
     if: github.ref == 'refs/heads/development' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
@@ -259,7 +299,7 @@ jobs:
   # =========================================================================
   dast-production-zap:
     name: 🛡️ DAST Production - OWASP ZAP Scan
-    needs: [sonar]
+    needs: [sonar-backend, sonar-frontend]
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 
@@ -342,9 +382,33 @@ jobs:
           echo "Branch: main (Release Commit: ${{ github.sha }})"
           echo "=================================================================================="
 
+      - name: ☁️ Deploy Frontend (Angular) to Vercel
+        working-directory: ./frontend
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm install --global vercel@latest
+          echo "Baixando configuração de ambiente de produção da Vercel..."
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          echo "Gerando build de produção..."
+          vercel build --prod --token="$VERCEL_TOKEN"
+          echo "Publicando artefatos já buildados na Vercel..."
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+      - name: 🚀 Deploy Backend (Spring Boot) to Render
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "❌ RENDER_DEPLOY_HOOK_URL não configurado nos segredos do repositório."
+            exit 1
+          fi
+          echo "Disparando deploy do backend na Render via Deploy Hook..."
+          curl -sSf -X POST "$RENDER_DEPLOY_HOOK_URL"
+          echo "✅ Deploy do backend na Render disparado com sucesso."
+
       - name: 🚢 Production Deploy Hook
         run: |
           echo "✅ Deploy em Produção finalizado com sucesso."
-
-
-
