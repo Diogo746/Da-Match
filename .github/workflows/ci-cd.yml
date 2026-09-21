@@ -209,7 +209,6 @@ jobs:
               -Dsonar.host.url="${SONAR_HOST_URL}" \
               -Dsonar.token="${SONAR_TOKEN}" \
               -Dsonar.projectKey="damatch-backend" \
-              -Dsonar.projectName="damatch-backend" \
               -Dsonar.java.binaries="target/classes" \
               -Dsonar.coverage.jacoco.xmlReportPaths="backend/target/site/jacoco/jacoco.xml" \
               -Dsonar.qualitygate.wait=true
@@ -249,7 +248,6 @@ jobs:
           projectBaseDir: frontend
           args: >
             -Dsonar.projectKey=damatch-frontend
-            -Dsonar.projectName=damatch-frontend
             -Dsonar.sources=src
             -Dsonar.qualitygate.wait=true
 
@@ -365,22 +363,22 @@ jobs:
   # =========================================================================
   # 9. PHASE 5B: DEPLOY PRODUCTION (Triggered on main branch / release tags)
   # =========================================================================
-  deploy-production:
-    name: 🏆 Deploy Production Environment
-    needs: [dast-production-zap]
-    if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
+ # deploy-production:
+  #  name: 🏆 Deploy Production Environment
+   # needs: [dast-production-zap]
+   # if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+   # runs-on: ubuntu-latest
 
-    steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v7
+   # steps:
+    #  - name: 📥 Checkout Repository
+     #   uses: actions/checkout@v7
 
-      - name: 📦 Packaging Production Release
-        run: |
-          echo "=================================================================================="
-          echo "🏆 Quality, Betterleaks, Supply Chain & DAST (OWASP ZAP) 100% APROVADOS para PRODUÇÃO!"
-          echo "Branch: main (Release Commit: ${{ github.sha }})"
-          echo "=================================================================================="
+     # - name: 📦 Packaging Production Release
+      #  run: |
+       #   echo "=================================================================================="
+        #  echo "🏆 Quality, Betterleaks, Supply Chain & DAST (OWASP ZAP) 100% APROVADOS para PRODUÇÃO!"
+         # echo "Branch: main (Release Commit: ${{ github.sha }})"
+         # echo "=================================================================================="
 
       - name: ☁️ Deploy Frontend (Angular) to Vercel
         working-directory: ./frontend
@@ -397,18 +395,19 @@ jobs:
           echo "Publicando artefatos já buildados na Vercel..."
           vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
 
-      - name: 🚀 Deploy Backend (Spring Boot) to Render
-        env:
-          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-        run: |
-          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
-            echo "❌ RENDER_DEPLOY_HOOK_URL não configurado nos segredos do repositório."
-            exit 1
-          fi
-          echo "Disparando deploy do backend na Render via Deploy Hook..."
-          curl -sSf -X POST "$RENDER_DEPLOY_HOOK_URL"
-          echo "✅ Deploy do backend na Render disparado com sucesso."
+#      - name: 🚀 Deploy Backend (Spring Boot) to Render
+  #      env:
+  #        RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+  #      run: |
+  #        if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+  #          echo "❌ RENDER_DEPLOY_HOOK_URL não configurado nos segredos do repositório."
+  #          exit 1
+  #        fi
+  #        echo "Disparando deploy do backend na Render via Deploy Hook..."
+  #        curl -sSf -X POST "$RENDER_DEPLOY_HOOK_URL"
+  #        echo "✅ Deploy do backend na Render disparado com sucesso."
 
-      - name: 🚢 Production Deploy Hook
-        run: |
-          echo "✅ Deploy em Produção finalizado com sucesso."
+  #    - name: 🚢 Production Deploy Hook
+  #      run: |
+  #        echo "✅ Deploy em Produção finalizado com sucesso."
+      
