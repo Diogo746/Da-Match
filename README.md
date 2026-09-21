@@ -85,12 +85,13 @@ O sistema não realizará investimentos, contratos ou movimentações financeira
 
 # 👥 Equipe
 
-| Integrante        | Papel                       |
-| ----------------- | --------------------------- |
-| **Diogo Barbosa** | Scrum Master / DevOps Lead  |
-| **Mário Brandão** | Full Stack Lead — Back-End  |
-| **Davi Maia**     | Full Stack Lead — Front-End |
-| **Christopher**   | Product Owner / Analyst     |
+| Integrante          | Papel                       |
+| ------------------- | --------------------------- |
+| **Diogo Barbosa**   | Scrum Master / DevOps Lead  |
+| **Mário Brandão**   | Full Stack Lead — Back-End  |
+| **Davi Maia**       | Full Stack Lead — Front-End |
+| **Christopher**     | Product Owner / Analyst     |
+| **Nikolas Messias** | Project Manager             |
 
 ### Responsabilidades
 
@@ -124,6 +125,10 @@ O sistema não realizará investimentos, contratos ou movimentações financeira
 * User Stories;
 * Análise;
 * Comunicação com o cliente.
+
+**Nikolas Messias — Project Manager**
+*  **Roadmap Definition**
+*  **Backlog Prioritization** 
 
 ---
 
