@@ -342,9 +342,33 @@ jobs:
           echo "Branch: main (Release Commit: ${{ github.sha }})"
           echo "=================================================================================="
 
+      - name: ☁️ Deploy Frontend (Angular) to Vercel
+        working-directory: ./frontend
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm install --global vercel@latest
+          echo "Baixando configuração de ambiente de produção da Vercel..."
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          echo "Gerando build de produção..."
+          vercel build --prod --token="$VERCEL_TOKEN"
+          echo "Publicando artefatos já buildados na Vercel..."
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+      - name: 🚀 Deploy Backend (Spring Boot) to Render
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "❌ RENDER_DEPLOY_HOOK_URL não configurado nos segredos do repositório."
+            exit 1
+          fi
+          echo "Disparando deploy do backend na Render via Deploy Hook..."
+          curl -sSf -X POST "$RENDER_DEPLOY_HOOK_URL"
+          echo "✅ Deploy do backend na Render disparado com sucesso."
+
       - name: 🚢 Production Deploy Hook
         run: |
           echo "✅ Deploy em Produção finalizado com sucesso."
-
-
-
