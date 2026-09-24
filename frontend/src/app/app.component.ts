@@ -1,8 +1,8 @@
-import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, Subscription, timer } from 'rxjs';
 
 export interface HealthStatus {
   status: string;
@@ -27,16 +27,32 @@ export interface HelloWorldResponse {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient, { optional: true });
+  private readonly backendApiUrl = 'https://da-match.onrender.com';
+  private healthCheckSubscription?: Subscription;
 
   title = signal('Fullstack Starter (Spring Boot 3 + Angular)');
   healthStatus = signal<HealthStatus | null>(null);
   helloMessage = signal<string>('Carregando saudação do backend...');
 
   ngOnInit(): void {
-    this.checkBackendHealth();
+    this.startHealthChecks();
     this.fetchHelloMessage();
+  }
+
+  ngOnDestroy(): void {
+    this.healthCheckSubscription?.unsubscribe();
+  }
+
+  private startHealthChecks(): void {
+    if (!this.http) {
+      this.checkBackendHealth();
+      return;
+    }
+
+    // Checks immediately and every 45 seconds while the frontend is open.
+    this.healthCheckSubscription = timer(0, 45_000).subscribe(() => this.checkBackendHealth());
   }
 
   checkBackendHealth(): void {
@@ -51,7 +67,7 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    this.http.get<HealthStatus>('/api/v1/health').pipe(
+    this.http.get<HealthStatus>(`${this.backendApiUrl}/api/v1/health`).pipe(
       catchError(() => of({
         status: 'OFFLINE (Local Dev Mode)',
         application: 'fullstack-api',
@@ -70,7 +86,7 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    this.http.get<HelloWorldResponse>('/api/v1/hello').pipe(
+    this.http.get<HelloWorldResponse>(`${this.backendApiUrl}/api/v1/hello`).pipe(
       catchError(() => of({
         message: 'Olá, Desenvolvedor Senac! (Modo Desconectado)',
         application: 'fullstack-api',
