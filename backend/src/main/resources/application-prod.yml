@@ -3,7 +3,8 @@ spring:
     name: fullstack-api-damatch
 
 server:
-  port: 8080
+  # Render injects PORT for web services. The default preserves local execution.
+  port: ${PORT:8080}
 
 app:
   environment: production

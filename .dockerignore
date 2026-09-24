@@ -1,0 +1,13 @@
+.git
+.github
+.idea
+.mvn
+backend/target
+frontend/node_modules
+frontend/dist
+frontend/.angular
+docs
+*.md
+*.iml
+.DS_Store
+Thumbs.db

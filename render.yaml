@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: da-match-backend
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    # Deploys are started only by the GitHub Actions job after its quality and
+    # security gates succeed. The deploy hook URL itself stays in GitHub Secrets.
+    autoDeployTrigger: off
+    envVars:
+      - key: PORT
+        value: "10000"

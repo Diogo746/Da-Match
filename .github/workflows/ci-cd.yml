@@ -396,19 +396,20 @@ jobs:
           echo "Publicando artefatos já buildados na Vercel..."
           vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
 
-#      - name: 🚀 Deploy Backend (Spring Boot) to Render
-  #      env:
-  #        RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-  #      run: |
-  #        if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
-  #          echo "❌ RENDER_DEPLOY_HOOK_URL não configurado nos segredos do repositório."
-  #          exit 1
-  #        fi
-  #        echo "Disparando deploy do backend na Render via Deploy Hook..."
-  #        curl -sSf -X POST "$RENDER_DEPLOY_HOOK_URL"
-  #        echo "✅ Deploy do backend na Render disparado com sucesso."
-
-  #    - name: 🚢 Production Deploy Hook
-  #      run: |
-  #        echo "✅ Deploy em Produção finalizado com sucesso."
+      - name: 🚀 Deploy Backend (Spring Boot) to Render
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "❌ RENDER_DEPLOY_HOOK_URL não configurado nos segredos do repositório."
+            exit 1
+          fi
+          echo "Disparando deploy do commit $GITHUB_SHA para o Render..."
+          QUERY_SEPARATOR="?"
+          case "$RENDER_DEPLOY_HOOK_URL" in
+            *\?*) QUERY_SEPARATOR="&" ;;
+          esac
+          curl --fail --show-error --silent --retry 3 --retry-all-errors \
+            --request POST "${RENDER_DEPLOY_HOOK_URL}${QUERY_SEPARATOR}ref=${GITHUB_SHA}"
+          echo "✅ Deploy do backend no Render disparado com sucesso."
       

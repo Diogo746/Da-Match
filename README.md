@@ -480,6 +480,25 @@ A versão MVP deverá ser homologada em **Staging** antes do deploy definitivo.
 ## 🟩 `v1.0.0` — 28/11/2026
 
 * [ ] Deploy em Produção
+
+## Deploy do backend no Render
+
+O backend é publicado como uma imagem Docker definida em `Dockerfile`. O
+arquivo `render.yaml` descreve o Web Service, usa o endpoint
+`/api/v1/health` como health check e faz a aplicação escutar a porta fornecida
+por `PORT` (10000 no Render).
+
+Crie um **Blueprint** no Render a partir deste repositório (ou crie um Web
+Service Docker com as mesmas opções de `render.yaml`). Em seguida, em
+**Settings > Deploy Hook**, copie a URL do hook e salve-a no repositório GitHub
+como o segredo `RENDER_DEPLOY_HOOK_URL`.
+
+Após cada push em `main` (ou tag `v*`) que concluir com sucesso os testes e os
+gates de segurança, o job `deploy-production` chama esse hook e solicita ao
+Render o deploy do SHA exato do workflow. O `autoDeployTrigger` permanece
+desativado para impedir que o Render publique commits antes da aprovação do
+pipeline.
+
 * [ ] Quality Gate SonarQube aprovado
 * [ ] Pitch / apresentação na banca
 
