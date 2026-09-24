@@ -8,6 +8,7 @@ WORKDIR /workspace
 
 COPY pom.xml ./
 COPY backend/pom.xml backend/pom.xml
+COPY backend/checkstyle.xml backend/checkstyle.xml
 RUN mvn --batch-mode --projects backend --also-make dependency:go-offline
 
 COPY backend/src backend/src
