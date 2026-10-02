@@ -1,9 +1,24 @@
 spring:
   application:
     name: fullstack-api-damatch
+  datasource:
+    # Configure com a URL JDBC do Supabase Session pooler (porta 5432).
+    # Exemplo: jdbc:postgresql://<host>:5432/postgres?user=<usuario>&password=<senha>&sslmode=require
+    url: ${SUPABASE_DB_URL}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
 server:
   port: 8080
+
 
 app:
   environment: development

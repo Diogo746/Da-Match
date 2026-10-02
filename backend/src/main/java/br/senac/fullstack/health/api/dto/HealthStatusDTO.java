@@ -1,4 +1,4 @@
-package br.senac.fullstack.dto;
+package br.senac.fullstack.health.api.dto;
 
 import java.time.Instant;
 

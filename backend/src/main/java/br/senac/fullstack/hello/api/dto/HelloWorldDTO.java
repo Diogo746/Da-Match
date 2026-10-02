@@ -1,4 +1,4 @@
-package br.senac.fullstack.dto;
+package br.senac.fullstack.hello.api.dto;
 
 import java.time.Instant;
 

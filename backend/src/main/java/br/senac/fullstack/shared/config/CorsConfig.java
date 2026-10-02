@@ -1,4 +1,4 @@
-package br.senac.fullstack.config;
+package br.senac.fullstack.shared.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

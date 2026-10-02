@@ -1,7 +1,7 @@
-package br.senac.fullstack.controller;
+package br.senac.fullstack.hello.api.controller;
 
-import br.senac.fullstack.dto.HelloWorldDTO;
-import br.senac.fullstack.service.HelloWorldService;
+import br.senac.fullstack.hello.api.dto.HelloWorldDTO;
+import br.senac.fullstack.hello.application.service.HelloWorldService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

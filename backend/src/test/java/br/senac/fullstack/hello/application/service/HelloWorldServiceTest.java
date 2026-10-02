@@ -1,6 +1,6 @@
-package br.senac.fullstack.service;
+package br.senac.fullstack.hello.application.service;
 
-import br.senac.fullstack.dto.HelloWorldDTO;
+import br.senac.fullstack.hello.api.dto.HelloWorldDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;

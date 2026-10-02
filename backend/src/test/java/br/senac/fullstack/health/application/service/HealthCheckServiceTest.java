@@ -1,6 +1,6 @@
-package br.senac.fullstack.service;
+package br.senac.fullstack.health.application.service;
 
-import br.senac.fullstack.dto.HealthStatusDTO;
+import br.senac.fullstack.health.api.dto.HealthStatusDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;

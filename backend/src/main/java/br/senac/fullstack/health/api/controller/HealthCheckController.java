@@ -1,7 +1,7 @@
-package br.senac.fullstack.controller;
+package br.senac.fullstack.health.api.controller;
 
-import br.senac.fullstack.dto.HealthStatusDTO;
-import br.senac.fullstack.service.HealthCheckService;
+import br.senac.fullstack.health.api.dto.HealthStatusDTO;
+import br.senac.fullstack.health.application.service.HealthCheckService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

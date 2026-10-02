@@ -1,6 +1,6 @@
-package br.senac.fullstack.service;
+package br.senac.fullstack.health.application.service;
 
-import br.senac.fullstack.dto.HealthStatusDTO;
+import br.senac.fullstack.health.api.dto.HealthStatusDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
