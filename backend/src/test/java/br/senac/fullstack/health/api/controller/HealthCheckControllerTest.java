@@ -2,10 +2,12 @@ package br.senac.fullstack.health.api.controller;
 
 import br.senac.fullstack.health.api.dto.HealthStatusDTO;
 import br.senac.fullstack.health.application.service.HealthCheckService;
+import br.senac.fullstack.shared.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -16,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(HealthCheckController.class)
+@Import(SecurityConfig.class)
 class HealthCheckControllerTest {
 
     @Autowired

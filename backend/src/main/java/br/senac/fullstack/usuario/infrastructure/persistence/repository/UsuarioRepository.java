@@ -1,4 +1,4 @@
-package br.senac.fullstack.usuario.repository;
+package br.senac.fullstack.usuario.infrastructure.persistence.repository;
 
 import br.senac.fullstack.usuario.domain.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
