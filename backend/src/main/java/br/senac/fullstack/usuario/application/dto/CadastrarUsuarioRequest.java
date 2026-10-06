@@ -2,19 +2,19 @@ package br.senac.fullstack.usuario.application.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import org.hibernate.validator.constraints.Length;
+import jakarta.validation.constraints.Size;
 
 public record CadastrarUsuarioRequest(
         @NotBlank(message = "Nome não pode está vazio")
-        @Length(min = 4)
+        @Size(min = 4, message = "Nome deve conter no mínimo 4 caracteres")
         String nome,
 
         @NotBlank(message = "Email não pode está vazio")
-        @Email()
+        @Email
         String email,
 
         @NotBlank(message = "Senha não pode está vazia")
-        @Length(min = 6, message = "Senha deve conter no minimo 6 caracteres")
+        @Size(min = 6, message = "Senha deve conter no mínimo 6 caracteres")
         String senha
 ) {
 }

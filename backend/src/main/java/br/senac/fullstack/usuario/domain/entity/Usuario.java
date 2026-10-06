@@ -2,7 +2,14 @@ package br.senac.fullstack.usuario.domain.entity;
 
 
 import br.senac.fullstack.shared.enums.TipoUsuario;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +24,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public final class Usuario {
-    @Id()
+public class Usuario {
+    @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private UUID id_ldap;
+    @Column(name = "id_ldap")
+    private UUID idLdap;
 
     @Column(nullable = false)
     private String nome;
@@ -34,15 +42,13 @@ public final class Usuario {
     private String senha;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TipoUsuario tipo_usuario;
+    @Column(name = "tipo_usuario", nullable = false)
+    private TipoUsuario tipoUsuario;
 
-    public Usuario(String nome, String email, String senha,  TipoUsuario tipo_usuario) {
+    public Usuario(String nome, String email, String senha, TipoUsuario tipoUsuario) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
-        this.tipo_usuario = tipo_usuario;
+        this.tipoUsuario = tipoUsuario;
     }
-
-
 }

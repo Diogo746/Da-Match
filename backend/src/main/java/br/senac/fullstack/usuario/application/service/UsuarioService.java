@@ -1,26 +1,22 @@
 package br.senac.fullstack.usuario.application.service;
 
 import br.senac.fullstack.shared.enums.TipoUsuario;
+import br.senac.fullstack.usuario.application.exception.EmailExistenteException;
 import br.senac.fullstack.usuario.application.exception.UsuarioNaoEncontradoException;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
-import br.senac.fullstack.usuario.application.exception.EmailExistenteException;
 import br.senac.fullstack.usuario.infrastructure.persistence.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UsuarioService {
-
-
     private final UsuarioRepository usuarioRepository;
-
     private final PasswordEncoder passwordEncoder;
 
     public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     private boolean emailExiste(String email) {
         return usuarioRepository.existsByEmail(email);
@@ -37,13 +33,11 @@ public class UsuarioService {
     }
 
     public Usuario buscarUsuarioPorEmail(String email) {
-        Usuario usuario = usuarioRepository.findByEmail(email).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
-
-        return usuario;
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
     }
 
     private String hashSenha(String senha) {
         return passwordEncoder.encode(senha);
     }
-
 }
