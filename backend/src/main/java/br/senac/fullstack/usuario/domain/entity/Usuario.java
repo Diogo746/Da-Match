@@ -1,13 +1,13 @@
 package br.senac.fullstack.usuario.domain.entity;
 
 
-import br.senac.fullstack.usuario.domain.enums.TipoUsuario;
+import br.senac.fullstack.shared.enums.TipoUsuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+
 
 import java.util.UUID;
 
@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Usuario {
+public final class Usuario {
     @Id()
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -37,15 +37,12 @@ public class Usuario {
     @Column(nullable = false)
     private TipoUsuario tipo_usuario;
 
-    public Usuario(String nome, String email, String senha) {
+    public Usuario(String nome, String email, String senha,  TipoUsuario tipo_usuario) {
         this.nome = nome;
         this.email = email;
-        this.senha = hashSenha(senha);
+        this.senha = senha;
+        this.tipo_usuario = tipo_usuario;
     }
 
-
-    private String hashSenha(String senha) {
-        return BCrypt.hashpw(senha, BCrypt.gensalt());
-    }
 
 }
