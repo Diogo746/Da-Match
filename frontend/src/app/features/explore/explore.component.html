@@ -1,0 +1,131 @@
+<app-discovery-hero [savedOnly]="savedOnly" />
+<div class="discovery-layout">
+  <section class="discovery" aria-labelledby="profiles-title">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">EXPLORE O ECOSSISTEMA</p>
+        <h2 id="profiles-title">
+          {{ savedOnly ? "Seus perfis salvos" : "Encontre quem pode somar" }}
+        </h2>
+      </div>
+      <span class="fiction-label">Perfis fictícios</span>
+    </div>
+    <div class="profile-tabs" role="group" aria-label="Tipo de perfil">
+      @for (tab of kinds; track tab.value) {
+        <button
+          type="button"
+          [class.selected]="kind() === tab.value"
+          [attr.aria-pressed]="kind() === tab.value"
+          (click)="setKind(tab.value)"
+        >
+          {{ tab.label }}<span>{{ count(tab.value) }}</span>
+        </button>
+      }
+    </div>
+    <div class="filter-panel">
+      <div class="search-field">
+        <app-icon name="search" /><label class="sr-only" for="profile-search"
+          >Buscar por nome, especialidade ou palavra-chave</label
+        ><input
+          id="profile-search"
+          type="search"
+          placeholder="Nome, especialidade ou palavra-chave"
+          [value]="search()"
+          (input)="updateFilter($event, 'search')"
+        />
+      </div>
+      <div class="filter-row">
+        <label
+          >Setor<select
+            [value]="sector()"
+            (change)="updateFilter($event, 'sector')"
+          >
+            <option value="">Todos os setores</option>
+            @for (item of sectors; track item) {
+              <option [value]="item">{{ item }}</option>
+            }
+          </select></label
+        ><label
+          >Estágio de interesse<select
+            [value]="stage()"
+            (change)="updateFilter($event, 'stage')"
+          >
+            <option value="">Todos os estágios</option>
+            @for (item of stages; track item) {
+              <option [value]="item">{{ item }}</option>
+            }
+          </select></label
+        ><label
+          >Localização<select
+            [value]="city()"
+            (change)="updateFilter($event, 'city')"
+          >
+            <option value="">Todas as cidades</option>
+            @for (item of cities; track item) {
+              <option [value]="item">{{ item }}</option>
+            }
+          </select></label
+        >
+      </div>
+    </div>
+    <div class="results-heading">
+      <p role="status" aria-live="polite">
+        {{ visibleProfiles().length }}
+        {{
+          visibleProfiles().length === 1
+            ? "perfil encontrado"
+            : "perfis encontrados"
+        }}
+      </p>
+      @if (hasFilters()) {
+        <button class="text-button" type="button" (click)="clearFilters()">
+          Limpar filtros<app-icon name="close" />
+        </button>
+      }
+      <span class="sr-only" role="status">{{ announcement() }}</span>
+    </div>
+    <div class="profiles-grid">
+      @for (profile of visibleProfiles(); track profile.id) {
+        <app-profile-card
+          [profile]="profile"
+          [saved]="store.isSaved(profile.id)"
+          (saveToggled)="toggleSaved(profile)"
+          (profileOpened)="details.open(profile)"
+        />
+      } @empty {
+        <div class="empty-state">
+          <app-icon name="search" />
+          <h3>
+            {{
+              savedOnly && !store.savedIds().length
+                ? "Sua lista começa com uma descoberta."
+                : "Nenhum perfil por aqui ainda."
+            }}
+          </h3>
+          <p>
+            {{
+              savedOnly && !store.savedIds().length
+                ? "Salve um perfil usando o ícone de marcador. Ele aparecerá aqui durante esta sessão."
+                : "Experimente outra palavra-chave ou amplie os filtros para encontrar novos caminhos."
+            }}
+          </p>
+          @if (savedOnly && !store.savedIds().length) {
+            <a class="button button-primary" routerLink="/"
+              >Descobrir perfis<app-icon name="arrow"
+            /></a>
+          } @else {
+            <button
+              class="button button-primary"
+              (click)="clearFilters(); setKind('TODOS')"
+              type="button"
+            >
+              Mostrar todos os perfis
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </section>
+  <app-discovery-guide />
+</div>
+<app-profile-dialog #details />

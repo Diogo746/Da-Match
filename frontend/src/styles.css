@@ -1,27 +1,200 @@
 :root {
-  --bg-primary: #0a0e17;
-  --bg-card: #121826;
-  --border-color: #1e293b;
-  --accent-cyan: #06b6d4;
-  --accent-blue: #3b82f6;
-  --accent-emerald: #10b981;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --font-sans: 'Plus Jakarta Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --navy: #0b3044;
+  --teal: #176b58;
+  --muted: #657a80;
+  --border: #dce5df;
+  --bg: #f6f8f5;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  color: var(--navy);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
-
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
-
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-main);
-  font-family: var(--font-sans);
-  min-height: 100vh;
+  margin: 0;
+  min-width: 320px;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a,
+input,
+select {
+  touch-action: manipulation;
+}
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 3px solid #349c81;
+  outline-offset: 4px;
+}
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: break-word;
+}
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--teal);
+  margin: 0;
+}
+.button {
+  display: inline-flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 13px 17px;
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: background 0.15s;
+}
+.button app-icon {
+  width: 16px;
+  height: 16px;
+}
+.button-primary {
+  background: var(--teal);
+  color: #fff;
+}
+.button-primary:hover {
+  background: #105544;
+}
+.button-secondary {
+  background: #fff;
+  border-color: var(--border);
+  color: var(--navy);
+}
+.button-secondary:hover {
+  background: #edf5f0;
+}
+.button-light {
+  background: #d5eadb;
+  color: #103f33;
+}
+.button-light:hover {
+  background: #c0dfce;
+}
+.button-small {
+  font-size: 11px;
+  padding: 10px 14px;
+}
+.text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teal);
+  cursor: pointer;
+}
+.text-button app-icon {
+  width: 13px;
+  height: 13px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link {
+  position: fixed;
+  left: 15px;
+  top: -70px;
+  background: #fff;
+  color: var(--navy);
+  padding: 12px 18px;
+  z-index: 100;
+  border: 2px solid var(--teal);
+  border-radius: 8px;
+}
+.skip-link:focus {
+  top: 15px;
+}
+dialog {
+  overscroll-behavior: contain;
+}
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Campos e mensagens compartilhados entre formulários. */
+.field-label {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 21px 0 9px;
+}
+.field-label span {
+  font-size: 9px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.form-input {
+  border: 1px solid #ccd8d2;
+  border-radius: 8px;
+  width: 100%;
+  height: 43px;
+  padding: 0 12px;
+  font-size: 12px;
+  color: var(--navy);
+  background: #fff;
+}
+.form-input[aria-invalid="true"] {
+  border-color: #aa3e3e;
+}
+.field-error {
+  color: #963d3d;
+  font-size: 10px;
+  line-height: 1.6;
+  margin: 8px 0;
+}
+.error-summary {
+  border: 1px solid #e6c0bb;
+  background: #fff4f1;
+  color: #8b3933;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 18px;
 }

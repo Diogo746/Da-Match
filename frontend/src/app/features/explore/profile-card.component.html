@@ -1,0 +1,51 @@
+<article class="profile-card">
+  <div [class]="'profile-cover ' + profile().theme">
+    <span class="cover-word">{{
+      profile().kind === "MENTOR"
+        ? "Compartilhar. Construir."
+        : profile().kind === "INVESTIDOR"
+          ? "Acreditar. Impulsionar."
+          : "Imaginar. Transformar."
+    }}</span
+    ><button
+      class="save-button"
+      type="button"
+      [class.saved]="saved()"
+      [attr.aria-label]="
+        (saved() ? 'Remover dos salvos: ' : 'Salvar perfil: ') + profile().name
+      "
+      [attr.aria-pressed]="saved()"
+      (click)="saveToggled.emit()"
+    >
+      <app-icon name="bookmark" />
+    </button>
+  </div>
+  <div class="card-body">
+    <div class="identity-row">
+      <span [class]="'avatar ' + profile().theme" aria-hidden="true">{{
+        profile().initials
+      }}</span
+      ><span class="kind-label">{{ label() }}</span>
+    </div>
+    <h3>{{ profile().name }}</h3>
+    <p class="profile-title">{{ profile().title }}</p>
+    <p class="location">
+      <app-icon name="pin" />{{ profile().city }}, Nordeste
+    </p>
+    <div class="tags">
+      @for (tag of profile().tags.slice(0, 2); track tag) {
+        <span>{{ tag }}</span>
+      }
+    </div>
+    <div class="card-bottom">
+      <span><app-icon name="clock" />{{ profile().availability }}</span
+      ><button
+        type="button"
+        class="profile-link"
+        (click)="profileOpened.emit()"
+      >
+        Ver perfil<app-icon name="arrow" />
+      </button>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,217 @@
+:host {
+  display: block;
+}
+.discovery-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 26px;
+  margin-top: 35px;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.section-heading h2 {
+  font-size: 23px;
+  letter-spacing: -0.8px;
+  margin: 7px 0 0;
+}
+.section-heading .eyebrow {
+  font-size: 9px;
+}
+.fiction-label {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.profile-tabs {
+  display: flex;
+  gap: 18px;
+  border-bottom: 1px solid var(--border);
+  margin-top: 24px;
+  overflow-x: auto;
+}
+.profile-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0 0 13px;
+  cursor: pointer;
+}
+.profile-tabs button span {
+  font-size: 9px;
+  min-width: 18px;
+  padding: 3px 5px;
+  background: #e8edeb;
+  border-radius: 4px;
+}
+.profile-tabs button.selected {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
+}
+.profile-tabs button.selected span {
+  background: #d9ebe4;
+}
+.filter-panel {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  margin-top: 21px;
+}
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 15px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+}
+.search-field input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+  color: var(--navy);
+  outline: none;
+  min-width: 0;
+}
+.search-field:focus-within {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.filter-row label {
+  font-size: 9px;
+  color: var(--muted);
+  padding: 11px 14px;
+}
+.filter-row label + label {
+  border-left: 1px solid var(--border);
+}
+.filter-row select {
+  display: block;
+  width: 100%;
+  font-size: 11px;
+  color: var(--navy);
+  border: 0;
+  background: #fff;
+  margin-top: 5px;
+  padding: 2px 0;
+  min-width: 0;
+}
+.results-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin: 16px 0;
+}
+.results-heading > p {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+}
+.results-heading .text-button {
+  font-size: 10px;
+}
+.profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+.empty-state {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 55px 25px;
+  border: 1px dashed #c9dad2;
+  border-radius: 12px;
+  background: #fff;
+}
+.empty-state > app-icon {
+  width: 30px;
+  height: 30px;
+  color: var(--teal);
+  margin-bottom: 12px;
+}
+.empty-state h3 {
+  font-size: 19px;
+  margin: 0;
+}
+.empty-state p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+  max-width: 350px;
+  margin: 12px auto 23px;
+}
+@media (min-width: 1500px) {
+  .profiles-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .discovery-layout {
+    grid-template-columns: minmax(0, 1fr) 255px;
+  }
+}
+@media (max-width: 1150px) {
+  .discovery-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 760px) {
+  .discovery-layout {
+    margin-top: 28px;
+  }
+  .section-heading h2 {
+    font-size: 21px;
+  }
+  .profile-tabs {
+    gap: 17px;
+  }
+}
+@media (max-width: 430px) {
+  .profiles-grid {
+    grid-template-columns: 1fr;
+  }
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+  .filter-row label + label {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+  .filter-row label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+  }
+  .filter-row select {
+    width: 60%;
+    margin-top: 0;
+    font-size: 11px;
+  }
+  .profile-tabs {
+    gap: 13px;
+  }
+  .profile-tabs button {
+    font-size: 11px;
+  }
+  .section-heading {
+    align-items: flex-start;
+  }
+  .fiction-label {
+    font-size: 9px;
+  }
+}
