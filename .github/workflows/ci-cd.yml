@@ -20,10 +20,34 @@ permissions:
   security-events: write
 
 jobs:
+  changes:
+    name: Detect Component Changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+
+    steps:
+      - name: Detect changed components
+        id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - 'pom.xml'
+              - 'Dockerfile'
+              - 'render.yaml'
+              - '.github/workflows/ci-cd.yml'
+            frontend:
+              - 'frontend/**'
+              - '.github/workflows/ci-cd.yml'
+
   # =========================================================================
   # 1. PHASE 1: LINT & AUTOMATED TESTS (Unit, Architecture & Coverage)
   # =========================================================================
   test:
+    needs: changes
     name: 🧪 Lint & Automated Tests
     runs-on: ubuntu-latest
 
@@ -34,6 +58,7 @@ jobs:
           fetch-depth: 0
 
       - name: ☕ Setup Java 21 LTS (Temurin)
+        if: github.event_name != 'pull_request' || needs.changes.outputs.backend == 'true'
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
@@ -41,6 +66,7 @@ jobs:
           cache: 'maven'
 
       - name: 📦 Setup Node.js 22 LTS
+        if: github.event_name != 'pull_request' || needs.changes.outputs.frontend == 'true'
         uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -48,16 +74,19 @@ jobs:
           cache-dependency-path: 'frontend/package.json'
 
       - name: 🔍 Backend - Lint (Checkstyle) & Validation
+        if: github.event_name != 'pull_request' || needs.changes.outputs.backend == 'true'
         run: |
           echo "Executando análise de linting no código Java com Checkstyle..."
           mvn -B checkstyle:check -f backend/pom.xml
 
       - name: 🏗️ Backend - Build & Run Tests with JaCoCo Coverage
+        if: github.event_name != 'pull_request' || needs.changes.outputs.backend == 'true'
         run: |
           echo "Executando testes automatizados do Spring Boot 3 e gerando relatório JaCoCo..."
           mvn -B clean test jacoco:report -f backend/pom.xml
 
       - name: 🔍 Frontend - Install Dependencies & Run Lint (ESLint)
+        if: github.event_name != 'pull_request' || needs.changes.outputs.frontend == 'true'
         working-directory: ./frontend
         run: |
           npm ci || npm install
@@ -65,12 +94,14 @@ jobs:
           npm run lint --if-present
 
       - name: 🎨 Frontend - Run Unit Tests (Vitest)
+        if: github.event_name != 'pull_request' || needs.changes.outputs.frontend == 'true'
         working-directory: ./frontend
         run: |
           echo "Executando testes unitários do Angular 22 com Vitest..."
           npm run test:coverage --if-present || npm run test --if-present
 
       - name: 📤 Upload JaCoCo Coverage Report
+        if: github.event_name != 'pull_request' || needs.changes.outputs.backend == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: jacoco-coverage-report
@@ -78,10 +109,12 @@ jobs:
           retention-days: 7
 
       - name: 📦 Package Backend JAR for DAST
+        if: github.event_name != 'pull_request' || needs.changes.outputs.backend == 'true'
         run: |
           mvn -B package -DskipTests -f backend/pom.xml
 
       - name: 📤 Upload Backend JAR Artifact
+        if: github.event_name != 'pull_request' || needs.changes.outputs.backend == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: backend-jar
@@ -169,8 +202,9 @@ jobs:
   # 5A. PHASE 3A: SONARQUBE ANALYSIS - BACKEND (damatch-backend)
   # =========================================================================
   sonar-backend:
+    if: github.event_name != 'pull_request' || needs.changes.outputs.backend == 'true'
     name: 🛡️ SonarQube Quality Gate - Backend
-    needs: [test, sast-semgrep, secret-scanning, supply-chain]
+    needs: [changes, test, sast-semgrep, secret-scanning, supply-chain]
     runs-on: ubuntu-latest
 
     steps:
@@ -218,8 +252,9 @@ jobs:
   # 5B. PHASE 3B: SONARQUBE ANALYSIS - FRONTEND (damatch-frontend)
   # =========================================================================
   sonar-frontend:
+    if: github.event_name != 'pull_request' || needs.changes.outputs.frontend == 'true'
     name: 🛡️ SonarQube Quality Gate - Frontend
-    needs: [test, sast-semgrep, secret-scanning, supply-chain]
+    needs: [changes, test, sast-semgrep, secret-scanning, supply-chain]
     runs-on: ubuntu-latest
 
     steps:
@@ -257,8 +292,12 @@ jobs:
   # =========================================================================
   dast-development-nuclei:
     name: ⚡ DAST Staging - Nuclei Scanner
-    needs: [sonar-backend, sonar-frontend]
-    if: github.ref == 'refs/heads/development' || github.event_name == 'pull_request'
+    needs: [changes, sonar-backend, sonar-frontend]
+    if: >-
+      always() &&
+      (github.ref == 'refs/heads/development' || github.event_name == 'pull_request') &&
+      needs.sonar-backend.result == 'success' &&
+      (needs.sonar-frontend.result == 'success' || needs.sonar-frontend.result == 'skipped')
     runs-on: ubuntu-latest
 
     steps:
@@ -298,8 +337,12 @@ jobs:
   # =========================================================================
   dast-production-zap:
     name: 🛡️ DAST Production - OWASP ZAP Scan
-    needs: [sonar-backend, sonar-frontend]
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    needs: [changes, sonar-backend, sonar-frontend]
+    if: >-
+      always() &&
+      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) &&
+      needs.sonar-backend.result == 'success' &&
+      (needs.sonar-frontend.result == 'success' || needs.sonar-frontend.result == 'skipped')
     runs-on: ubuntu-latest
 
     steps:
