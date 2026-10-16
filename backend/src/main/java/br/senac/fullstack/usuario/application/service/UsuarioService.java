@@ -22,14 +22,16 @@ public class UsuarioService {
         return usuarioRepository.existsByEmail(email);
     }
 
-    public void criarConta(String nome, String email, String senha, TipoUsuario tipoUsuario) {
+    public Usuario criarConta(String nome, String email, String senha, TipoUsuario tipoUsuario) {
         if (emailExiste(email)) {
             throw new EmailExistenteException("Email existente");
         }
         String senhaHash = hashSenha(senha);
 
-        Usuario usuario = new Usuario(nome, email, senhaHash, tipoUsuario);
-        usuarioRepository.save(usuario);
+        Usuario novoUsuario = new Usuario(nome, email, senhaHash, tipoUsuario);
+        usuarioRepository.save(novoUsuario);
+
+        return novoUsuario;
     }
 
     public Usuario buscarUsuarioPorEmail(String email) {
