@@ -20,7 +20,7 @@ export class ProfileCardComponent {
   readonly saveToggled = output<void>();
   readonly profileOpened = output<void>();
   label(): string {
-    return { MENTOR: "Mentor", INVESTIDOR: "Investidor", STARTUP: "Startup" }[
+    return { MENTOR: "Mentor", STARTUP: "Startup · Ideação" }[
       this.profile().kind
     ];
   }

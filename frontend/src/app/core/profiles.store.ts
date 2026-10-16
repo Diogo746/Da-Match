@@ -1,5 +1,5 @@
 import { Injectable, signal } from "@angular/core";
-export type ProfileKind = "MENTOR" | "INVESTIDOR" | "STARTUP";
+export type ProfileKind = "MENTOR" | "STARTUP";
 export interface DemoProfile {
   id: string;
   name: string;
@@ -8,7 +8,7 @@ export interface DemoProfile {
   title: string;
   city: string;
   sector: string;
-  stages: string[];
+  stage: "Ideação";
   description: string;
   tags: string[];
   reasons: string[];
@@ -25,10 +25,10 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
     title: "Estratégia de produto e validação",
     city: "Recife",
     sector: "Tecnologia",
-    stages: ["Ideação", "Validação"],
+    stage: "Ideação",
     description:
       "Apoia fundadores a transformar hipóteses em experimentos, conversar com clientes e definir um primeiro produto com foco.",
-    tags: ["Produto", "Validação", "Pesquisa"],
+    tags: ["Ideação", "Produto", "Pesquisa"],
     reasons: [
       "Experiência em validação de negócios",
       "Apoio a startups em ideação",
@@ -42,17 +42,17 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
     name: "Rafael Nascimento",
     initials: "RN",
     kind: "MENTOR",
-    title: "Tecnologia e primeiros produtos",
+    title: "Tecnologia para ideias em construção",
     city: "Recife",
     sector: "Tecnologia",
-    stages: ["Validação", "Operação"],
+    stage: "Ideação",
     description:
-      "Orienta decisões de arquitetura, planejamento de MVP e organização de equipes de desenvolvimento em negócios nascentes.",
-    tags: ["MVP", "Tecnologia", "Gestão"],
+      "Ajuda equipes em ideação a entender possibilidades técnicas, organizar hipóteses e escolher os primeiros experimentos para uma ideia.",
+    tags: ["Ideação", "Tecnologia", "Experimentos"],
     reasons: [
-      "Experiência no desenvolvimento de MVPs",
+      "Orientação para primeiros experimentos",
       "Atuação em tecnologia",
-      "Apoio a equipes em validação",
+      "Apoio a equipes em ideação",
     ],
     availability: "1 encontro por mês",
     theme: "blue",
@@ -62,16 +62,16 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
     name: "Camila Duarte",
     initials: "CD",
     kind: "MENTOR",
-    title: "Marketing e entrada no mercado",
+    title: "Público e posicionamento de novas ideias",
     city: "João Pessoa",
     sector: "Economia criativa",
-    stages: ["Validação", "Operação"],
+    stage: "Ideação",
     description:
-      "Ajuda negócios criativos a definir posicionamento, entender seu público e planejar os primeiros canais de aquisição.",
+      "Ajuda projetos criativos em ideação a conhecer seu público, investigar problemas e construir uma proposta de valor.",
     tags: ["Marketing", "Posicionamento", "Design"],
     reasons: [
       "Foco em economia criativa",
-      "Experiência na entrada no mercado",
+      "Apoio à descoberta do público",
       "Mentoria remota disponível",
     ],
     availability: "2 encontros por mês",
@@ -85,7 +85,7 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
     title: "Modelo de negócio e finanças",
     city: "Salvador",
     sector: "Impacto social",
-    stages: ["Ideação", "Validação"],
+    stage: "Ideação",
     description:
       "Contribui com modelos de receita, planejamento financeiro e estruturação de iniciativas de impacto social.",
     tags: ["Finanças", "Modelo de negócio", "Impacto"],
@@ -98,46 +98,6 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
     theme: "mint",
   },
   {
-    id: "investidor-1",
-    name: "Horizonte Capital",
-    initials: "HC",
-    kind: "INVESTIDOR",
-    title: "Tecnologia com raízes no Nordeste",
-    city: "Recife",
-    sector: "Tecnologia",
-    stages: ["Validação", "Operação"],
-    description:
-      "Perfil demonstrativo de um grupo interessado em negócios de tecnologia que estejam validando sua solução ou iniciando a operação.",
-    tags: ["SaaS", "B2B", "Tecnologia"],
-    reasons: [
-      "Interesse em negócios de tecnologia",
-      "Foco regional no Nordeste",
-      "Abertura a negócios em validação",
-    ],
-    availability: "Conversas iniciais online",
-    theme: "blue",
-  },
-  {
-    id: "investidor-2",
-    name: "Raiz Investimentos",
-    initials: "RI",
-    kind: "INVESTIDOR",
-    title: "Negócios com impacto positivo",
-    city: "Salvador",
-    sector: "Impacto social",
-    stages: ["Operação"],
-    description:
-      "Perfil demonstrativo voltado a projetos com propósito social e primeiros resultados operacionais.",
-    tags: ["Impacto", "Sustentabilidade", "Educação"],
-    reasons: [
-      "Foco em impacto social",
-      "Interesse em negócios em operação",
-      "Atuação no Nordeste",
-    ],
-    availability: "Análise inicial de projetos",
-    theme: "mint",
-  },
-  {
     id: "startup-1",
     name: "Semente Labs",
     initials: "SL",
@@ -145,16 +105,16 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
     title: "Tecnologia para aprender melhor",
     city: "Recife",
     sector: "Tecnologia",
-    stages: ["Validação"],
+    stage: "Ideação",
     description:
-      "Startup fictícia que explora ferramentas de apoio à aprendizagem. Busca orientação para validar sua proposta e priorizar o MVP.",
-    tags: ["Educação", "Produto", "MVP"],
+      "Startup fictícia em ideação que investiga dificuldades de aprendizagem. Busca mentoria para entender o problema e estruturar sua proposta inicial.",
+    tags: ["Educação", "Ideação", "Pesquisa"],
     reasons: [
-      "Busca apoio em validação",
+      "Busca apoio para estruturar uma ideia",
       "Atua no setor de tecnologia",
-      "Está no estágio de validação",
+      "Está no estágio de ideação",
     ],
-    availability: "Busca mentoria de produto",
+    availability: "Busca mentoria para sua ideia",
     theme: "sand",
   },
   {
@@ -165,7 +125,7 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
     title: "Novas experiências na economia criativa",
     city: "João Pessoa",
     sector: "Economia criativa",
-    stages: ["Ideação"],
+    stage: "Ideação",
     description:
       "Projeto fictício de experiências digitais para a economia criativa. Procura apoio em modelo de negócio e descoberta de clientes.",
     tags: ["Design", "Experiências digitais", "Negócio"],

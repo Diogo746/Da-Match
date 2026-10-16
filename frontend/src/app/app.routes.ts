@@ -1,6 +1,6 @@
 import { Routes } from "@angular/router";
 import { ExploreComponent } from "./features/explore/explore.component";
-import { AccessComponent } from "./features/access/access.component";
+import { RegisterComponent } from "./features/register/register.component";
 import { AboutComponent } from "./features/about/about.component";
 export const routes: Routes = [
   { path: "", component: ExploreComponent, title: "Descobrir | DaMatch" },
@@ -11,10 +11,11 @@ export const routes: Routes = [
     title: "Perfis salvos | DaMatch",
   },
   {
-    path: "solicitar-acesso",
-    component: AccessComponent,
-    title: "Solicitar acesso | DaMatch",
+    path: "cadastro",
+    component: RegisterComponent,
+    title: "Cadastro | DaMatch",
   },
+  { path: "solicitar-acesso", redirectTo: "cadastro", pathMatch: "full" },
   {
     path: "como-funciona",
     component: AboutComponent,

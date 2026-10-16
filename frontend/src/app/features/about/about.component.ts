@@ -10,12 +10,13 @@ import { IconComponent } from "../../shared/icon.component";
       <p class="eyebrow">CONEXÕES COM CONTEXTO</p>
       <h1>Encontrar apoio deve começar por entender quem pode somar.</h1>
       <p>
-        O DaMatch está sendo desenvolvido para aproximar startups nascentes,
-        mentores e investidores do Nordeste. O recorte inicial é Recife e o
-        ecossistema do Porto Digital.
+        O DaMatch aproxima startups em ideação e mentores do Nordeste. O foco
+        está em entender problemas, investigar hipóteses e estruturar as
+        primeiras ideias, com Recife e o ecossistema do Porto Digital como ponto
+        de partida.
       </p>
-      <a routerLink="/solicitar-acesso" class="button button-primary"
-        >Solicitar acesso<app-icon name="arrow"
+      <a routerLink="/cadastro" class="button button-primary"
+        >Testar cadastro<app-icon name="arrow"
       /></a>
     </section>
     <section class="journey" aria-label="Jornada prevista do produto">
@@ -30,11 +31,11 @@ import { IconComponent } from "../../shared/icon.component";
     <section class="about-note">
       <app-icon name="shield" />
       <div>
-        <h2>Conexão é o começo, não uma garantia.</h2>
+        <h2>Uma boa orientação ajuda a ideia a ganhar forma.</h2>
         <p>
-          O DaMatch não movimentará dinheiro nem garantirá investimentos ou
-          parcerias. Interesse mútuo permite iniciar uma conexão; reuniões
-          ajudam os participantes a conversar sobre possibilidades.
+          Mentores compartilham experiências; startups trazem problemas e
+          hipóteses para explorar. O objetivo é facilitar conversas que ajudem
+          os participantes a decidir os próximos passos da ideia.
         </p>
       </div>
     </section>
@@ -42,9 +43,9 @@ import { IconComponent } from "../../shared/icon.component";
       <h2>O que você pode experimentar agora</h2>
       <p>
         Explore perfis fictícios, combine filtros, salve perfis nesta sessão e
-        teste a solicitação de acesso. Login, aprovação administrativa,
-        matching, conexões e reuniões ainda dependem da integração com o
-        backend.
+        teste o cadastro de startup em ideação ou mentor com nome, e-mail e
+        senha fictícios. Criação de conta, login, matching, conexões e reuniões
+        ainda dependem da integração com o backend.
       </p>
       <a class="text-button" routerLink="/"
         >Explorar os perfis<app-icon name="arrow"
@@ -154,7 +155,7 @@ export class AboutComponent {
       number: "01",
       title: "Um perfil que conta sua história",
       description:
-        "Objetivos, setor, experiência e estágio ajudam a apresentar o que cada participante busca ou oferece.",
+        "Ideias, desafios e experiências ajudam a apresentar o que a startup busca e o que o mentor pode compartilhar.",
     },
     {
       number: "02",

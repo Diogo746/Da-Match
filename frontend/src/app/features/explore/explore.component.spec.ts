@@ -29,18 +29,20 @@ function create(savedOnly = false) {
 }
 afterEach(() => injector?.destroy());
 describe("Descoberta de perfis fictícios", () => {
-  it("combina tipo, setor, estágio e cidade", () => {
+  it("combina tipo, setor e cidade", () => {
     const { component } = create();
     component.kind.set("MENTOR");
     component.sector.set("Tecnologia");
-    component.stage.set("Ideação");
     component.city.set("Recife");
-    expect(component.visibleProfiles().map((p) => p.id)).toEqual(["mentor-1"]);
+    expect(component.visibleProfiles().map((p) => p.id)).toEqual([
+      "mentor-1",
+      "mentor-2",
+    ]);
   });
   it("busca sem diferença de acento ou caixa e admite resultado vazio", () => {
     const { component } = create();
-    component.search.set(" VALIDACAO ");
-    expect(component.visibleProfiles().some((p) => p.id === "mentor-1")).toBe(
+    component.search.set(" ANDRE ");
+    expect(component.visibleProfiles().some((p) => p.id === "mentor-4")).toBe(
       true,
     );
     component.search.set("texto sem nenhum resultado");
@@ -49,12 +51,24 @@ describe("Descoberta de perfis fictícios", () => {
   it("mantém os salvos durante a navegação e remove da lista ao desfazer", () => {
     const { component, store } = create(true);
     expect(component.visibleProfiles()).toEqual([]);
-    store.toggleSaved("investidor-1");
-    expect(component.visibleProfiles().map((p) => p.id)).toEqual([
-      "investidor-1",
-    ]);
-    store.toggleSaved("investidor-1");
+    store.toggleSaved("startup-1");
+    expect(component.visibleProfiles().map((p) => p.id)).toEqual(["startup-1"]);
+    store.toggleSaved("startup-1");
     expect(component.visibleProfiles()).toEqual([]);
+  });
+  it("mostra somente startups em ideação na categoria de startups", () => {
+    const { component } = create();
+    component.setKind("STARTUP");
+    expect(component.visibleProfiles()).toHaveLength(2);
+    expect(
+      component
+        .visibleProfiles()
+        .every(
+          (profile) =>
+            profile.kind === "STARTUP" && profile.stage === "Ideação",
+        ),
+    ).toBe(true);
+    expect(component.count("TODOS")).toBe(6);
   });
   it("limpa filtros sem apagar perfis salvos", () => {
     const { component, store } = create();
@@ -71,16 +85,14 @@ describe("Interações de descoberta", () => {
   it("seleciona tipo, atualiza filtro e conta salvos", () => {
     const { component, store } = create(true);
     store.toggleSaved("mentor-1");
-    store.toggleSaved("investidor-1");
-    component.setKind("INVESTIDOR");
+    store.toggleSaved("startup-1");
+    component.setKind("STARTUP");
     component.updateFilter(
       { target: { value: "Recife" } } as unknown as Event,
       "city",
     );
     expect(component.count("TODOS")).toBe(2);
-    expect(component.visibleProfiles().map((p) => p.id)).toEqual([
-      "investidor-1",
-    ]);
+    expect(component.visibleProfiles().map((p) => p.id)).toEqual(["startup-1"]);
   });
   it("anuncia inclusão e remoção de um perfil e ignora IDs inexistentes", () => {
     const { component, store } = create();

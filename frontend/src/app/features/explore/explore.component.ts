@@ -47,17 +47,14 @@ export class ExploreComponent {
   );
   readonly search = signal("");
   readonly sector = signal("");
-  readonly stage = signal("");
   readonly city = signal("");
   readonly announcement = signal("");
   readonly kinds: { value: ProfileKind | "TODOS"; label: string }[] = [
     { value: "TODOS", label: "Todos" },
     { value: "MENTOR", label: "Mentores" },
-    { value: "INVESTIDOR", label: "Investidores" },
     { value: "STARTUP", label: "Startups" },
   ];
   readonly sectors = ["Tecnologia", "Economia criativa", "Impacto social"];
-  readonly stages = ["Ideação", "Validação", "Operação"];
   readonly cities = ["Recife", "João Pessoa", "Salvador"];
   readonly visibleProfiles = computed(() => {
     const query = normalizeSearch(this.search());
@@ -67,7 +64,6 @@ export class ExploreComponent {
           (!this.savedOnly || this.store.isSaved(profile.id)) &&
           (this.kind() === "TODOS" || profile.kind === this.kind()) &&
           (!this.sector() || profile.sector === this.sector()) &&
-          (!this.stage() || profile.stages.includes(this.stage())) &&
           (!this.city() || profile.city === this.city()) &&
           (!query ||
             normalizeSearch(
@@ -85,13 +81,8 @@ export class ExploreComponent {
       );
   });
   readonly hasFilters = computed(
-    () => !!(this.search() || this.sector() || this.stage() || this.city()),
+    () => !!(this.search() || this.sector() || this.city()),
   );
-  label(kind: ProfileKind): string {
-    return { MENTOR: "Mentor", INVESTIDOR: "Investidor", STARTUP: "Startup" }[
-      kind
-    ];
-  }
   count(kind: ProfileKind | "TODOS"): number {
     return this.store.profiles.filter(
       (profile) =>
@@ -102,10 +93,7 @@ export class ExploreComponent {
   setKind(kind: ProfileKind | "TODOS"): void {
     this.kind.set(kind);
   }
-  updateFilter(
-    event: Event,
-    filter: "search" | "sector" | "stage" | "city",
-  ): void {
+  updateFilter(event: Event, filter: "search" | "sector" | "city"): void {
     this[filter].set(
       (event.target as HTMLInputElement | HTMLSelectElement).value,
     );
@@ -113,7 +101,6 @@ export class ExploreComponent {
   clearFilters(): void {
     this.search.set("");
     this.sector.set("");
-    this.stage.set("");
     this.city.set("");
   }
   toggleSaved(profile: DemoProfile): void {

@@ -46,16 +46,6 @@
             }
           </select></label
         ><label
-          >Estágio de interesse<select
-            [value]="stage()"
-            (change)="updateFilter($event, 'stage')"
-          >
-            <option value="">Todos os estágios</option>
-            @for (item of stages; track item) {
-              <option [value]="item">{{ item }}</option>
-            }
-          </select></label
-        ><label
           >Localização<select
             [value]="city()"
             (change)="updateFilter($event, 'city')"

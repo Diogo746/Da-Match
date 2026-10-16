@@ -5,7 +5,10 @@ import {
 import { provideHttpClient, withFetch } from "@angular/common/http";
 import { provideRouter, withInMemoryScrolling } from "@angular/router";
 import { routes } from "./app.routes";
-import { AccessGateway, DemoAccessGateway } from "./core/access.gateway";
+import {
+  RegistrationGateway,
+  DemoRegistrationGateway,
+} from "./core/registration.gateway";
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
@@ -14,6 +17,6 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({ scrollPositionRestoration: "enabled" }),
     ),
     provideHttpClient(withFetch()),
-    { provide: AccessGateway, useClass: DemoAccessGateway },
+    { provide: RegistrationGateway, useClass: DemoRegistrationGateway },
   ],
 };

@@ -1,169 +1,124 @@
-# DaMatch — primeira versão do frontend
+# DaMatch — protótipo do frontend v0.2
 
-Branch: `feature/frontend-access`.
-Base: `main`, commit `4795f9c8ae1bc28be52a32e614368d962a1db597`.
+Esta versão adapta o frontend da branch `feature/frontend-access` ao escopo de **startups em ideação e mentores**. Mantém a identidade visual e as funcionalidades de descoberta, detalhes e salvos. O backend não é alterado por este pacote.
 
-Esta versão substitui a tela de demonstração do starter pelo protótipo do DaMatch. As referências visuais são os conceitos de interface apresentados no benchmark e no pré-pitch: azul-marinho, verde-petróleo, menta, menu lateral e cartões. As pessoas e organizações mostradas são inventadas. A jornada foi construída para revisão da equipe, sem integração com a API de negócio.
+## Mudanças
 
-## O que está disponível
+- Dois tipos de participação: startup em ideação e mentor.
+- Seis perfis fictícios: quatro mentores e duas startups em ideação.
+- Busca sem diferença de acento ou caixa, filtros por setor e cidade e resultados em ordem de nome.
+- Cadastro em `/cadastro`, com nome, e-mail e senha, baseado no DTO existente do backend.
+- O caminho anterior `/solicitar-acesso` redireciona para `/cadastro`.
+- Confirmação demonstrativa com o perfil e o e-mail usados no teste.
+- Validação dos campos, prevenção de envios repetidos e tratamento de e-mail repetido na sessão.
+- Senha oculta por padrão, botão Mostrar/Ocultar e limpeza do campo após o sucesso.
+- Testes ajustados ao novo escopo e documentação de execução atualizada.
 
-- Descoberta de mentores, investidores e startups fictícios.
-- Busca sem diferença de caixa ou acento; filtros combinados por setor, estágio e cidade.
-- Resultados em ordem de nome; estado vazio e limpeza dos filtros.
-- Detalhes do perfil em diálogo nativo, com fechamento por Escape.
-- Salvos compartilhados entre páginas enquanto a aplicação permanece aberta.
-- Explicação da jornada prevista do produto.
-- Solicitação de acesso demonstrativa: nome, e-mail e Startup/Mentor/Investidor.
-- Validação, bloqueio de cliques repetidos durante envio, erro de duplicidade e protocolo DEMO pendente.
-- Layouts para desktop e celular, foco visível, rótulos e mensagens de erro.
+## O que foi considerado do backend
 
-O formulário não pede senha nem oferece ADMIN. A ciência do modo de demonstração não substitui uma política de privacidade real. Busca e salvos são funcionalidades de protótipo, não novas decisões de escopo aprovadas.
+A referência são os ZIPs `Da-Match-feature-database-models.zip` e `Da-Match-main (1).zip`, enviados para análise. Seus 78 arquivos têm conteúdo idêntico. O frontend usado como base veio do ZIP separado `Da-Match-feature-frontend-access(1).zip`.
 
-## Limites desta entrega
+| Código do backend                                      | Relação com o frontend                                                                                      |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `usuario/application/dto/CadastrarUsuarioRequest.java` | Define nome, e-mail e senha; nome com mínimo de 4 caracteres e senha com mínimo de 6                        |
+| `shared/enums/TipoUsuario.java`                        | Contém `STARTUP`, `MENTOR` e `ADMIN`; o cadastro público desta prévia oferece os dois tipos de participante |
+| `usuario/application/service/UsuarioService.java`      | Tem a criação interna da conta, verificação de e-mail e codificação da senha                                |
+| `usuario/domain/entity/Usuario.java`                   | Representa a conta no banco; o frontend não solicita os identificadores gerados internamente                |
 
-Nenhuma conta é criada e nenhum dado é enviado à equipe. Login, LLDAP, aprovação administrativa, matching, interesses, conexões, reuniões e persistência real não estão implementados no frontend. Os motivos apresentados nos perfis são exemplos fixos; não há pontuação de matching calculada. Recarregar a página apaga salvos e solicitações da memória. A descoberta pública existe apenas para testar os perfis fictícios: a futura descoberta com dados reais dependerá da autenticação e das permissões previstas nos requisitos.
+Ainda não há rotas de cadastro nem campos próprios de startup ou mentor nesses arquivos. O exemplo de mentor com `usuario` e `biografia` fornecido na conversa é uma indicação de formato futuro, mas não tem implementação correspondente nos ZIPs. A prévia usa os três campos do DTO existente, sem presumir esse contrato futuro.
 
-As duas diferenças do backend (PostgreSQL/Supabase versus SQLite e senha local versus LLDAP) permanecem para alinhamento da equipe. Esta branch não altera o backend.
+O objeto `RegistrationRequest` contém exatamente `nome`, `email` e `senha`. O tipo do perfil é um argumento separado de `RegistrationGateway.register`. Isso organiza a interface enquanto o contrato HTTP não está definido; não indica que já exista uma rota capaz de receber o cadastro.
 
-## 1. Testar rapidamente no Windows, sem alterar o repositório
+O banco configurado no backend enviado é PostgreSQL/Supabase. A documentação geral ainda contém referências ao planejamento anterior. Esta alteração não modifica o banco nem decide a futura autenticação.
 
-1. Extraia `DaMatch-Frontend-v0.1.zip` usando “Extrair tudo”.
-2. Instale ou use Node.js 24.15 ou mais recente da linha 24. O Angular deste projeto também aceita Node 22 a partir de 22.22.3. Java não é necessário para esta demonstração.
-3. No VS Code, escolha Arquivo → Abrir Pasta e abra a pasta `frontend` extraída.
-4. Abra Terminal → Novo Terminal. Confirme `node -v` e `npm.cmd -v`.
-5. Execute:
+## Executar para testar
+
+1. Extraia `DaMatch-Frontend-v0.2.zip` em uma pasta nova.
+2. Abra a pasta `frontend` extraída no VS Code.
+3. Use Node 24 a partir de 24.15.0 ou Node 22 a partir de 22.22.3, dentro das respectivas linhas.
+4. No terminal dessa pasta, execute:
 
 ```powershell
 npm.cmd ci
 npm.cmd start
 ```
 
-`npm ci` instala as dependências a partir do arquivo de versões. `npm start` executa o servidor de desenvolvimento. Aguarde a indicação de que a compilação terminou.
+5. Abra **http://localhost:4200**. Não é necessário iniciar Java ou banco de dados.
+6. Siga o roteiro de testes em `frontend/README.md`.
+7. Para parar o servidor, pressione Ctrl+C.
 
-6. Abra `http://localhost:4200` no navegador. Use essa URL; abrir `index.html` com dois cliques não executa um projeto Angular.
-7. Para parar, pressione Ctrl+C no terminal. Para executar novamente, use apenas `npm.cmd start`.
+O pacote funciona sozinho para teste e não contém histórico Git. Se `git status` informar que a pasta extraída não é um repositório, isso é esperado. Os commits devem ser feitos na sua cópia já conectada ao GitHub.
 
-O uso de `npm.cmd` evita o bloqueio comum de `npm.ps1` no PowerShell, sem alterar a política de execução do Windows.
+## Aplicar na sua cópia do repositório
 
-## 2. Roteiro de conferência manual
+Aplique depois de testar a pasta extraída. O pacote tem apenas o frontend e este guia: não substitua a raiz do repositório nem o backend.
 
-| Ação | Resultado esperado |
-| --- | --- |
-| Abrir Descobrir | Quatro mentores fictícios em ordem alfabética |
-| Buscar `validacao` | Encontrar perfis com “validação”, sem exigir acento |
-| Combinar Mentor + Tecnologia + Ideação + Recife | Mostrar Marina Albuquerque |
-| Buscar uma palavra inexistente | Mostrar orientação para ampliar os filtros |
-| Salvar um perfil e abrir Perfis salvos | Mostrar o perfil selecionado |
-| Remover esse perfil dos salvos | Atualizar a lista e seu estado vazio |
-| Abrir Ver perfil | Mostrar detalhes e exemplos dos motivos da conexão |
-| Pressionar Escape no diálogo | Fechar o diálogo |
-| Enviar formulário vazio | Apresentar erros; não gerar recibo |
-| Selecionar Investidor e enviar nome fictício/e-mail válido | Gerar protocolo DEMO pendente |
-| Testar outra solicitação com o mesmo e-mail em outra caixa | Informar duplicidade nesta sessão |
-| Recarregar a página | Reiniciar os dados temporários |
-| Reduzir a janela e usar Tab/Shift+Tab | Conferir adaptação do layout e foco dos controles |
-
-Esta conferência de navegador ainda precisa ser feita no seu computador. Build e testes de lógica não substituem avaliação visual, teste assistivo ou aprovação WCAG.
-
-## 3. Colocar esta versão em uma branch do repositório
-
-O arquivo `damatch-frontend.bundle` transporta a branch e seus commits, sem precisar copiar arquivos sobre a main. O código já está comprometido nesse bundle. A branch ainda não foi enviada ao GitHub.
-
-Se você ainda não tem o projeto clonado, abra um terminal na pasta onde deseja guardar projetos e execute:
+1. Pare o servidor de desenvolvimento.
+2. Na sua cópia do repositório, confira `git status`. Preserve em commit ou cópia qualquer alteração sua que ainda não tenha sido guardada.
+3. Confirme a branch com `git branch --show-current`. Para continuar o trabalho anterior, use `feature/frontend-access`.
+4. Faça uma cópia de segurança da pasta `frontend` atual **fora do repositório**.
+5. Substitua a pasta `frontend` inteira pela nova. Não apenas mescle os arquivos: as antigas pastas `src/app/features/access/` e os arquivos `core/access.gateway.*` foram substituídos por `features/register/` e `core/registration.gateway.*`.
+6. Copie este arquivo para `docs/09-frontend-prototype.md` na sua cópia do repositório.
+7. Dentro da nova pasta `frontend`, execute:
 
 ```powershell
-git clone https://github.com/Diogo746/Da-Match.git
-cd Da-Match
-```
-
-Se você já tem uma cópia, abra essa pasta no VS Code. Em ambos os casos, execute `git status` primeiro. Se houver trabalho não salvo, faça commit dele antes de mudar de branch. Não use comandos de descarte para prosseguir.
-
-Na raiz do repositório, importe o bundle. Substitua o caminho de exemplo pelo caminho do arquivo extraído:
-
-```powershell
-git fetch "C:\caminho\DaMatch-Frontend-v0.1\damatch-frontend.bundle" feature/frontend-access:feature/frontend-access
-git switch feature/frontend-access
-cd frontend
 npm.cmd ci
-npm.cmd start
-```
-
-O comando `git fetch` acima cria a branch local a partir do pacote; `git switch` passa a trabalhar nessa versão. Não é necessário executar `git switch -c` depois da importação. Se uma branch com esse nome já existir, pare e confira seu conteúdo antes de substituí-la.
-
-Para rodar as verificações, abra outro terminal dentro de `frontend`:
-
-```powershell
 npm.cmd run lint
 npm.cmd run test:coverage
 npm.cmd run build
 ```
 
-Quando você revisar e quiser compartilhar a branch, volte à raiz e envie:
+8. Abra o terminal na raiz do repositório e confira o que será enviado:
 
 ```powershell
-cd ..
 git status
-git push -u origin feature/frontend-access
+git diff --stat
+git add frontend docs/09-frontend-prototype.md
+git diff --cached --stat
 ```
 
-O envio pode solicitar autenticação do seu GitHub. Depois, na página do repositório, use “Compare & pull request”, com base `main` e comparação `feature/frontend-access`. O pipeline poderá continuar falhando nas etapas SonarQube já identificadas; verificar localmente não comprova aprovação do Sonar.
-
-Não faça merge antes da revisão da equipe e dos controles exigidos pelo professor. Se a equipe adotar develop/development como destino, ajuste a base do PR ao fluxo acordado.
-
-## 4. Entender os arquivos, na ordem
-
-| Arquivo/pasta | O que estudar |
-| --- | --- |
-| `src/main.ts` | Inicializa a aplicação Angular |
-| `src/app/app.config.ts` | Registra navegação e o serviço demonstrativo |
-| `src/app/app.routes.ts` | Associa cada URL à sua página |
-| `src/app/app.component.html` | Estrutura principal: menu, cabeçalho e conteúdo |
-| `src/styles.css` | Cores, botões, campos e estilos compartilhados |
-| `src/app/features/explore/` | Página de descoberta e componentes menores |
-| `src/app/core/profiles.store.ts` | Dados fictícios e estado dos perfis salvos |
-| `src/app/features/access/` | Formulário e confirmação |
-| `src/app/core/access.gateway.ts` | Contrato de envio e sua implementação simulada |
-| `*.spec.ts` | Testes de comportamento |
-
-- HTML define a estrutura e os textos.
-- CSS define aparência e adaptações de tela.
-- TypeScript define comportamento e tipos.
-- Um componente junta a estrutura, a aparência e o comportamento de uma parte da interface.
-- Um serviço concentra uma responsabilidade compartilhada. Aqui, `ProfilesStore` mantém salvos e `AccessGateway` define como enviar uma solicitação.
-- `signal` guarda um valor que a interface acompanha. Quando ele muda, o Angular atualiza a parte correspondente.
-- `computed` deriva um resultado de outros valores: a lista visível depende dos filtros e dos salvos.
-- `FormGroup` reúne campos e validações do formulário.
-
-## 5. Seu primeiro exercício
-
-Com `npm start` executando:
-
-1. Abra `src/app/features/explore/discovery-hero.component.html`.
-2. Localize o texto “Seu próximo passo começa com uma conexão.”.
-3. Altere para um texto curto que a equipe aprove e salve o arquivo.
-4. Confira a atualização automática no navegador.
-5. Abra `src/styles.css` e identifique `--navy` e `--teal`. São as cores compartilhadas.
-6. Abra `profiles.store.ts` e encontre `Marina Albuquerque`. Observe seus campos.
-7. Abra `explore.component.ts`. Relacione os filtros com `visibleProfiles`.
-8. Abra `access.component.ts`. Relacione o botão de envio com `submit` e as validações.
-
-Após uma alteração sua, confira o resultado e execute os checks antes do commit:
+9. Depois da sua revisão, faça o commit e envie a branch:
 
 ```powershell
-git diff
-git add frontend/src/app/features/explore/discovery-hero.component.html
-git commit -m "feat(frontend): ajusta apresentação inicial do DaMatch"
-git push
+git commit -m "feat(frontend): ajusta escopo de ideação e cadastros"
+git push origin feature/frontend-access
 ```
 
-Execute esses comandos na raiz do repositório; o caminho do `git add` acima presume essa localização. Inclua apenas os arquivos que você alterou e revisou.
+O ZIP de entrega, a cópia de segurança, `node_modules`, `dist`, `.angular` e `coverage` não fazem parte do commit. O `.gitignore` do frontend cobre as pastas geradas.
 
-## 6. Integração futura
+O push atualiza a branch. A entrada na `main` ocorre pelo Pull Request e pelos checks exigidos pela equipe. O destino do PR deve seguir a branch de integração acordada no projeto. O workflow enviado executa automaticamente em PRs para `main` ou `development`; um push isolado em `feature/frontend-access`, sem PR aberto, não aciona esse gatilho.
 
-`AccessGateway` é um contrato TypeScript, não a confirmação de um endpoint existente. Quando a equipe definir URL, campos JSON, respostas e erros do RF01, um serviço HTTP poderá implementar esse contrato. A troca ocorre no provider de `app.config.ts`; o formulário não precisará ser redesenhado.
+## Onde estudar o código
 
-O backend deverá validar novamente os dados, normalizar e-mail, impedir duplicidade e devolver protocolo/status. Validações no Angular ajudam a experiência do usuário; não substituem controles no servidor. A aprovação e o vínculo LLDAP são etapas posteriores (RF02/RF03).
+| Arquivo/pasta                                   | Responsabilidade                                  |
+| ----------------------------------------------- | ------------------------------------------------- |
+| `frontend/src/main.ts`                          | Inicialização do Angular                          |
+| `frontend/src/app/app.config.ts`                | Navegação e escolha do serviço demonstrativo      |
+| `frontend/src/app/app.routes.ts`                | URLs de descoberta, salvos, cadastro e explicação |
+| `frontend/src/app/app.component.html`           | Menu, cabeçalho e área das páginas                |
+| `frontend/src/styles.css`                       | Cores e estilos compartilhados                    |
+| `frontend/src/app/core/profiles.store.ts`       | Perfis fictícios e estado temporário dos salvos   |
+| `frontend/src/app/features/explore/`            | Busca, filtros, cartões e detalhes                |
+| `frontend/src/app/features/register/`           | Formulário e confirmação de cadastro              |
+| `frontend/src/app/core/registration.gateway.ts` | Dados da conta e simulação de envio               |
+| `frontend/src/app/features/about/`              | Explicação da proposta e da jornada prevista      |
+| `*.spec.ts`                                     | Testes de comportamento                           |
 
-## Validação desta entrega
+HTML organiza os elementos; CSS define a apresentação; TypeScript controla o comportamento. O `FormGroup` reúne os campos e suas validações. Um `signal` guarda estado acompanhado pela interface; um `computed` calcula resultados a partir desse estado.
 
-Instalação limpa (`npm ci`), lint, testes Vitest e build de produção foram verificados no ambiente de desenvolvimento. Não foi realizado teste visual em navegador nem análise SonarQube desta branch. Não declarar homologação completa, conformidade WCAG ou aprovação de Quality Gate com base nesses checks.
+## Verificação desta entrega
+
+| Verificação                                                | Resultado          |
+| ---------------------------------------------------------- | ------------------ |
+| Instalação limpa com `npm ci`                              | Concluída          |
+| ESLint                                                     | Sem erros          |
+| Tipos dos testes, com `tsc -p tsconfig.spec.json --noEmit` | Sem erros          |
+| Vitest                                                     | 32 testes passaram |
+| Cobertura V8 de linhas nos arquivos medidos                | 86,95%             |
+| Build Angular de produção                                  | Concluído          |
+| Revisão visual em navegador                                | Pendente           |
+| Análise SonarQube deste código                             | Não executada      |
+
+A suíte verifica os limites do DTO, a separação dos campos do cadastro, erros e nova tentativa, bloqueio de envios repetidos, limpeza da senha, busca, filtros e salvos. Os testes de componentes exercitam a lógica em contexto de injeção; não substituem navegação real em navegador, revisão de acessibilidade ou testes integrados com a API.
+
+A prévia mantém somente e-mails e IDs salvos em memória. Não grava senha, não cria conta real e não adiciona o cadastro simulado à lista fixa de perfis. A integração dependerá das rotas, respostas, erros e regras definitivas do backend.

@@ -27,9 +27,7 @@ export class ProfileDialogComponent {
   @ViewChild("profileDialog", { static: true })
   private dialog!: ElementRef<HTMLDialogElement>;
   label(kind: ProfileKind): string {
-    return { MENTOR: "Mentor", INVESTIDOR: "Investidor", STARTUP: "Startup" }[
-      kind
-    ];
+    return { MENTOR: "Mentor", STARTUP: "Startup em ideação" }[kind];
   }
   open(profile: DemoProfile): void {
     this.selected.set(profile);

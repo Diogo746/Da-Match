@@ -188,6 +188,12 @@ body:has(dialog[open]) {
   line-height: 1.6;
   margin: 8px 0;
 }
+.field-help {
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 8px 0;
+}
 .error-summary {
   border: 1px solid #e6c0bb;
   background: #fff4f1;

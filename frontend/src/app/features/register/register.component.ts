@@ -15,40 +15,45 @@ import {
 import { RouterLink } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import {
-  AccessGateway,
-  AccessReceipt,
-  AccessRequestError,
-} from "../../core/access.gateway";
+  RegistrationGateway,
+  RegistrationReceipt,
+  RegistrationError,
+} from "../../core/registration.gateway";
 import { ProfileKind } from "../../core/profiles.store";
 import { IconComponent } from "../../shared/icon.component";
+
 @Component({
-  selector: "app-access",
+  selector: "app-register",
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./access.component.html",
-  styleUrl: "./access.component.css",
+  templateUrl: "./register.component.html",
+  styleUrl: "./register.component.css",
 })
-export class AccessComponent {
-  private readonly gateway = inject(AccessGateway);
+export class RegisterComponent {
+  private readonly gateway = inject(RegistrationGateway);
   readonly form = new FormGroup({
-    name: new FormControl("", {
+    nome: new FormControl("", {
       nonNullable: true,
       validators: [
         Validators.required,
-        Validators.maxLength(120),
+        Validators.minLength(4),
         Validators.pattern(/\S/),
       ],
     }),
     email: new FormControl("", {
       nonNullable: true,
+      validators: [Validators.required, Validators.email],
+    }),
+    senha: new FormControl("", {
+      nonNullable: true,
       validators: [
         Validators.required,
-        Validators.email,
-        Validators.maxLength(254),
+        Validators.minLength(6),
+        Validators.pattern(/\S/),
       ],
     }),
-    kind: new FormControl<ProfileKind>("STARTUP", {
+    tipoUsuario: new FormControl<ProfileKind>("STARTUP", {
       nonNullable: true,
       validators: [Validators.required],
     }),
@@ -61,35 +66,41 @@ export class AccessComponent {
     [
       {
         value: "STARTUP",
-        title: "Startup",
-        description: "Quero encontrar apoio para meu negócio.",
+        title: "Startup em ideação",
+        description:
+          "Tenho uma ideia e busco orientação para os primeiros passos.",
       },
       {
         value: "MENTOR",
         title: "Mentor",
-        description: "Quero compartilhar minha experiência.",
-      },
-      {
-        value: "INVESTIDOR",
-        title: "Investidor",
-        description: "Quero conhecer novos negócios.",
+        description:
+          "Quero orientar projetos e compartilhar minha experiência.",
       },
     ];
   readonly loading = signal(false);
   readonly error = signal("");
-  readonly receipt = signal<AccessReceipt | null>(null);
+  readonly receipt = signal<RegistrationReceipt | null>(null);
+  readonly passwordVisible = signal(false);
   @ViewChild("receiptHeading") private receiptHeading?: ElementRef<HTMLElement>;
   @ViewChild("errorSummary") private errorSummary?: ElementRef<HTMLElement>;
-  invalid(field: "name" | "email" | "demoConsent"): boolean {
+
+  invalid(field: "nome" | "email" | "senha" | "demoConsent"): boolean {
     return (
       this.form.controls[field].touched && this.form.controls[field].invalid
     );
   }
+
+  togglePassword(): void {
+    this.passwordVisible.update((visible) => !visible);
+  }
+
   async submit(): Promise<void> {
-    if (this.loading()) return;
+    if (this.loading() || this.receipt()) return;
     this.error.set("");
-    this.form.controls.name.setValue(this.form.controls.name.value.trim());
-    this.form.controls.email.setValue(this.form.controls.email.value.trim());
+    this.form.controls.nome.setValue(this.form.controls.nome.value.trim());
+    this.form.controls.email.setValue(
+      this.form.controls.email.value.trim().toLowerCase(),
+    );
     this.form.markAllAsTouched();
     if (this.form.invalid) {
       this.error.set("Confira os campos indicados antes de continuar.");
@@ -98,25 +109,30 @@ export class AccessComponent {
     }
     this.loading.set(true);
     try {
-      const { name, email, kind } = this.form.getRawValue();
-      this.receipt.set(
-        await firstValueFrom(this.gateway.submit({ name, email, kind })),
+      const { nome, email, senha, tipoUsuario } = this.form.getRawValue();
+      const result = await firstValueFrom(
+        this.gateway.register(tipoUsuario, { nome, email, senha }),
       );
+      this.form.controls.senha.reset();
+      this.passwordVisible.set(false);
+      this.receipt.set(result);
       setTimeout(() => this.receiptHeading?.nativeElement.focus());
     } catch (error: unknown) {
       this.error.set(
-        error instanceof AccessRequestError && error.code === "DUPLICATE_EMAIL"
-          ? "Já existe uma solicitação para este e-mail nesta demonstração. Use outro e-mail fictício para testar."
-          : "Não foi possível enviar. Confira os dados e tente novamente.",
+        error instanceof RegistrationError && error.code === "DUPLICATE_EMAIL"
+          ? "Este e-mail já foi usado nesta demonstração. Teste com outro e-mail fictício ou recarregue a página para reiniciar."
+          : "Não foi possível concluir o teste. Confira os dados e tente novamente.",
       );
       setTimeout(() => this.errorSummary?.nativeElement.focus());
     } finally {
       this.loading.set(false);
     }
   }
+
   restart(): void {
     this.receipt.set(null);
     this.error.set("");
-    this.form.reset({ kind: "STARTUP", demoConsent: false });
+    this.passwordVisible.set(false);
+    this.form.reset({ tipoUsuario: "STARTUP", demoConsent: false });
   }
 }
