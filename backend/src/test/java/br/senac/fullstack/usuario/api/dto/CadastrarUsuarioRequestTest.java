@@ -1,4 +1,4 @@
-package br.senac.fullstack.usuario.application.dto;
+package br.senac.fullstack.usuario.api.dto;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
