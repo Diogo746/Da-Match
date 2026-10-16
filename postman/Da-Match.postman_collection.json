@@ -1,0 +1,170 @@
+{
+  "info": {
+    "_postman_id": "89f937f0-df1e-43b4-92d1-19b7680021bb",
+    "name": "Da-Match API",
+    "description": "Coleção baseada na análise do backend em 15/10/2026. As requisições na pasta PENDENTE representam contratos propostos: elas ainda retornam 404 porque não existe MentorController.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "mentorId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Disponíveis agora",
+      "description": "Endpoints que possuem controller no backend atual.",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/health",
+            "description": "HealthCheckController#getHealth"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {", 
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Resposta contém status e timestamp', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('status');",
+                  "    pm.expect(body).to.have.property('timestamp');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Hello world",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hello?name=Postman",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hello"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Postman"
+                }
+              ]
+            },
+            "description": "HelloWorldController#sayHello. O parâmetro name é opcional."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {", 
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Resposta contém mensagem', function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Obter token CSRF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/csrf",
+            "description": "CsrfController#obterToken. Ao criar rotas de escrita protegidas por CSRF, envie o token retornado no header indicado por headerName."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {", 
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Resposta contém os dados do token', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('headerName');",
+                  "    pm.expect(body).to.have.property('token');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "PENDENTE — Mentor (sem controller)",
+      "description": "Nenhuma rota de mentor está exposta pelo backend. As três requisições abaixo foram separadas conforme solicitado e usam convenções REST propostas; valide os paths e os códigos de resposta ao criar o MentorController.",
+      "item": [
+        {
+          "name": "PENDENTE — Registrar mentor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": {\n    \"nome\": \"Mentor de Teste\",\n    \"email\": \"mentor.teste+{{$timestamp}}@example.com\",\n    \"senha\": \"senha-teste-123\"\n  },\n  \"biografia\": \"Mentor com experiência em produtos digitais.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/v1/mentores",
+            "description": "Rota proposta. Contrato derivado de CadastrarMentorRequest. Ainda não existe MentorController; o backend atual responderá 404. Não inclua senhas reais."
+          },
+          "response": []
+        },
+        {
+          "name": "PENDENTE — Buscar mentor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/mentores/{{mentorId}}",
+            "description": "Rota proposta para busca por id do mentor. Ainda não existe MentorController nem método de serviço que busque Mentor por UUID para resposta HTTP; o backend atual responderá 404."
+          },
+          "response": []
+        },
+        {
+          "name": "PENDENTE — Exibir mentores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/mentores",
+            "description": "Rota proposta para listar mentores. Ainda não existe MentorController nem caso de uso de listagem; o backend atual responderá 404."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
