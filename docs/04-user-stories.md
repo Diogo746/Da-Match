@@ -220,3 +220,81 @@
 ---
 
 > ⚠️ **Ponto de atenção para o time:** a entidade `Mentor` da branch `feature/database-models` tem biografia, LinkedIn, Instagram e site. Ainda faltam os campos obrigatórios do SRS para o mentor entrar no matching (setores, áreas de experiência, estágios, formatos, cidade/UF e disponibilidade). Startup e investidor ainda não têm entidade.
+
+---
+
+## 🎯 Épico 3: Descoberta de perfis (DESCOBERTA)
+
+### 🔹 `US-12`: Pesquisar startups
+* **Como** mentor ou investidor,
+* **Quero** buscar startups por nome e filtrar por setor, estágio e localização,
+* **Para que** eu encontre projetos dentro da minha área sem depender só das recomendações.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Filtros combinados):**
+>   * **Dado** que existem startups de setores, estágios e cidades diferentes,
+>   * **Quando** combino filtros (ex.: Tecnologia + Ideação + Recife),
+>   * **Então** aparecem só as startups publicadas que atendem a todos os filtros, em páginas de até 20 itens.
+> * **Cenário 2 (Nada encontrado):**
+>   * **Dado** que nenhuma startup atende aos filtros,
+>   * **Quando** faço a busca,
+>   * **Então** o sistema mostra claramente que não há resultados.
+* *Prioridade:* P1 · *Rastreabilidade:* RF12, RN12, RN13, CA10.
+
+---
+
+### 🔹 `US-13`: Pesquisar mentores
+* **Como** startup,
+* **Quero** buscar mentores por nome, setor, área de experiência, formato e localização,
+* **Para que** eu escolha quem pode me orientar no próximo passo.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Resultado filtrado):**
+>   * **Dado** que apliquei filtros de setor e formato,
+>   * **Quando** vejo a lista,
+>   * **Então** aparecem só mentores publicados e ativos que atendem aos filtros.
+> * **Cenário 2 (Perfil indisponível):**
+>   * **Dado** que um mentor está em rascunho ou suspenso,
+>   * **Quando** faço qualquer busca,
+>   * **Então** ele não aparece.
+* *Prioridade:* P1 · *Rastreabilidade:* RF13, RN12, RN13, CA11, CA12.
+
+---
+
+### 🔹 `US-14`: Pesquisar investidores
+* **Como** startup,
+* **Quero** buscar investidores por setor, estágio de interesse, faixa de investimento, formato e localização,
+* **Para que** eu saiba quem costuma investir em projetos como o meu.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Filtro por faixa):**
+>   * **Dado** que filtrei por uma faixa de investimento,
+>   * **Quando** vejo a lista,
+>   * **Então** aparecem só investidores cuja faixa tem interseção com a que filtrei.
+> * **Cenário 2 (Busca não é conexão):**
+>   * **Dado** que encontrei um investidor na busca,
+>   * **Quando** abro o resultado,
+>   * **Então** nenhum interesse ou conexão é criado automaticamente.
+* *Prioridade:* P1 · *Rastreabilidade:* RF14, RN09, RN12, RN13, CA11.
+
+---
+
+### 🔹 `US-15`: Ver o perfil de um participante
+* **Como** participante,
+* **Quero** abrir o perfil de alguém que encontrei na busca ou nas recomendações,
+* **Para que** eu decida se vale demonstrar interesse.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Só dados públicos):**
+>   * **Dado** que abri um perfil publicado,
+>   * **Quando** vejo os detalhes,
+>   * **Então** aparecem apresentação e campos de descoberta, sem e-mail de login, grupos ou dados administrativos.
+> * **Cenário 2 (Contato protegido):**
+>   * **Dado** que ainda não tenho conexão ativa com a pessoa,
+>   * **Quando** abro o perfil dela,
+>   * **Então** os dados de contato não aparecem.
+* *Prioridade:* P1 · *Rastreabilidade:* RF15, RN12, RN29, CA10, CA11, CA12.
+
+---
+
+> ⚠️ **Ponto de atenção para o time:** pelo SRS (RN12), startup só pesquisa mentores e investidores, e mentor/investidor só pesquisa startups. O protótipo atual mostra as abas "Todos / Mentores / Startups" para qualquer usuário. Na integração com o backend, a tela precisa respeitar o papel de quem está logado.
