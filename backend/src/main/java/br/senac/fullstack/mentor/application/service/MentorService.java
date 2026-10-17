@@ -14,9 +14,12 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Service
 public class MentorService {
+    private static final ZoneId PLATFORM_TIME_ZONE = ZoneId.of("America/Sao_Paulo");
+
     private final MentorRepository mentorRepository;
     private final UsuarioService usuarioService;
     private final MentorMapper mentorMapper;
@@ -38,7 +41,7 @@ public class MentorService {
 
         Mentor mentor = new Mentor(
                 novoUsuario,
-                LocalDate.now(),
+                LocalDate.now(PLATFORM_TIME_ZONE),
                 request.biografia(),
                 request.linkedin(),
                 request.instagram()

@@ -16,6 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
@@ -91,6 +94,7 @@ class MentorServiceTest {
         assertEquals("Experiencia em produtos digitais.", mentor.getBiografia());
         assertEquals("https://www.linkedin.com/in/mentor-teste", mentor.getLinkedin());
         assertEquals("mentor.teste", mentor.getInstagram());
+        assertEquals(LocalDate.now(ZoneId.of("America/Sao_Paulo")), mentor.getDataEntradaPlataforma());
         assertEquals(TipoUsuario.MENTOR, mentor.getUsuario().getTipoUsuario());
         assertSame(mentorResponse, resultado);
     }
