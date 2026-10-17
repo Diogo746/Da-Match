@@ -31,7 +31,8 @@
 | Diogo Barbosa       | diogo.barbosa@edu.pe.senac.br            | **Scrum Master / DevOps Lead**        | Git Flow, CI/CD GitHub Actions & Quality Gate SonarQube          |
 | Mário Brandão       | jose.guimaraes@edu.pe.senac.br           | **Full Stack Lead (Back-End)**        | Arquitetura REST Spring Boot, Security, LLDAP & SQLite3          |
 | Davi Maia           | DAVI.MAIA@edu.pe.senac.br                | **Full Stack Lead (Front-End)**       | Interfaces Angular Standalone, RxJS, Forms & Acessibilidade      |
-| Christopher         | christopher.carvalho@edu.pe.senac.br     | **Product Owner / Analyst**           | Gestão do Backlog, User Stories e ponte com o Cliente Real       |
+| Christopher Lindoso de Carvalho | christopher.carvalho@edu.pe.senac.br     | **Product Owner / Analyst**           | Gestão do Backlog, User Stories e ponte com o Cliente Real       |
+| Nikolas Messias     | nikolas.martins0020016525@edu.pe.senac.br | **Project Manager**                   | Definição do Roadmap e Priorização do Backlog                    |
 
 ---
 
@@ -129,5 +130,5 @@ A autenticação e a autorização serão realizadas pelo **LLDAP**. O LLDAP arm
 
 Ao commitar este arquivo na branch `main`, todos os membros da equipe confirmam o compromisso com o escopo, governança de código e entregas do Projeto Integrador.
 
-- **Data:** ____ / ____ / 2026
-- **Equipe:** *[Nomes dos Integrantes]*
+- **Data:** 17 / 10 / 2026
+- **Equipe:** Diogo Barbosa, Mário Brandão, Davi Maia, Christopher Lindoso de Carvalho e Nikolas Messias
