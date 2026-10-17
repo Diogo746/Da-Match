@@ -573,3 +573,127 @@
 >   * **Então** o sistema recusa.
 * *Prioridade:* P1 · *Rastreabilidade:* RF30, RN19, RN27, CA25.
 * *Observação:* "realizada" é uma declaração do participante. Não comprova investimento, contrato ou resultado.
+
+---
+
+## 🎯 Épico 7: Administração e privacidade (ADMIN)
+
+### 🔹 `US-31`: Suspender e reativar um participante
+* **Como** administrador,
+* **Quero** suspender o acesso de um participante informando o motivo, e reativá-lo depois da revisão,
+* **Para que** eu consiga agir rápido diante de mau uso da plataforma.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Suspensão):**
+>   * **Dado** que o participante está logado e tem conexões ativas,
+>   * **Quando** suspendo o acesso dele,
+>   * **Então** a próxima chamada dele é bloqueada, o perfil sai da descoberta, as conexões ficam SUSPENSAS e as reuniões futuras são canceladas.
+> * **Cenário 2 (Reativação):**
+>   * **Dado** que reativei o participante,
+>   * **Quando** ele volta a usar a plataforma,
+>   * **Então** as reuniões canceladas na suspensão não voltam sozinhas.
+* *Prioridade:* P1 · *Rastreabilidade:* RF31, RN23, RN25, RN29, CA26.
+
+---
+
+### 🔹 `US-32`: Ver indicadores de uso
+* **Como** administrador,
+* **Quero** um painel com perfis ativos por tipo, conexões ativas e reuniões propostas, confirmadas e realizadas, filtrando por período,
+* **Para que** eu acompanhe se a plataforma está gerando conexões de verdade.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Totais corretos):**
+>   * **Dado** uma base de teste com quantidades conhecidas,
+>   * **Quando** escolho um período no painel,
+>   * **Então** os totais batem com os registros.
+> * **Cenário 2 (Acesso restrito):**
+>   * **Dado** que sou startup, mentor ou investidor,
+>   * **Quando** tento abrir o painel administrativo,
+>   * **Então** o acesso é negado.
+* *Prioridade:* P1 · *Rastreabilidade:* RF32, CA27.
+* *Observação:* os números não podem ser apresentados como "investimento captado" ou "impacto comprovado".
+
+---
+
+### 🔹 `US-33`: Consultar a trilha de auditoria
+* **Como** administrador autorizado,
+* **Quero** consultar quem fez o quê e quando (aprovações, acessos, perfis, interesses, conexões, reuniões e mudanças no matching),
+* **Para que** eu consiga investigar problemas e prestar contas.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Evento registrado):**
+>   * **Dado** que uma operação crítica foi concluída,
+>   * **Quando** consulto a trilha,
+>   * **Então** vejo autor, ação, recurso, data/hora e resultado, sem senha nem token.
+> * **Cenário 2 (Acesso restrito):**
+>   * **Dado** que sou participante comum,
+>   * **Quando** tento consultar a trilha geral,
+>   * **Então** o acesso é negado.
+* *Prioridade:* P1 · *Rastreabilidade:* RF33, CA28.
+
+---
+
+### 🔹 `US-34`: Controlar quem vê meu contato
+* **Como** participante,
+* **Quero** saber para que meus dados são usados e decidir se meu e-mail de contato aparece para minhas conexões,
+* **Para que** eu tenha controle sobre minha privacidade.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Contato liberado):**
+>   * **Dado** que autorizei compartilhar meu contato e tenho uma conexão ativa,
+>   * **Quando** a outra parte abre os detalhes da conexão,
+>   * **Então** ela vê meu contato.
+> * **Cenário 2 (Contato retirado):**
+>   * **Dado** que retirei a autorização ou a conexão foi encerrada,
+>   * **Quando** a outra parte consulta de novo, pela tela ou pela API,
+>   * **Então** o contato não é mais retornado.
+* *Prioridade:* P1 · *Rastreabilidade:* RF34, RN29, CA29.
+
+---
+
+### 🔹 `US-35`: Desativar meu perfil
+* **Como** titular de um perfil,
+* **Quero** pedir a desativação do meu perfil no DaMatch,
+* **Para que** eu saia da plataforma quando não quiser mais participar.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Desativação):**
+>   * **Dado** que confirmei a desativação,
+>   * **Quando** o pedido é processado,
+>   * **Então** meu perfil some da descoberta, meus interesses ativos são retirados, minhas conexões são encerradas e as reuniões futuras são canceladas.
+* *Prioridade:* P1 · *Rastreabilidade:* RF35, RN23, RN29, CA30.
+
+---
+
+### 🔹 `US-36`: Receber avisos dentro da plataforma
+* **Como** startup, mentor ou investidor,
+* **Quero** ver avisos de interesse recebido, nova conexão, encerramento e mudanças de reunião, marcando como lidos,
+* **Para que** eu não perca nada sem precisar conferir cada tela.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Um aviso por evento):**
+>   * **Dado** que alguém demonstrou interesse em mim,
+>   * **Quando** abro meus avisos,
+>   * **Então** vejo um único aviso desse evento e posso marcá-lo como lido.
+> * **Cenário 2 (Não é chat):**
+>   * **Dado** que estou na tela de avisos,
+>   * **Quando** procuro como responder,
+>   * **Então** não existe envio de mensagem livre. Chat está fora do MVP.
+* *Prioridade:* **P2** (desejável) · *Rastreabilidade:* RF36, CA31.
+* *Observação:* se ficar para depois, os eventos continuam visíveis nas telas de interesses, conexões e reuniões.
+
+---
+
+## 📋 Resumo do backlog
+
+| Épico | Histórias | Requisitos | Prioridade |
+| --- | --- | --- | --- |
+| 1. Acesso | US-01 a US-05 | RF01–RF05 | P1 |
+| 2. Perfis | US-06 a US-11 | RF06–RF11 | P1 |
+| 3. Descoberta | US-12 a US-15 | RF12–RF15 | P1 |
+| 4. Matching | US-16 a US-19 | RF16–RF19 | P1 |
+| 5. Interesses e conexões | US-20 a US-25 | RF20–RF25 | P1 |
+| 6. Reuniões | US-26 a US-30 | RF26–RF30 | P1 |
+| 7. Administração e privacidade | US-31 a US-36 | RF31–RF36 | P1 (US-36 é P2) |
+
+**Total:** 36 histórias, uma para cada requisito funcional do SRS v1.0.
