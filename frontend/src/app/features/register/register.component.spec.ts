@@ -14,6 +14,8 @@ import {
   RegistrationError,
 } from "../../core/registration.gateway";
 
+import { ProfileSessionStore } from "../../core/profile-session.store";
+import { emptyProfile } from "../../core/profile.models";
 let injector: EnvironmentInjector;
 const receipt: RegistrationReceipt = {
   nome: "Maria Teste",
@@ -25,7 +27,7 @@ function create(
   register: RegistrationGateway["register"] = vi.fn(() => of(receipt)),
 ) {
   injector = createEnvironmentInjector(
-    [{ provide: RegistrationGateway, useValue: { register } }],
+    [{ provide: RegistrationGateway, useValue: { register } }, ProfileSessionStore],
     Injector.NULL as EnvironmentInjector,
   );
   return {
@@ -167,5 +169,26 @@ describe("Formulário de cadastro", () => {
     expect(component.error()).toBe("");
     expect(component.receipt()).toEqual(receipt);
     expect(register).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("Do cadastro ao perfil", () => {
+  it("ativa o perfil somente após completar as etapas e não leva credenciais para ele", async () => {
+    const { component } = create();
+    fill(component); await component.submit();
+    expect(component.session.profile()).toBeNull();
+    component.completeProfile({ ...emptyProfile("STARTUP"), projectName: "Minha Ideia", sectors: ["TECH"], topics: ["VALIDATION"], format: "ONLINE", days: ["MON"], periods: ["EVENING"] });
+    expect(component.profileReady()).toBe(true);
+    expect(component.session.profile()!.displayName).toBe("Minha Ideia");
+    expect(component.form.controls.senha.value).toBe("");
+    expect(JSON.stringify(component.session.profile())).not.toContain("email");
+    component.restart();
+    expect(component.session.profile()).toBeNull();
+    expect(component.profileReady()).toBe(false);
+  });
+  it("não permite concluir o perfil antes do cadastro", () => {
+    const { component } = create();
+    component.completeProfile(emptyProfile("STARTUP"));
+    expect(component.session.profile()).toBeNull();
   });
 });

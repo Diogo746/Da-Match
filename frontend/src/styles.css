@@ -1,11 +1,9 @@
+@import "./app/shared/theme.css";
+@import "./app/features/profile/profile-choices.css";
+@import "./app/shared/motion.css";
 :root {
-  --navy: #0b3044;
-  --teal: #176b58;
-  --muted: #657a80;
-  --border: #dce5df;
-  --bg: #f6f8f5;
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
-  color: var(--navy);
+  color:var(--text-primary);
   background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -38,7 +36,7 @@ a {
   color: inherit;
 }
 :focus-visible {
-  outline: 3px solid #349c81;
+  outline: 3px solid var(--focus);
   outline-offset: 4px;
 }
 h1,
@@ -67,33 +65,32 @@ p {
   text-decoration: none;
   cursor: pointer;
   line-height: 1.4;
-  transition: background 0.15s;
 }
 .button app-icon {
   width: 16px;
   height: 16px;
 }
 .button-primary {
-  background: var(--teal);
-  color: #fff;
+  background: var(--action-bg);
+  color:var(--action-text);
 }
 .button-primary:hover {
-  background: #105544;
+  background: var(--action-hover);
 }
 .button-secondary {
-  background: #fff;
+  background: var(--surface);
   border-color: var(--border);
-  color: var(--navy);
+  color:var(--text-primary);
 }
 .button-secondary:hover {
-  background: #edf5f0;
+  background: var(--surface-hover);
 }
 .button-light {
-  background: #d5eadb;
-  color: #103f33;
+  background: var(--button-soft-bg);
+  color: var(--button-soft-text);
 }
 .button-light:hover {
-  background: #c0dfce;
+  background: var(--button-soft-hover);
 }
 .button-small {
   font-size: 11px;
@@ -130,8 +127,8 @@ p {
   position: fixed;
   left: 15px;
   top: -70px;
-  background: #fff;
-  color: var(--navy);
+  background: var(--surface);
+  color:var(--text-primary);
   padding: 12px 18px;
   z-index: 100;
   border: 2px solid var(--teal);
@@ -170,20 +167,20 @@ body:has(dialog[open]) {
   font-weight: 400;
 }
 .form-input {
-  border: 1px solid #ccd8d2;
+  border: 1px solid var(--field-border);
   border-radius: 8px;
   width: 100%;
   height: 43px;
   padding: 0 12px;
   font-size: 12px;
-  color: var(--navy);
-  background: #fff;
+  color:var(--text-primary);
+  background: var(--surface);
 }
 .form-input[aria-invalid="true"] {
-  border-color: #aa3e3e;
+  border-color: var(--error-border);
 }
 .field-error {
-  color: #963d3d;
+  color: var(--error-text);
   font-size: 10px;
   line-height: 1.6;
   margin: 8px 0;
@@ -195,9 +192,9 @@ body:has(dialog[open]) {
   margin: 8px 0;
 }
 .error-summary {
-  border: 1px solid #e6c0bb;
-  background: #fff4f1;
-  color: #8b3933;
+  border: 1px solid var(--error-border);
+  background: var(--error-bg);
+  color: var(--error-text);
   padding: 12px;
   border-radius: 8px;
   font-size: 12px;

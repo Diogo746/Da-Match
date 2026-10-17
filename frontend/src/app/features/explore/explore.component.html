@@ -5,17 +5,25 @@
       <div>
         <p class="eyebrow">EXPLORE O ECOSSISTEMA</p>
         <h2 id="profiles-title">
-          {{ savedOnly ? "Seus perfis salvos" : "Encontre quem pode somar" }}
+          {{ savedOnly ? "Seus perfis salvos" : personalized() ? "Indicações para o seu próximo passo" : "Encontre quem pode somar" }}
         </h2>
       </div>
       <span class="fiction-label">Perfis fictícios</span>
     </div>
+    @if (session.profile(); as viewer) {
+      @if (!savedOnly) {
+        <div class="personal-context"><div><strong>{{ viewer.displayName }}</strong><p>{{ viewer.answers.kind === 'MENTOR' && !viewer.answers.accepting ? 'Novas mentorias em pausa. Você pode retomar quando quiser.' : 'Indicações a partir das suas respostas. Os perfis desta prévia são fictícios.' }}</p></div><a routerLink="/meu-perfil">Editar perfil<app-icon name="arrow" /></a></div>
+      }
+    }
     <div class="profile-tabs" role="group" aria-label="Tipo de perfil">
+      @if (session.profile() && !savedOnly) {
+        <button type="button" [class.selected]="personalized()" [attr.aria-pressed]="personalized()" (click)="showRecommendations()"><app-icon name="spark" />Para você<span>{{ recommendationCount() }}</span></button>
+      }
       @for (tab of kinds; track tab.value) {
         <button
           type="button"
-          [class.selected]="kind() === tab.value"
-          [attr.aria-pressed]="kind() === tab.value"
+          [class.selected]="!personalized() && kind() === tab.value"
+          [attr.aria-pressed]="!personalized() && kind() === tab.value"
           (click)="setKind(tab.value)"
         >
           {{ tab.label }}<span>{{ count(tab.value) }}</span>
@@ -58,6 +66,7 @@
         >
       </div>
     </div>
+    @if (personalized()) { <p class="matching-note">A compatibilidade indica aderência às respostas. Abra o perfil para ver os motivos e os pontos de atenção.</p> }
     <div class="results-heading">
       <p role="status" aria-live="polite">
         {{ visibleProfiles().length }}
@@ -79,38 +88,22 @@
         <app-profile-card
           [profile]="profile"
           [saved]="store.isSaved(profile.id)"
+          [match]="matchFor(profile)"
           (saveToggled)="toggleSaved(profile)"
-          (profileOpened)="details.open(profile)"
+          (profileOpened)="details.open(profile, matchFor(profile))"
         />
       } @empty {
         <div class="empty-state">
           <app-icon name="search" />
-          <h3>
-            {{
-              savedOnly && !store.savedIds().length
-                ? "Sua lista começa com uma descoberta."
-                : "Nenhum perfil por aqui ainda."
-            }}
-          </h3>
-          <p>
-            {{
-              savedOnly && !store.savedIds().length
-                ? "Salve um perfil usando o ícone de marcador. Ele aparecerá aqui durante esta sessão."
-                : "Experimente outra palavra-chave ou amplie os filtros para encontrar novos caminhos."
-            }}
-          </p>
-          @if (savedOnly && !store.savedIds().length) {
-            <a class="button button-primary" routerLink="/"
-              >Descobrir perfis<app-icon name="arrow"
-            /></a>
+          @if (personalized()) {
+            <h3>{{ hasFilters() ? 'Nenhuma indicação com esses filtros.' : 'Ainda não encontramos uma indicação para este momento.' }}</h3>
+            <p>{{ hasFilters() ? 'Limpe os filtros para conferir suas indicações.' : 'Suas preferências continuam valendo. Você pode revisar o perfil ou conhecer o catálogo de demonstração.' }}</p>
+            <div class="empty-actions"><a class="button button-primary" routerLink="/meu-perfil">Revisar meu perfil</a><button class="button button-secondary" type="button" (click)="clearFilters(); setKind('TODOS')">Explorar o catálogo</button></div>
           } @else {
-            <button
-              class="button button-primary"
-              (click)="clearFilters(); setKind('TODOS')"
-              type="button"
-            >
-              Mostrar todos os perfis
-            </button>
+            <h3>{{ savedOnly && !store.savedIds().length ? 'Sua lista começa com uma descoberta.' : 'Nenhum perfil por aqui ainda.' }}</h3>
+            <p>{{ savedOnly && !store.savedIds().length ? 'Salve um perfil usando o ícone de marcador. Ele aparecerá aqui durante esta sessão.' : 'Experimente outra palavra-chave ou amplie os filtros para encontrar novos caminhos.' }}</p>
+            @if (savedOnly && !store.savedIds().length) { <a class="button button-primary" routerLink="/">Descobrir perfis<app-icon name="arrow" /></a> }
+            @else { <button class="button button-primary" type="button" (click)="clearFilters(); setKind('TODOS')">Mostrar todos os perfis</button> }
           }
         </div>
       }
