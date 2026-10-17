@@ -1,5 +1,7 @@
 # Lumen — mascote do DaMatch
 
+> Referência histórica das versões anteriores. O comportamento atual está em [18-frontend-v0.5.0.md](18-frontend-v0.5.0.md) e a identidade visual em [19-visual-identity.md](19-visual-identity.md).
+
 Lumen é um vaga-lume que representa uma ideia ganhando luz com o apoio de quem orienta. A versão aprovada é a **opção 3, em guache**, com azul e verde-petróleo mais escuros, detalhes em menta e luz amarelo-esverdeada. O personagem tem anatomia simplificada de inseto e olho lateral, sem rosto humano, mãos ou expressão de pessoa.
 
 A pintura é exclusiva do mascote. A interface mantém cartões, tipografia e controles limpos. Sua presença é pequena e complementar às instruções, especialmente no cadastro.

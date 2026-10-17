@@ -42,7 +42,7 @@ import { IconComponent } from "../../shared/icon.component";
     <section class="demo-scope">
       <h2>O que você pode experimentar agora</h2>
       <p>
-        Explore perfis fictícios, monte seu perfil em quatro etapas com o Lumen e
+        Explore perfis fictícios, monte seu perfil em cinco etapas com o Lumen e
         receba indicações com porcentagem, motivos e pontos de atenção.
         A compatibilidade é calculada por regras, a partir das suas respostas.
         Cadastros, perfis e salvos são temporários. Contas reais, login,

@@ -78,3 +78,9 @@ O setor "ainda descobrindo" precisa de uma decisão própria: ou o SRS passa a a
 | Data | |
 | Participantes | |
 | Próximo passo | Atualizar o SRS (seção 7) e os cenários da US-16 com a regra escolhida |
+
+## Atualização do protótipo — v0.5.0
+
+O frontend demonstrativo passa a usar `damatch-rules-v2`: necessidades até 70, setor até 20 e momento dentro da ideação até 10, com filtros de modalidade, pares de agenda e frequência. Experiência prática desempata notas iguais. O setor em descoberta continua parcial. A especificação atual está no [documento 18](18-frontend-v0.5.0.md).
+
+Essa implementação experimental não registra uma aprovação do PO ou uma alteração automática do SRS. O alinhamento da regra definitiva e dos critérios de aceitação com a equipe continua necessário antes do cálculo no backend.

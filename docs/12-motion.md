@@ -1,5 +1,7 @@
 # Movimento no DaMatch
 
+> Referência histórica das versões anteriores. O comportamento atual está em [18-frontend-v0.5.0.md](18-frontend-v0.5.0.md) e a identidade visual em [19-visual-identity.md](19-visual-identity.md).
+
 As animações acompanham o percurso do usuário sem atrasar ações. Não existem telas de espera artificiais, mudanças automáticas de respostas, contagem animada de porcentagens ou efeitos de competição.
 
 ## Comportamentos

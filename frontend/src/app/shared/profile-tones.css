@@ -1,0 +1,9 @@
+.mentor-deep{--profile-cover:#2a536a;--profile-tint:#c8dee8;--profile-ink:#2a536a}
+.mentor-soft{--profile-cover:#3c7189;--profile-tint:#dce7ec;--profile-ink:#2a536a}
+.startup-deep{--profile-cover:#176b58;--profile-tint:#c6e3d4;--profile-ink:#235849}
+.startup-soft{--profile-cover:#2c8067;--profile-tint:#dcece3;--profile-ink:#235849}
+:root[data-theme="dark"] .mentor-deep{--profile-tint:#243f50;--profile-ink:#cbe5f3}
+:root[data-theme="dark"] .mentor-soft{--profile-tint:#2d5064;--profile-ink:#cbe5f3}
+:root[data-theme="dark"] .startup-deep{--profile-tint:#24483f;--profile-ink:#d2ecdf}
+:root[data-theme="dark"] .startup-soft{--profile-tint:#2c594b;--profile-ink:#d2ecdf}
+

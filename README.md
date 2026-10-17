@@ -1,5 +1,7 @@
 # DaMatch
 
+> **Frontend v0.5.0:** questionário com Lumen, compatibilidade e paleta azul/verde. Veja o [guia de execução](frontend/README.md) e o [registro da revisão](docs/18-frontend-v0.5.0.md).
+
 > **Projeto Integrador — Extensão Full Stack | ADS — Faculdade Senac Recife**
 
 🚧 **Status: Em desenvolvimento**

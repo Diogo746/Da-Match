@@ -1,0 +1,7 @@
+<app-lumen [compact]="compact()" [pose]="pose()" [priority]="priority()" />
+<div class="speech">
+  <span class="speaker">Lumen <span>· seu guia</span></span>
+  @if (question()) { <h2 #heading [id]="questionId()" tabindex="-1" class="question-title">{{ question() }}</h2> }
+  <p class="speech-text">{{ message() }}</p>
+</div>
+

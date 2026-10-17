@@ -1,16 +1,9 @@
-.mint {
-  background: var(--tone-mint-bg);
-  color: var(--tone-mint-text);
-}
-.sand {
-  background: var(--tone-sand-bg);
-  color: var(--tone-sand-text);
-}
-.blue {
-  background: var(--tone-blue-bg);
-  color: var(--tone-blue-text);
-}
+
+
+
 .avatar {
+  background: var(--profile-tint);
+  color: var(--profile-ink);
   width: 47px;
   height: 47px;
   display: flex;
@@ -89,6 +82,8 @@
   backdrop-filter: blur(4px);
 }
 .dialog-cover {
+  background: var(--profile-cover);
+  color: #fff;
   height: 85px;
   padding: 25px;
   position: relative;

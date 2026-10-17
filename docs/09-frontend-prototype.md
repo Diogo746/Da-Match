@@ -1,129 +1,44 @@
-# DaMatch — protótipo do frontend v0.4.2
+# 09 — Protótipo do frontend v0.5.0
 
-## Entrega
+O frontend atual atende startups em ideação e mentores. A demonstração reúne cadastro, cinco etapas guiadas pelo Lumen, revisão antes de concluir, Meu perfil com edição por seção, descoberta e recomendações explicáveis. Os perfis públicos são fictícios.
 
-Esta revisão da v0.4 mantém o foco em startups em ideação e mentores. A experiência reúne cadastro básico, quatro etapas de perfil, prévia do cartão e recomendações explicáveis. **Meu perfil** passa a abrir o resumo das informações. A edição é uma ação explícita, com respostas preenchidas, acesso direto às seções, salvamento e cancelamento. O mascote Lumen em guache, a luz reforçada, os balões de fala e os temas claro/escuro foram preservados.
+O cadastro conectado de mentor da v0.4.3 foi preservado. Ele usa o contrato da main fornecida em 17/10/2026 e depende do backend em execução. Questionário e recomendações continuam demonstrativos.
 
-O pacote contém o frontend, documentação e a correção da transferência de cobertura no workflow `.github/workflows/ci-cd.yml`. Os arquivos do backend e do banco não foram alterados. O cálculo demonstrativo usa TypeScript e dados fictícios, com as responsabilidades da futura versão Spring Boot descritas em `10-profile-and-matching.md`.
+## Executar
 
-## Organização
-
-| Arquivo/pasta em frontend | Responsabilidade |
-| --- | --- |
-| `src/app/core/profile.models.ts` | Tipos, códigos das perguntas e dados mínimos do perfil |
-| `src/app/core/profile-session.store.ts` | Perfil temporário da sessão, separado das credenciais |
-| `src/app/core/matching.engine.ts` | Possibilidade de mentoria, pontuação, motivos e limitações |
-| `src/app/core/demo-profiles.json` | Conteúdo estático dos dez perfis fictícios |
-| `src/app/core/profiles.store.ts` | Construção dos perfis com campos derivados e salvos |
-| `src/app/core/registration.gateway.ts` | Simulação do cadastro básico |
-| `src/app/features/register/` | Dados básicos e passagem para a montagem do perfil |
-| `src/app/features/profile/profile.component.*` | Consulta do perfil concluído e entrada na edição opcional |
-| `src/app/features/profile/profile-setup.component.*` | Quatro etapas no cadastro e seções acessíveis diretamente na edição |
-| `src/app/features/profile/` | Prévia do cartão e conclusão do perfil |
-| `src/app/features/explore/` | Home, busca, filtros, recomendações, cartões e detalhes |
-| `src/app/shared/lumen.component.ts`, `.css` | Mascote com núcleo e halo luminoso, mais intensos no escuro |
-| `src/app/shared/lumen-guide.component.ts` | Balões com falas curtas para o contexto atual |
-| `src/app/core/theme.store.ts` | Tema inicial, alternância e preferência no navegador |
-| `src/app/shared/theme.css` | Paletas completas de tema claro e escuro |
-| `src/app/shared/motion.css` | Transições e preferência de movimento |
-| `public/assets/lumen.png` | Mascote original com transparência |
-| `angular.json`, alvo `test` | Vitest integrado à compilação oficial do Angular |
-| `sonar-project.properties` | Localização do LCOV para o scanner do frontend |
-
-## Rodar
-
-Abra a pasta `frontend` no VS Code e use uma versão compatível de Node, conforme seu README.
+Dentro da pasta `frontend`:
 
 ```powershell
 npm.cmd ci
 npm.cmd start
 ```
 
-Acesse **http://localhost:4200**. O terminal deve permanecer aberto. Ctrl+C encerra o servidor.
+Abra http://localhost:4200. O [README do frontend](../frontend/README.md) contém os roteiros de startup, mentor e integração com a API.
 
-A porta continua 4200. Esta demonstração não precisa da API, do banco ou de LLDAP. Os dados são apagados ao recarregar.
+## Organização
 
-## Roteiro de revisão manual
-
-| Ação | Resultado esperado |
+| Arquivo ou pasta em frontend | Responsabilidade |
 | --- | --- |
-| Abrir a home sem perfil | Catálogo público e convite para montar o perfil, sem percentuais inventados |
-| Preencher os dados básicos | Continuar para as quatro etapas; senha removida após a simulação |
-| Tentar avançar sem resposta | Mensagem indicando o que falta, com foco acessível |
-| Escolher uma única necessidade | Permitir concluir e preservar os 70 pontos possíveis desse critério |
-| Escolher duas necessidades | Mostrar a ordem 1 e 2; trocar a ordem exige desmarcar e escolher novamente |
-| Mentor selecionar setores/especialidades | Limitar a dois setores ou atuação geral e a três especialidades |
-| Selecionar presencial | Pedir a cidade; lista reduzida explicitada |
-| Selecionar exclusivamente online | Omitir a cidade e remover o valor da escolha anterior |
-| Concluir o perfil | Apresentar o cartão e levar às indicações para o tipo oposto |
-| Abrir os detalhes | Explicar critérios, pontos e limitações |
-| Abrir Meu perfil depois de concluir o cadastro | Mostrar informações e cartão, sem abrir o questionário |
-| Navegar para outra aba e voltar a Meu perfil | Continuar mostrando o resumo do perfil concluído |
-| Usar Editar perfil | Abrir as respostas atuais, com seções acessíveis diretamente |
-| Usar Alterar em uma seção | Abrir essa seção com as escolhas já marcadas |
-| Salvar alterações válidas | Voltar ao resumo, confirmar o salvamento e recalcular as indicações |
-| Salvar com uma resposta obrigatória vazia | Mostrar a seção incompleta e a mensagem; manter o perfil anterior |
-| Cancelar a edição ou navegar para fora dela | Descartar o rascunho e manter as respostas salvas |
-| Abrir Meu perfil sem concluir um cadastro | Mostrar convite para criar o perfil, sem inventar dados |
-| Mentor pausar novas startups | Esvaziar as indicações e informar a pausa |
-| Escolher setor em descoberta | Mostrar compatibilidade em construção, sem porcentagem |
-| Não haver indicação | Preservar as preferências e oferecer revisão ou catálogo |
-| Salvar e remover um perfil | Atualizar a página de salvos durante a sessão |
-| Recarregar | Reiniciar perfil, salvos e e-mails utilizados no cadastro simulado |
-| Usar Tab, Shift+Tab, Enter e Espaço | Conferir ordem e visibilidade do foco, escolhas e botões |
-| Abrir detalhes e usar Escape | Conferir o comportamento nativo do dialog e retorno do foco |
-| Reduzir a janela para celular | Conferir leitura, navegação, cartões e ausência de corte de conteúdo |
-| Observar a lanterna do Lumen | Núcleo e halo variam lentamente, sem movimento do personagem |
-| Alternar o tema pelo botão no topo | Adaptar textos, superfícies, formulários e detalhes; aumentar o brilho no escuro |
-| Recarregar após escolher o tema | Restaurar apenas a aparência; reiniciar os dados de demonstração |
-| Avançar as etapas com Lumen | Atualizar a fala do balão de acordo com a pergunta |
-| Usar Pausar animações no rodapé | Interromper luz e transições; manter a escolha ao navegar |
-| Usar Retomar animações | Reativar os movimentos, respeitando a preferência do dispositivo |
-| Ativar redução de movimento no sistema | Remover animações e transições, mantendo os fluxos utilizáveis |
+| `src/app/core/profile.models.ts` | Códigos, cinco etapas e validação do perfil |
+| `src/app/core/profile-session.store.ts` | Perfil temporário e versão do questionário |
+| `src/app/core/matching.engine.ts` | Viabilidade, regra v2, pontuação e explicações |
+| `src/app/core/profile-appearance.ts` | Variação de cor estável por papel/identificador |
+| `src/app/core/motion.store.ts` | Pausa e preferência de movimento reduzido |
+| `src/app/core/demo-profiles.json` | Dez perfis fictícios com respostas v2 |
+| `src/app/core/http-mentor-registration.gateway.ts` | CSRF e cadastro real de mentor |
+| `src/app/features/profile/` | Questionário, revisão, cartão, conclusão e Meu perfil |
+| `src/app/features/explore/` | Catálogo, filtros, salvos, indicações e detalhes |
+| `src/app/shared/lumen*` | Pose, halo, flutuação e balões |
+| `src/app/shared/profile-tones.css` | Variações de azul/verde em ambos os temas |
+| `public/assets/lumen/` | Seis poses transparentes do Lumen |
 
-A meta de preenchimento é breve, mas o tempo real precisa ser medido com participantes. O progresso mostra etapas efetivamente preenchidas. Não existem pontos de competição, ranking de pessoas, diagnóstico de personalidade ou conexão automática a partir da nota.
+## Verificações locais
 
-## Verificações
+Lint, tipos dos testes, 168 testes em 15 arquivos e builds DEMO/API concluídos. Cobertura: linhas 97,60%; declarações 96,19%; ramificações 95,36%; funções 92,60%. Os limites globais de 80% foram mantidos.
 
-Na pasta `frontend`:
+A revisão visual em navegador real não foi concluída por indisponibilidade do navegador no ambiente. A homologação com Java/Supabase, leitor de tela e participantes também continua pendente. Os testes HTTP usam respostas simuladas.
 
-```powershell
-npm.cmd run lint
-npm.cmd run test:coverage
-npm.cmd run build
-```
+A aprovação no SonarQube deve ser conferida no pipeline após o envio desta versão. O guia detalhado está em [18-frontend-v0.5.0.md](18-frontend-v0.5.0.md); a identidade visual, em [19-visual-identity.md](19-visual-identity.md).
 
-O comando de teste usa o builder oficial `@angular/build:unit-test` com Vitest e jsdom. Isso compila os mesmos templates usados pelo aplicativo e permite testar cliques, validações, rotas e conteúdo renderizado. O suporte nativo de abertura de `dialog` é emulado somente no ambiente de teste, porque não está implementado pelo jsdom.
+As descrições anteriores dos documentos 10 a 14 são históricas; o documento 18 registra o comportamento atual.
 
-O build verifica os templates e gera `dist/frontend/browser`. O relatório local fica em `coverage/frontend/index.html`; o LCOV, em `coverage/frontend/lcov.info`. Os limites globais de cobertura são de 80% nas quatro métricas configuradas.
-
-A revisão visual em navegador, o teste com leitor de tela, a avaliação de tempo de preenchimento e o teste integrado com a API não foram executados nesta entrega. A análise no SonarQube também depende do pipeline da equipe.
-
-## Resultado da validação local
-
-| Verificação | Resultado |
-| --- | --- |
-| Dependências | Mesma base instalada e validada na entrega anterior; sem mudanças nesta revisão |
-| Lint | Sem erros |
-| Tipos dos testes | Sem erros |
-| Vitest + Angular | 112 testes passaram em 9 arquivos |
-| Cobertura de linhas nos arquivos medidos | 96,66% |
-| Cobertura de declarações | 95,32% |
-| Cobertura de ramificações | 94,57% |
-| Cobertura de funções | 88,82% |
-| Motor de compatibilidade | 100% nas quatro métricas |
-| Limites globais de 80% | Atendidos |
-| Build de produção | Concluído, sem avisos |
-| Auditoria de dependências | Não repetida nesta revisão; dependências preservadas |
-
-Os pacotes Angular permanecem em 22.2.3. O `package.json` e o lockfile mudaram somente o número da versão do projeto para 0.4.2. A configuração usa APIs de teste oficiais do Angular, sem adaptações privadas do compilador. O fluxo corrigido e seu roteiro de teste estão em [14-my-profile.md](14-my-profile.md).
-
-## SonarQube e envio ao repositório
-
-Esta revisão corrige a passagem de `coverage/frontend/lcov.info` do job `test` para `sonar-frontend`. O primeiro publica o artefato `frontend-coverage-report`; o segundo o baixa, verifica que não está vazio e só então executa o scanner. O processo usa o `sonar-project.properties` do frontend, sem sobrescrever `sonar.sources` e `sonar.exclusions` pela linha de comando.
-
-Os testes não usam mais comandos alternativos que permitiam continuar sem cobertura. Lint, teste com cobertura e build de produção devem concluir com sucesso. Os limites globais continuam em 80% e as regras do Quality Gate não foram alteradas.
-
-Os apontamentos conhecidos receberam ajustes no código. A duplicação vinha do catálogo fictício; os dados estáticos foram separados e os campos compartilhados são derivados em uma única função. A equivalência dos dez perfis com a v0.4.1 foi conferida. O relatório detalhado e os limites da validação estão em [15-sonar-and-coverage.md](15-sonar-and-coverage.md).
-
-Envie a entrega pela branch `feature/frontend-v0.4.2` e abra um PR para `main`. Os arquivos a versionar pertencem a `frontend/`, `docs/` e `.github/workflows/ci-cd.yml`. O pacote não inclui Git, dependências instaladas nem builds. A execução real dos Actions e a aprovação do Quality Gate precisam ser conferidas após o push, antes do merge.

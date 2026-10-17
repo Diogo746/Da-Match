@@ -120,7 +120,7 @@ describe("Interações de descoberta", () => {
   });
 });
 
-const startupAnswers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["TECH"], topics: ["VALIDATION", "PRICING"], format: "ONLINE", cityId: "", days: ["THU"], periods: ["EVENING"], accepting: true };
+const startupAnswers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["TECH"], topics: ["VALIDATION", "PRICING"], format: "ONLINE", cityId: "", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true };
 describe("Indicações personalizadas na home", () => {
   it("ordena mentores compatíveis por pontuação e explica o resultado", () => {
     const { component } = create();

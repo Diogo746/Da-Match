@@ -1,5 +1,7 @@
 # DaMatch — perfil e compatibilidade v0.3
 
+> Referência histórica das versões anteriores. O comportamento atual está em [18-frontend-v0.5.0.md](18-frontend-v0.5.0.md) e a identidade visual em [19-visual-identity.md](19-visual-identity.md).
+
 ## Escopo
 
 Startups exclusivamente em ideação e mentores. O cadastro básico da conta é seguido por quatro etapas curtas de perfil, compartilhando os mesmos códigos de setor, assunto, modalidade e disponibilidade. O frontend demonstra o comportamento em memória; o contrato abaixo é uma proposta para alinhamento, não uma API existente.

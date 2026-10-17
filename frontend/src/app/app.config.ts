@@ -7,8 +7,8 @@ import { provideRouter, withInMemoryScrolling } from "@angular/router";
 import { routes } from "./app.routes";
 import {
   RegistrationGateway,
-  DemoRegistrationGateway,
 } from "./core/registration.gateway";
+import { registrationGatewayFactory } from "./core/registration.config";
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
@@ -17,6 +17,6 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({ scrollPositionRestoration: "enabled" }),
     ),
     provideHttpClient(),
-    { provide: RegistrationGateway, useClass: DemoRegistrationGateway },
+    { provide: RegistrationGateway, useFactory: registrationGatewayFactory },
   ],
 };

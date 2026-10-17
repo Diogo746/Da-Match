@@ -33,11 +33,14 @@ async function account(kind: ProfileKind) {
   const label = [...root.querySelectorAll<HTMLLabelElement>(".role-option")].find((item) => item.textContent?.includes(kind === "MENTOR" ? "Mentor" : "Startup"))!;
   label.querySelector<HTMLInputElement>('input[type="radio"]')!.click();
   fill("register-name", "Maria Teste"); fill("register-email", "maria@example.test"); fill("register-password", "senha-inventada");
+  if (kind === "MENTOR") fill("register-biography", "Mentora em tecnologia e produtos digitais.");
   root.querySelector<HTMLInputElement>('input[formControlName="demoConsent"]')!.click();
   await click("Continuar para meu perfil");
+  await click(kind === "MENTOR" ? "Descoberta do problema" : "Um problema que quero entender"); await click("Continuar");
 }
 async function onlineSchedule() {
   await click("Online"); await click("Continuar");
+  await click("Podemos combinar");
   root.querySelector<HTMLButtonElement>('button[aria-label="Quinta-feira"]')!.click();
   await click("Noite");
 }
@@ -77,7 +80,7 @@ it("permite pausar e retomar o movimento mantendo a escolha durante a navegaçã
   expect(pause.getAttribute("aria-pressed")).toBe("true");
   expect(root.querySelector(".app-layout")?.classList.contains("motion-paused")).toBe(true);
   await TestBed.inject(Router).navigateByUrl("/cadastro"); await settle();
-  expect(root.querySelector("app-lumen img")?.getAttribute("src")).toBe("assets/lumen.png");
+  expect(root.querySelector("app-lumen img")?.getAttribute("src")).toBe("assets/lumen/welcome.png");
   expect(root.querySelector(".app-layout")?.classList.contains("motion-paused")).toBe(true);
   await click("Retomar animações");
   expect(pause.getAttribute("aria-pressed")).toBe("false");
@@ -89,7 +92,7 @@ describe("Fluxo renderizado de cadastro, perfil e home", () => {
     await render("/cadastro"); await click("Modo escuro"); await account("STARTUP");
     await click("Tecnologia"); await click("Continuar");
     await click("Validar a ideia"); await click("Preços e custos"); await click("Continuar");
-    await onlineSchedule(); await click("Meu perfil está pronto");
+    await onlineSchedule(); await click("Revisar meu perfil"); await click("Concluir meu perfil");
     expect(root.querySelector("app-profile-complete")).not.toBeNull();
     expect(document.activeElement).toBe(root.querySelector("#complete-title"));
     expect(root.textContent).not.toContain("senha-inventada");
@@ -121,8 +124,10 @@ describe("Fluxo renderizado de cadastro, perfil e home", () => {
   it("mostra startups ao mentor e atualiza a home ao pausar novas mentorias", async () => {
     await render("/cadastro"); await account("MENTOR");
     await click("Tecnologia"); await click("Continuar");
-    await click("Validar a ideia"); await click("Primeiro protótipo"); await click("Continuar");
-    await onlineSchedule(); await click("Meu perfil está pronto"); await goHomeFromCompletion();
+    await click("Validar a ideia"); await click("Primeiro protótipo");
+    root.querySelector<HTMLButtonElement>('button[aria-label="Experiência prática em Validar a ideia"]')!.click();
+    root.querySelector<HTMLButtonElement>('button[aria-label="Experiência prática em Primeiro protótipo"]')!.click(); await settle(); await click("Continuar");
+    await onlineSchedule(); await click("Revisar meu perfil"); await click("Concluir meu perfil"); await goHomeFromCompletion();
     expect(root.querySelector(".compatibility-label")?.textContent).toContain("100%");
     expect(root.querySelector(".kind-label")?.textContent).toContain("Startup");
     await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
@@ -148,7 +153,7 @@ describe("Fluxo renderizado de cadastro, perfil e home", () => {
   });
   it("apresenta uma indicação parcial sem fabricar porcentagem", async () => {
     await render("/");
-    const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["DISCOVERING"], topics: ["VALIDATION"], format: "ONLINE", cityId: "", days: ["THU"], periods: ["EVENING"], accepting: true };
+    const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["DISCOVERING"], topics: ["VALIDATION"], format: "ONLINE", cityId: "", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true };
     TestBed.inject(ProfileSessionStore).save("Maria Teste", answers); await settle();
     expect(root.querySelectorAll(".partial-label").length).toBeGreaterThan(0);
     expect(root.querySelector(".compatibility-label")).toBeNull();
@@ -157,18 +162,18 @@ describe("Fluxo renderizado de cadastro, perfil e home", () => {
 
 it("cancela alterações e volta a abrir Meu perfil sem reapresentar o questionário", async () => {
   await render("/");
-  const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["TECH"], topics: ["VALIDATION"], format: "PRESENCIAL", cityId: "PE_RECIFE", days: ["THU"], periods: ["EVENING"], accepting: true };
+  const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["TECH"], topics: ["VALIDATION"], format: "PRESENCIAL", cityId: "PE_RECIFE", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true };
   TestBed.inject(ProfileSessionStore).save("Maria Teste", answers);
   await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
   expect(root.querySelector(".profile-details")?.textContent).toContain("Recife");
   await click("Editar perfil");
-  await click("Educação");
+  await click("Setor"); await click("Educação");
   expect(TestBed.inject(ProfileSessionStore).profile()!.answers.sectors).toEqual(["TECH"]);
   await click("Cancelar");
   expect(root.querySelector("app-profile-setup")).toBeNull();
   expect(root.querySelector(".profile-details")?.textContent).toContain("Tecnologia");
   expect(document.activeElement).toBe(root.querySelector("#my-profile-title"));
-  await click("Editar perfil"); await click("Educação");
+  await click("Editar perfil"); await click("Setor"); await click("Educação");
   await TestBed.inject(Router).navigateByUrl("/"); await settle();
   await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
   expect(root.querySelector("app-profile-setup")).toBeNull();
@@ -177,7 +182,7 @@ it("cancela alterações e volta a abrir Meu perfil sem reapresentar o question�
 
 it.each(["PE_OLINDA", ""])("apresenta a modalidade flexível e a cidade declarada no perfil: %s", async (cityId) => {
   await render("/");
-  const answers: ProfileDraft = { kind: "MENTOR", projectName: "", sectors: ["TECH", "EDUCATION"], topics: ["VALIDATION", "PROTOTYPE"], format: "AMBOS", cityId, days: ["MON", "THU"], periods: ["MORNING", "EVENING"], accepting: true };
+  const answers: ProfileDraft = { kind: "MENTOR", projectName: "", sectors: ["TECH", "EDUCATION"], topics: ["VALIDATION", "PROTOTYPE"], format: "AMBOS", cityId, moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "MON", period: "MORNING" }, { day: "MON", period: "EVENING" }, { day: "THU", period: "MORNING" }, { day: "THU", period: "EVENING" }], accepting: true };
   TestBed.inject(ProfileSessionStore).save("Maria Teste", answers);
   await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
   const details = root.querySelector(".profile-details")?.textContent;
@@ -191,13 +196,13 @@ it.each(["PE_OLINDA", ""])("apresenta a modalidade flexível e a cidade declarad
 
 it("limpa o perfil pela interface e mantém acessíveis o cadastro e a explicação do produto", async () => {
   await render("/");
-  const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["TECH"], topics: ["VALIDATION"], format: "ONLINE", cityId: "", days: ["THU"], periods: ["EVENING"], accepting: true };
+  const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["TECH"], topics: ["VALIDATION"], format: "ONLINE", cityId: "", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true };
   TestBed.inject(ProfileSessionStore).save("Maria Teste", answers);
   await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
   await click("Limpar perfil de teste");
   expect(root.querySelector(".no-profile")?.textContent).toContain("Seu próximo passo começa pelo seu perfil");
   expect(TestBed.inject(ProfileSessionStore).profile()).toBeNull();
   await TestBed.inject(Router).navigateByUrl("/como-funciona"); await settle();
-  expect(root.textContent).toContain("monte seu perfil em quatro etapas com o Lumen");
+  expect(root.textContent).toContain("monte seu perfil em cinco etapas com o Lumen");
   expect(root.querySelector('.topbar-actions a')?.textContent).toContain("Criar perfil");
 });
