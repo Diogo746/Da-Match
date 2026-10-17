@@ -1,84 +1,116 @@
-# DaMatch — frontend
+# DaMatch — frontend v0.4.2
 
-Protótipo Angular para conectar **startups em ideação e mentores** do Nordeste. A interface mantém azul-marinho, verde-petróleo e menta. Há quatro mentores e duas startups fictícias, busca, filtros, detalhes, salvos e cadastro demonstrativo.
+Protótipo Angular para **startups em ideação e mentores** do Nordeste. O cadastro recebe o apoio do **Lumen**, mascote original do projeto, e apresenta quatro pequenas etapas. As respostas geram indicações com porcentagem, motivos e pontos de atenção. Identidade visual em azul-marinho, verde-petróleo e menta.
 
 ## Executar no Windows
 
-Requer Node.js 24 a partir de **24.15.0**, dentro da linha 24, ou Node.js 22 a partir de **22.22.3**, dentro da linha 22. O npm acompanha o Node.
+Requer Node.js **24.15.0 ou superior na linha 24**, ou **22.22.3 ou superior na linha 22**. O npm acompanha o Node.
 
-1. Abra esta pasta `frontend` no VS Code. Ela contém `package.json`, `angular.json` e `src`.
-2. Abra **Terminal → Novo Terminal** e execute:
+Abra esta pasta `frontend`, que contém `package.json`, no VS Code. No terminal:
 
 ```powershell
-node -v
-npm.cmd -v
 npm.cmd ci
 npm.cmd start
 ```
 
-3. Abra **http://localhost:4200** quando a compilação terminar. Mantenha o terminal aberto. Para parar, pressione **Ctrl+C**.
+Abra **http://localhost:4200** e mantenha o terminal aberto. Para parar, use **Ctrl+C**. Em Linux/macOS, utilize `npm` no lugar de `npm.cmd`. Nas próximas execuções, basta `npm.cmd start`; reinstale com `npm.cmd ci` ao atualizar as dependências ou trocar de versão.
 
-No Linux/macOS, use `npm` no lugar de `npm.cmd`. Se o Angular perguntar sobre compartilhar dados de uso, responder **N** permite continuar normalmente. Não abra `index.html` com dois cliques.
+Esta demonstração funciona sem backend ou banco de dados. Não abra `index.html` por duplo clique.
 
-O backend, o banco e o LLDAP não precisam estar rodando para testar esta versão. Para executar outra vez, basta `npm.cmd start`; repita `npm.cmd ci` quando as dependências forem alteradas.
+## Correções da v0.4.2
 
-## Cadastro e relação com o backend
+Esta revisão trata os apontamentos conhecidos da análise do PR #5: validação de e-mail, elementos HTML com semântica nativa, seletores CSS repetidos, expressões condicionais e APIs obsoletas. O catálogo fictício agora fica em `src/app/core/demo-profiles.json`; uma função deriva os campos compartilhados sem mudar os dez perfis.
 
-A tela **Cadastrar**, em `/cadastro`, oferece os perfis **Startup em ideação** e **Mentor**. Ambos usam os campos encontrados em `CadastrarUsuarioRequest`:
+O workflow incluído em `../.github/workflows/ci-cd.yml` publica o LCOV no job de testes e o baixa antes do scanner. Lint, testes com cobertura e build são obrigatórios. A aprovação final ainda depende da nova execução no GitHub e no SonarQube. Veja [docs/15-sonar-and-coverage.md](../docs/15-sonar-and-coverage.md).
 
-| Campo   | Regra aplicada                                                                                   |
-| ------- | ------------------------------------------------------------------------------------------------ |
-| `nome`  | Obrigatório; mínimo de 4 caracteres após remover espaços nas extremidades                        |
-| `email` | Obrigatório; formato válido; espaços nas extremidades removidos e caixa normalizada no protótipo |
-| `senha` | Obrigatória; mínimo de 6 caracteres; não pode conter apenas espaços                              |
+## Meu perfil
 
-Exemplo de dados da conta, conforme o DTO existente:
+**Meu perfil** agora abre uma página de consulta, com suas informações, preferências e cartão. O questionário inicial não reaparece ao navegar para essa aba depois de concluir o perfil.
 
-```json
-{
-  "nome": "Maria Teste",
-  "email": "maria@example.test",
-  "senha": "senha-de-teste"
-}
-```
+Use **Editar perfil** para revisar as respostas ou **Alterar** na seção desejada para ir direto ao assunto. Tudo vem preenchido. **Salvar alterações** aplica as mudanças e recalcula as indicações; **Cancelar** ou sair da tela mantém as respostas anteriores. Na edição, as quatro seções ficam acessíveis sem repetir a sequência do cadastro.
 
-O tipo `STARTUP` ou `MENTOR` fica separado desse objeto na chamada interna de `RegistrationGateway`. O DTO enviado pelo colega não define esse campo no JSON. A ciência do modo de demonstração também pertence apenas à interface.
+O perfil continua temporário nesta demonstração: recarregar a página reinicia os dados. A consulta e a edição estão detalhadas em [docs/14-my-profile.md](../docs/14-my-profile.md).
 
-Os ZIPs de backend analisados não contêm rotas de cadastro, entidade própria de startup ou mentor, nem o campo `biografia`. Por isso, esta versão prepara o cadastro básico da conta com os campos existentes. Os dados completos dos perfis dependem da implementação desses contratos pelo backend.
+## Aparência e movimento
 
-A senha é usada apenas durante o preenchimento e a validação do teste. Não é gravada em armazenamento do navegador, incluída na confirmação ou enviada por HTTP. Após sucesso, seu campo é limpo. O BCrypt encontrado no backend será responsabilidade da integração real; esta demonstração não simula autenticação nem guarda hashes.
+- **Tema claro e escuro** em todas as telas, com seletor no topo e preferência lembrada no navegador.
+- **Brilho do Lumen reforçado**, com núcleo na lanterna e halo externo, mais intenso no escuro.
+- **Balões de fala** na home, no cadastro e nas quatro etapas, com mensagens curtas que acompanham o contexto.
 
-## Roteiro de teste manual
+## Recursos
 
-Utilize dados fictícios, como `Maria Teste`, `maria@example.test` e uma senha inventada.
+- Lumen em guache 2D, com tons escuros, sem traços humanos e com uma luz lenta no abdômen.
+- Transições discretas de navegação, etapas, escolhas e abertura de perfis, com opção de pausar as animações.
+- Dados básicos da conta, seguidos por quatro etapas: setor, necessidades/especialidades, modalidade e agenda.
+- Prévia do cartão atualizada durante o preenchimento e progresso calculado a partir das etapas respondidas.
+- Home personalizada para startup ou mentor, com resultados ordenados por compatibilidade.
+- Detalhes com motivos, limitações e decomposição da pontuação.
+- Consulta em **Meu perfil**, com edição opcional e recálculo das indicações ao salvar.
+- Pausa para novas mentorias, sem mudar as preferências do participante para preencher a lista.
+- Descoberta pública, busca sem acentos, filtros e salvos preservados.
+- Dez perfis fictícios: seis mentores e quatro startups em ideação.
 
-| Ação                                                        | Resultado esperado                                                  |
-| ----------------------------------------------------------- | ------------------------------------------------------------------- |
-| Abrir Descobrir                                             | Quatro mentores em ordem alfabética                                 |
-| Escolher Todos                                              | Seis perfis: quatro mentores e duas startups                        |
-| Escolher Startups                                           | Mostrar somente duas startups em ideação                            |
-| Combinar Mentores + Tecnologia + Recife                     | Mostrar Marina Albuquerque e Rafael Nascimento                      |
-| Buscar `ANDRE`                                              | Encontrar André Monteiro, sem exigir acento ou caixa                |
-| Buscar texto inexistente                                    | Apresentar estado vazio e opção de ampliar a busca                  |
-| Limpar filtros                                              | Restaurar os resultados da categoria selecionada                    |
-| Abrir Ver perfil e pressionar Escape                        | Abrir e depois fechar os detalhes                                   |
-| Salvar um perfil e abrir Perfis salvos                      | Mostrar o perfil durante esta sessão                                |
-| Remover dos salvos                                          | Atualizar a lista                                                   |
-| Abrir Cadastrar                                             | Oferecer Startup em ideação e Mentor                                |
-| Enviar formulário vazio                                     | Apresentar os campos obrigatórios                                   |
-| Usar nome `Ana`, e-mail inválido ou senha de 5 caracteres   | Impedir a conclusão                                                 |
-| Clicar em Mostrar/Ocultar                                   | Alternar a visibilidade da senha sem enviar o formulário            |
-| Enviar dados válidos com ciência da demonstração            | Mostrar confirmação local, perfil e e-mail de teste; limpar a senha |
-| Clicar repetidamente durante o envio                        | Concluir somente um envio                                           |
-| Testar outro cadastro com o mesmo e-mail em caixa diferente | Informar duplicidade na sessão, mesmo ao trocar de tipo de perfil   |
-| Recarregar a página                                         | Reiniciar salvos e cadastros temporários                            |
-| Navegar com Tab/Shift+Tab e reduzir a janela                | Conferir foco, leitura e adaptação do layout                        |
+O catálogo público fica acessível antes do cadastro. Porcentagens só aparecem quando há um perfil preenchido para comparar.
 
-Os perfis exibidos são exemplos fixos. Um cadastro simulado não adiciona um novo cartão à descoberta.
+## Tema claro e escuro
+
+Use o botão **Modo escuro / Modo claro**, no topo. A primeira abertura acompanha a preferência do dispositivo quando não há escolha salva. Ao alternar, a preferência fica no navegador e é restaurada ao recarregar. Somente o tema é lembrado; conta, perfil e salvos continuam temporários.
+
+Se o navegador bloquear o armazenamento, a alternância continua funcionando durante a sessão. Nenhuma informação de cadastro é guardada junto à preferência de aparência. Os detalhes estão em [docs/13-appearance.md](../docs/13-appearance.md).
+
+## Movimento e acessibilidade
+
+A lanterna do Lumen combina um núcleo luminoso e um halo externo. A intensidade aumenta e reduz em um ciclo de **6,8 segundos**, com brilho mais forte no modo escuro, sem apagar a ilustração nem piscar rapidamente. A navegação, as etapas e a abertura dos perfis usam transições curtas. O menu permanece estável.
+
+No rodapé, **Pausar animações** interrompe os movimentos e as transições durante a sessão; **Retomar animações** restaura o comportamento padrão. A preferência **reduzir movimento** do dispositivo tem prioridade. No modo reduzido, as mesmas informações e ações ficam disponíveis sem animação. O comportamento está documentado em [docs/12-motion.md](../docs/12-motion.md).
+
+## Teste rápido como startup
+
+1. Clique em **Montar meu perfil** ou **Criar perfil**.
+2. Escolha **Startup em ideação**. Use `Maria Teste`, `maria@example.test` e uma senha inventada com pelo menos seis caracteres. Confirme o modo de demonstração.
+3. Clique em **Continuar para meu perfil**.
+4. Em **Setor**, selecione **Tecnologia**. O nome da ideia é opcional.
+5. Escolha **Validar a ideia** primeiro e **Preços e custos** depois. A ordem define a prioridade.
+6. Escolha **Online**.
+7. Marque **quinta-feira** e **Noite**, conclua e clique em **Ver minhas indicações**.
+8. Marina Albuquerque e Rafael Nascimento devem aparecer com **80%**: atendem à necessidade principal e ao setor, sem cobrir a secundária.
+9. Abra **Ver perfil** para conferir os motivos, o ponto de atenção e os pontos de cada critério.
+10. Abra **Meu perfil**. A página deve mostrar o resumo, sem questionário.
+11. Em **O que sua ideia precisa**, clique em **Alterar**. As necessidades atuais já devem estar marcadas. Desmarque **Preços e custos** e clique em **Salvar alterações**.
+12. Você volta ao resumo. Em **Ver indicações**, Marina e Rafael agora devem aparecer com **100%**: a única necessidade passa a valer os 70 pontos.
+13. Para testar o cancelamento, edite outra resposta e clique em **Cancelar**. O resumo e as indicações devem manter os dados salvos anteriormente.
+
+Para experimentar o estado vazio, selecione **Presencial** em **Olinda**. O catálogo de teste não tem mentor presencial nessa cidade. A aplicação mantém sua escolha e oferece revisar o perfil ou explorar o catálogo.
+
+## Teste rápido como mentor
+
+Use outro e-mail fictício, ou recarregue a página para reiniciar a demonstração.
+
+1. Escolha **Mentor** no cadastro.
+2. Selecione **Tecnologia** e as especialidades **Validar a ideia** e **Primeiro protótipo**.
+3. Escolha **Online**, **quinta-feira** e **Noite**. Mantenha ativa a opção de receber novas startups.
+4. Na home, **Semente Labs** deve aparecer com **100% nos critérios declarados**.
+5. Abra **Meu perfil** e clique em **Alterar** na seção **Disponibilidade**. Desmarque **Estou recebendo novas startups** e salve. O resumo deve indicar **Novas mentorias em pausa**; as indicações ficam em pausa e o catálogo público continua disponível.
+
+## Como a compatibilidade funciona
+
+O cálculo está em `src/app/core/matching.engine.ts` e usa regras determinísticas, sem IA ou serviço externo.
+
+| Critério | Pontos |
+| --- | ---: |
+| Necessidade principal atendida | 50 |
+| Necessidade secundária atendida | 20 |
+| Experiência declarada no setor | 30 |
+
+Quando a startup escolhe apenas uma necessidade, ela vale os **70 pontos**, para não punir a ausência da resposta opcional. Um mentor de atuação geral recebe **15 dos 30 pontos de setor**; experiência direta recebe 30. Um setor diferente recebe zero nesse critério.
+
+Antes de recomendar, verificamos se o mentor recebe novas startups, se as modalidades permitem um encontro e se existem dias e períodos em comum. Para encontros exclusivamente presenciais, a cidade precisa coincidir. Os dias e períodos marcados representam combinações disponíveis; as faixas são indicativas, no horário de Recife, e não reservam uma reunião.
+
+Uma indicação precisa atender a pelo menos uma necessidade. Coincidência de setor, sozinha, não basta. O setor **Ainda estou descobrindo** permite apresentar pontos em comum, mas mantém a porcentagem como pendente. A página nunca inventa um percentual completo para esse caso.
+
+A pontuação representa **aderência às respostas**, não probabilidade de sucesso. Os pesos iniciais precisam ser avaliados com participantes e com a equipe. Interesse mútuo, conexão e agendamento são funcionalidades futuras.
 
 ## Verificações automáticas
-
-Dentro de `frontend`, execute:
 
 ```powershell
 npm.cmd run lint
@@ -86,26 +118,30 @@ npm.cmd run test:coverage
 npm.cmd run build
 ```
 
-`npm.cmd test` executa os testes sem gerar cobertura. A suíte utiliza **Vitest**, não Karma/Jasmine.
+Os testes usam **Vitest pelo builder oficial do Angular**, com compilação dos templates e DOM simulado em jsdom. O comando continua o mesmo; a configuração fica no alvo `test` de `angular.json`. `npm.cmd test` executa sem cobertura e `npm.cmd run test:watch` acompanha alterações.
 
-Nesta entrega, a instalação limpa, o lint, a checagem de tipos dos testes e os **32 testes** passaram. O relatório V8 apresentou **86,95% de cobertura de linhas nos arquivos medidos**. O relatório local pode ser aberto em `coverage/index.html`, e o LCOV é gerado em `coverage/lcov.info`.
+A cobertura tem mínimo global de **80% em linhas, declarações, funções e ramificações**. O teste falha se um desses limites não for atendido.
 
-O build de produção fica em `dist/frontend/browser`. Para hospedar, utilize um servidor HTTP com fallback de navegação para `index.html`; não abra o HTML compilado por `file://`.
+- Relatório HTML: `coverage/frontend/index.html`.
+- Relatório para o SonarQube: `coverage/frontend/lcov.info`.
+- Build de produção: `dist/frontend/browser`.
 
-A análise SonarQube e a revisão visual em navegador não foram executadas nesta entrega. A aprovação do Quality Gate depende da análise do commit no pipeline da equipe.
+### Resultado desta entrega
 
-## Dificuldades comuns
+**112 testes passaram em 9 arquivos**, incluindo os fluxos renderizados de cadastro, consulta do perfil, edição por seção, validação, cancelamento e atualização das indicações para os dois tipos de participante. Os novos casos cobrem e-mails inválidos e o contrato do catálogo fictício. A cobertura medida apresentou **96,66% de linhas**, 95,32% de declarações, 94,57% de ramificações e 88,82% de funções. O motor de compatibilidade teve 100% nas quatro métricas. Lint, verificação de tipos dos testes e build de produção concluídos sem erros.
 
-| Situação                                             | Como resolver                                          |
-| ---------------------------------------------------- | ------------------------------------------------------ |
-| `node` não reconhecido                               | Instalar uma versão compatível e reabrir o VS Code     |
-| Bloqueio de `npm.ps1`                                | Usar `npm.cmd`                                         |
-| `package.json` não encontrado                        | Conferir se o terminal está dentro de `frontend`       |
-| Porta 4200 ocupada                                   | Encerrar o outro servidor com Ctrl+C                   |
-| Dependências inconsistentes depois de trocar a pasta | Parar o servidor e executar `npm.cmd ci` na pasta nova |
+As dependências foram preservadas nesta revisão, com Angular 22.2.3. `package.json` e `package-lock.json` mudam apenas a versão do projeto para 0.4.2. As verificações reutilizaram a instalação da v0.4.1; a auditoria de dependências não foi repetida nesta revisão.
 
-## Limites e integração
+O arquivo `sonar-project.properties` define `src` como origem e aponta para o LCOV. O workflow preserva essa configuração, transfere o relatório entre os jobs e aguarda o Quality Gate. Os resultados locais não comprovam a aprovação no servidor, cujas métricas de código novo podem diferir da cobertura global local.
 
-O envio é simulado por `DemoRegistrationGateway`. Os e-mails usados no teste e os perfis salvos ficam somente na memória até recarregar a página. Não há criação real de conta, login, persistência, chamada à API de negócio ou cálculo de matching.
+Para hospedar o build, use servidor HTTP com fallback de rotas para `index.html`.
 
-A implementação HTTP deverá ser ligada a `RegistrationGateway` quando o backend definir rotas, respostas e erros. As regras definitivas e o armazenamento da senha protegida pertencem à API. O guia de integração dos arquivos no repositório está em [docs/09-frontend-prototype.md](../docs/09-frontend-prototype.md).
+## Dados e integração
+
+Esta versão simula a conta com `DemoRegistrationGateway`. O objeto básico da conta continua com `nome`, `email` e `senha`. A senha é validada, não é enviada por HTTP ou gravada em armazenamento, e seu campo é limpo após a confirmação do teste. Nome e e-mail são normalizados; a senha não tem seus espaços removidos.
+
+As respostas adicionais ficam em `ProfileSessionStore`, separadas das credenciais. Perfil, e-mails usados no teste e salvos existem apenas em memória e são apagados ao recarregar. O perfil criado personaliza a sessão; não adiciona automaticamente um cartão ao catálogo fictício.
+
+A integração real exige combinar rotas e DTOs com o backend. O cálculo definitivo deve acontecer no Spring Boot, com validação e autorização no servidor. O contrato proposto e os casos de teste estão em [docs/10-profile-and-matching.md](../docs/10-profile-and-matching.md).
+
+A revisão visual em navegador e a avaliação com usuários continuam necessárias. Os testes de DOM verificam interação e conteúdo; não medem layout, contraste, leitor de tela ou tempo real de preenchimento. O roteiro manual consta em [docs/09-frontend-prototype.md](../docs/09-frontend-prototype.md).

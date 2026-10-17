@@ -36,6 +36,17 @@
       }
     </div>
     <div class="card-bottom">
+      @if (match(); as result) {
+        @if (result.eligible && result.relevant) {
+          <div class="compatibility-summary">
+            @if (result.score !== null) {
+              <span class="compatibility-label"><strong>{{ result.score }}%</strong> de compatibilidade</span>
+              <div class="compatibility-track" aria-hidden="true"><i [style.width.%]="result.score"></i></div>
+            } @else { <span class="partial-label">Compatibilidade em construção</span> }
+            <p>{{ result.reasons[0] }}</p>
+          </div>
+        }
+      }
       <span><app-icon name="clock" />{{ profile().availability }}</span
       ><button
         type="button"

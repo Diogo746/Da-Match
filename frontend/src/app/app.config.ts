@@ -2,7 +2,7 @@ import {
   ApplicationConfig,
   provideZonelessChangeDetection,
 } from "@angular/core";
-import { provideHttpClient, withFetch } from "@angular/common/http";
+import { provideHttpClient } from "@angular/common/http";
 import { provideRouter, withInMemoryScrolling } from "@angular/router";
 import { routes } from "./app.routes";
 import {
@@ -16,7 +16,7 @@ export const appConfig: ApplicationConfig = {
       routes,
       withInMemoryScrolling({ scrollPositionRestoration: "enabled" }),
     ),
-    provideHttpClient(withFetch()),
+    provideHttpClient(),
     { provide: RegistrationGateway, useClass: DemoRegistrationGateway },
   ],
 };

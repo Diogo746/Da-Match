@@ -16,7 +16,7 @@ import { IconComponent } from "../../shared/icon.component";
         de partida.
       </p>
       <a routerLink="/cadastro" class="button button-primary"
-        >Testar cadastro<app-icon name="arrow"
+        >Montar meu perfil<app-icon name="arrow"
       /></a>
     </section>
     <section class="journey" aria-label="Jornada prevista do produto">
@@ -42,10 +42,11 @@ import { IconComponent } from "../../shared/icon.component";
     <section class="demo-scope">
       <h2>O que você pode experimentar agora</h2>
       <p>
-        Explore perfis fictícios, combine filtros, salve perfis nesta sessão e
-        teste o cadastro de startup em ideação ou mentor com nome, e-mail e
-        senha fictícios. Criação de conta, login, matching, conexões e reuniões
-        ainda dependem da integração com o backend.
+        Explore perfis fictícios, monte seu perfil em quatro etapas com o Lumen e
+        receba indicações com porcentagem, motivos e pontos de atenção.
+        A compatibilidade é calculada por regras, a partir das suas respostas.
+        Cadastros, perfis e salvos são temporários. Contas reais, login,
+        conexões e reuniões dependem da integração com o backend.
       </p>
       <a class="text-button" routerLink="/"
         >Explorar os perfis<app-icon name="arrow"
@@ -84,11 +85,11 @@ import { IconComponent } from "../../shared/icon.component";
       padding: 25px 20px;
       border: 1px solid var(--border);
       border-radius: 12px;
-      background: #fff;
+      background: var(--surface);
     }
     .journey article > span {
       font-size: 24px;
-      color: #83ab9a;
+      color: var(--text-soft);
       font-weight: 600;
     }
     .journey h2 {
@@ -107,8 +108,8 @@ import { IconComponent } from "../../shared/icon.component";
     .about-note {
       display: flex;
       gap: 18px;
-      background: #e4f0e9;
-      border: 1px solid #cfe2d7;
+      background: var(--surface-tint);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 25px;
       margin: 28px 0;
@@ -161,7 +162,7 @@ export class AboutComponent {
       number: "02",
       title: "Descoberta com mais contexto",
       description:
-        "Busca e recomendações deverão facilitar a comparação e apresentar os motivos de compatibilidade.",
+        "As respostas do perfil ajudam a ordenar indicações e explicar os motivos de compatibilidade.",
     },
     {
       number: "03",

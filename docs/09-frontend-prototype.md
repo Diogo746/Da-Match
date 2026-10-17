@@ -1,124 +1,129 @@
-# DaMatch — protótipo do frontend v0.2
+# DaMatch — protótipo do frontend v0.4.2
 
-Esta versão adapta o frontend da branch `feature/frontend-access` ao escopo de **startups em ideação e mentores**. Mantém a identidade visual e as funcionalidades de descoberta, detalhes e salvos. O backend não é alterado por este pacote.
+## Entrega
 
-## Mudanças
+Esta revisão da v0.4 mantém o foco em startups em ideação e mentores. A experiência reúne cadastro básico, quatro etapas de perfil, prévia do cartão e recomendações explicáveis. **Meu perfil** passa a abrir o resumo das informações. A edição é uma ação explícita, com respostas preenchidas, acesso direto às seções, salvamento e cancelamento. O mascote Lumen em guache, a luz reforçada, os balões de fala e os temas claro/escuro foram preservados.
 
-- Dois tipos de participação: startup em ideação e mentor.
-- Seis perfis fictícios: quatro mentores e duas startups em ideação.
-- Busca sem diferença de acento ou caixa, filtros por setor e cidade e resultados em ordem de nome.
-- Cadastro em `/cadastro`, com nome, e-mail e senha, baseado no DTO existente do backend.
-- O caminho anterior `/solicitar-acesso` redireciona para `/cadastro`.
-- Confirmação demonstrativa com o perfil e o e-mail usados no teste.
-- Validação dos campos, prevenção de envios repetidos e tratamento de e-mail repetido na sessão.
-- Senha oculta por padrão, botão Mostrar/Ocultar e limpeza do campo após o sucesso.
-- Testes ajustados ao novo escopo e documentação de execução atualizada.
+O pacote contém o frontend, documentação e a correção da transferência de cobertura no workflow `.github/workflows/ci-cd.yml`. Os arquivos do backend e do banco não foram alterados. O cálculo demonstrativo usa TypeScript e dados fictícios, com as responsabilidades da futura versão Spring Boot descritas em `10-profile-and-matching.md`.
 
-## O que foi considerado do backend
+## Organização
 
-A referência são os ZIPs `Da-Match-feature-database-models.zip` e `Da-Match-main (1).zip`, enviados para análise. Seus 78 arquivos têm conteúdo idêntico. O frontend usado como base veio do ZIP separado `Da-Match-feature-frontend-access(1).zip`.
+| Arquivo/pasta em frontend | Responsabilidade |
+| --- | --- |
+| `src/app/core/profile.models.ts` | Tipos, códigos das perguntas e dados mínimos do perfil |
+| `src/app/core/profile-session.store.ts` | Perfil temporário da sessão, separado das credenciais |
+| `src/app/core/matching.engine.ts` | Possibilidade de mentoria, pontuação, motivos e limitações |
+| `src/app/core/demo-profiles.json` | Conteúdo estático dos dez perfis fictícios |
+| `src/app/core/profiles.store.ts` | Construção dos perfis com campos derivados e salvos |
+| `src/app/core/registration.gateway.ts` | Simulação do cadastro básico |
+| `src/app/features/register/` | Dados básicos e passagem para a montagem do perfil |
+| `src/app/features/profile/profile.component.*` | Consulta do perfil concluído e entrada na edição opcional |
+| `src/app/features/profile/profile-setup.component.*` | Quatro etapas no cadastro e seções acessíveis diretamente na edição |
+| `src/app/features/profile/` | Prévia do cartão e conclusão do perfil |
+| `src/app/features/explore/` | Home, busca, filtros, recomendações, cartões e detalhes |
+| `src/app/shared/lumen.component.ts`, `.css` | Mascote com núcleo e halo luminoso, mais intensos no escuro |
+| `src/app/shared/lumen-guide.component.ts` | Balões com falas curtas para o contexto atual |
+| `src/app/core/theme.store.ts` | Tema inicial, alternância e preferência no navegador |
+| `src/app/shared/theme.css` | Paletas completas de tema claro e escuro |
+| `src/app/shared/motion.css` | Transições e preferência de movimento |
+| `public/assets/lumen.png` | Mascote original com transparência |
+| `angular.json`, alvo `test` | Vitest integrado à compilação oficial do Angular |
+| `sonar-project.properties` | Localização do LCOV para o scanner do frontend |
 
-| Código do backend                                      | Relação com o frontend                                                                                      |
-| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `usuario/application/dto/CadastrarUsuarioRequest.java` | Define nome, e-mail e senha; nome com mínimo de 4 caracteres e senha com mínimo de 6                        |
-| `shared/enums/TipoUsuario.java`                        | Contém `STARTUP`, `MENTOR` e `ADMIN`; o cadastro público desta prévia oferece os dois tipos de participante |
-| `usuario/application/service/UsuarioService.java`      | Tem a criação interna da conta, verificação de e-mail e codificação da senha                                |
-| `usuario/domain/entity/Usuario.java`                   | Representa a conta no banco; o frontend não solicita os identificadores gerados internamente                |
+## Rodar
 
-Ainda não há rotas de cadastro nem campos próprios de startup ou mentor nesses arquivos. O exemplo de mentor com `usuario` e `biografia` fornecido na conversa é uma indicação de formato futuro, mas não tem implementação correspondente nos ZIPs. A prévia usa os três campos do DTO existente, sem presumir esse contrato futuro.
-
-O objeto `RegistrationRequest` contém exatamente `nome`, `email` e `senha`. O tipo do perfil é um argumento separado de `RegistrationGateway.register`. Isso organiza a interface enquanto o contrato HTTP não está definido; não indica que já exista uma rota capaz de receber o cadastro.
-
-O banco configurado no backend enviado é PostgreSQL/Supabase. A documentação geral ainda contém referências ao planejamento anterior. Esta alteração não modifica o banco nem decide a futura autenticação.
-
-## Executar para testar
-
-1. Extraia `DaMatch-Frontend-v0.2.zip` em uma pasta nova.
-2. Abra a pasta `frontend` extraída no VS Code.
-3. Use Node 24 a partir de 24.15.0 ou Node 22 a partir de 22.22.3, dentro das respectivas linhas.
-4. No terminal dessa pasta, execute:
+Abra a pasta `frontend` no VS Code e use uma versão compatível de Node, conforme seu README.
 
 ```powershell
 npm.cmd ci
 npm.cmd start
 ```
 
-5. Abra **http://localhost:4200**. Não é necessário iniciar Java ou banco de dados.
-6. Siga o roteiro de testes em `frontend/README.md`.
-7. Para parar o servidor, pressione Ctrl+C.
+Acesse **http://localhost:4200**. O terminal deve permanecer aberto. Ctrl+C encerra o servidor.
 
-O pacote funciona sozinho para teste e não contém histórico Git. Se `git status` informar que a pasta extraída não é um repositório, isso é esperado. Os commits devem ser feitos na sua cópia já conectada ao GitHub.
+A porta continua 4200. Esta demonstração não precisa da API, do banco ou de LLDAP. Os dados são apagados ao recarregar.
 
-## Aplicar na sua cópia do repositório
+## Roteiro de revisão manual
 
-Aplique depois de testar a pasta extraída. O pacote tem apenas o frontend e este guia: não substitua a raiz do repositório nem o backend.
+| Ação | Resultado esperado |
+| --- | --- |
+| Abrir a home sem perfil | Catálogo público e convite para montar o perfil, sem percentuais inventados |
+| Preencher os dados básicos | Continuar para as quatro etapas; senha removida após a simulação |
+| Tentar avançar sem resposta | Mensagem indicando o que falta, com foco acessível |
+| Escolher uma única necessidade | Permitir concluir e preservar os 70 pontos possíveis desse critério |
+| Escolher duas necessidades | Mostrar a ordem 1 e 2; trocar a ordem exige desmarcar e escolher novamente |
+| Mentor selecionar setores/especialidades | Limitar a dois setores ou atuação geral e a três especialidades |
+| Selecionar presencial | Pedir a cidade; lista reduzida explicitada |
+| Selecionar exclusivamente online | Omitir a cidade e remover o valor da escolha anterior |
+| Concluir o perfil | Apresentar o cartão e levar às indicações para o tipo oposto |
+| Abrir os detalhes | Explicar critérios, pontos e limitações |
+| Abrir Meu perfil depois de concluir o cadastro | Mostrar informações e cartão, sem abrir o questionário |
+| Navegar para outra aba e voltar a Meu perfil | Continuar mostrando o resumo do perfil concluído |
+| Usar Editar perfil | Abrir as respostas atuais, com seções acessíveis diretamente |
+| Usar Alterar em uma seção | Abrir essa seção com as escolhas já marcadas |
+| Salvar alterações válidas | Voltar ao resumo, confirmar o salvamento e recalcular as indicações |
+| Salvar com uma resposta obrigatória vazia | Mostrar a seção incompleta e a mensagem; manter o perfil anterior |
+| Cancelar a edição ou navegar para fora dela | Descartar o rascunho e manter as respostas salvas |
+| Abrir Meu perfil sem concluir um cadastro | Mostrar convite para criar o perfil, sem inventar dados |
+| Mentor pausar novas startups | Esvaziar as indicações e informar a pausa |
+| Escolher setor em descoberta | Mostrar compatibilidade em construção, sem porcentagem |
+| Não haver indicação | Preservar as preferências e oferecer revisão ou catálogo |
+| Salvar e remover um perfil | Atualizar a página de salvos durante a sessão |
+| Recarregar | Reiniciar perfil, salvos e e-mails utilizados no cadastro simulado |
+| Usar Tab, Shift+Tab, Enter e Espaço | Conferir ordem e visibilidade do foco, escolhas e botões |
+| Abrir detalhes e usar Escape | Conferir o comportamento nativo do dialog e retorno do foco |
+| Reduzir a janela para celular | Conferir leitura, navegação, cartões e ausência de corte de conteúdo |
+| Observar a lanterna do Lumen | Núcleo e halo variam lentamente, sem movimento do personagem |
+| Alternar o tema pelo botão no topo | Adaptar textos, superfícies, formulários e detalhes; aumentar o brilho no escuro |
+| Recarregar após escolher o tema | Restaurar apenas a aparência; reiniciar os dados de demonstração |
+| Avançar as etapas com Lumen | Atualizar a fala do balão de acordo com a pergunta |
+| Usar Pausar animações no rodapé | Interromper luz e transições; manter a escolha ao navegar |
+| Usar Retomar animações | Reativar os movimentos, respeitando a preferência do dispositivo |
+| Ativar redução de movimento no sistema | Remover animações e transições, mantendo os fluxos utilizáveis |
 
-1. Pare o servidor de desenvolvimento.
-2. Na sua cópia do repositório, confira `git status`. Preserve em commit ou cópia qualquer alteração sua que ainda não tenha sido guardada.
-3. Confirme a branch com `git branch --show-current`. Para continuar o trabalho anterior, use `feature/frontend-access`.
-4. Faça uma cópia de segurança da pasta `frontend` atual **fora do repositório**.
-5. Substitua a pasta `frontend` inteira pela nova. Não apenas mescle os arquivos: as antigas pastas `src/app/features/access/` e os arquivos `core/access.gateway.*` foram substituídos por `features/register/` e `core/registration.gateway.*`.
-6. Copie este arquivo para `docs/09-frontend-prototype.md` na sua cópia do repositório.
-7. Dentro da nova pasta `frontend`, execute:
+A meta de preenchimento é breve, mas o tempo real precisa ser medido com participantes. O progresso mostra etapas efetivamente preenchidas. Não existem pontos de competição, ranking de pessoas, diagnóstico de personalidade ou conexão automática a partir da nota.
+
+## Verificações
+
+Na pasta `frontend`:
 
 ```powershell
-npm.cmd ci
 npm.cmd run lint
 npm.cmd run test:coverage
 npm.cmd run build
 ```
 
-8. Abra o terminal na raiz do repositório e confira o que será enviado:
+O comando de teste usa o builder oficial `@angular/build:unit-test` com Vitest e jsdom. Isso compila os mesmos templates usados pelo aplicativo e permite testar cliques, validações, rotas e conteúdo renderizado. O suporte nativo de abertura de `dialog` é emulado somente no ambiente de teste, porque não está implementado pelo jsdom.
 
-```powershell
-git status
-git diff --stat
-git add frontend docs/09-frontend-prototype.md
-git diff --cached --stat
-```
+O build verifica os templates e gera `dist/frontend/browser`. O relatório local fica em `coverage/frontend/index.html`; o LCOV, em `coverage/frontend/lcov.info`. Os limites globais de cobertura são de 80% nas quatro métricas configuradas.
 
-9. Depois da sua revisão, faça o commit e envie a branch:
+A revisão visual em navegador, o teste com leitor de tela, a avaliação de tempo de preenchimento e o teste integrado com a API não foram executados nesta entrega. A análise no SonarQube também depende do pipeline da equipe.
 
-```powershell
-git commit -m "feat(frontend): ajusta escopo de ideação e cadastros"
-git push origin feature/frontend-access
-```
+## Resultado da validação local
 
-O ZIP de entrega, a cópia de segurança, `node_modules`, `dist`, `.angular` e `coverage` não fazem parte do commit. O `.gitignore` do frontend cobre as pastas geradas.
+| Verificação | Resultado |
+| --- | --- |
+| Dependências | Mesma base instalada e validada na entrega anterior; sem mudanças nesta revisão |
+| Lint | Sem erros |
+| Tipos dos testes | Sem erros |
+| Vitest + Angular | 112 testes passaram em 9 arquivos |
+| Cobertura de linhas nos arquivos medidos | 96,66% |
+| Cobertura de declarações | 95,32% |
+| Cobertura de ramificações | 94,57% |
+| Cobertura de funções | 88,82% |
+| Motor de compatibilidade | 100% nas quatro métricas |
+| Limites globais de 80% | Atendidos |
+| Build de produção | Concluído, sem avisos |
+| Auditoria de dependências | Não repetida nesta revisão; dependências preservadas |
 
-O push atualiza a branch. A entrada na `main` ocorre pelo Pull Request e pelos checks exigidos pela equipe. O destino do PR deve seguir a branch de integração acordada no projeto. O workflow enviado executa automaticamente em PRs para `main` ou `development`; um push isolado em `feature/frontend-access`, sem PR aberto, não aciona esse gatilho.
+Os pacotes Angular permanecem em 22.2.3. O `package.json` e o lockfile mudaram somente o número da versão do projeto para 0.4.2. A configuração usa APIs de teste oficiais do Angular, sem adaptações privadas do compilador. O fluxo corrigido e seu roteiro de teste estão em [14-my-profile.md](14-my-profile.md).
 
-## Onde estudar o código
+## SonarQube e envio ao repositório
 
-| Arquivo/pasta                                   | Responsabilidade                                  |
-| ----------------------------------------------- | ------------------------------------------------- |
-| `frontend/src/main.ts`                          | Inicialização do Angular                          |
-| `frontend/src/app/app.config.ts`                | Navegação e escolha do serviço demonstrativo      |
-| `frontend/src/app/app.routes.ts`                | URLs de descoberta, salvos, cadastro e explicação |
-| `frontend/src/app/app.component.html`           | Menu, cabeçalho e área das páginas                |
-| `frontend/src/styles.css`                       | Cores e estilos compartilhados                    |
-| `frontend/src/app/core/profiles.store.ts`       | Perfis fictícios e estado temporário dos salvos   |
-| `frontend/src/app/features/explore/`            | Busca, filtros, cartões e detalhes                |
-| `frontend/src/app/features/register/`           | Formulário e confirmação de cadastro              |
-| `frontend/src/app/core/registration.gateway.ts` | Dados da conta e simulação de envio               |
-| `frontend/src/app/features/about/`              | Explicação da proposta e da jornada prevista      |
-| `*.spec.ts`                                     | Testes de comportamento                           |
+Esta revisão corrige a passagem de `coverage/frontend/lcov.info` do job `test` para `sonar-frontend`. O primeiro publica o artefato `frontend-coverage-report`; o segundo o baixa, verifica que não está vazio e só então executa o scanner. O processo usa o `sonar-project.properties` do frontend, sem sobrescrever `sonar.sources` e `sonar.exclusions` pela linha de comando.
 
-HTML organiza os elementos; CSS define a apresentação; TypeScript controla o comportamento. O `FormGroup` reúne os campos e suas validações. Um `signal` guarda estado acompanhado pela interface; um `computed` calcula resultados a partir desse estado.
+Os testes não usam mais comandos alternativos que permitiam continuar sem cobertura. Lint, teste com cobertura e build de produção devem concluir com sucesso. Os limites globais continuam em 80% e as regras do Quality Gate não foram alteradas.
 
-## Verificação desta entrega
+Os apontamentos conhecidos receberam ajustes no código. A duplicação vinha do catálogo fictício; os dados estáticos foram separados e os campos compartilhados são derivados em uma única função. A equivalência dos dez perfis com a v0.4.1 foi conferida. O relatório detalhado e os limites da validação estão em [15-sonar-and-coverage.md](15-sonar-and-coverage.md).
 
-| Verificação                                                | Resultado          |
-| ---------------------------------------------------------- | ------------------ |
-| Instalação limpa com `npm ci`                              | Concluída          |
-| ESLint                                                     | Sem erros          |
-| Tipos dos testes, com `tsc -p tsconfig.spec.json --noEmit` | Sem erros          |
-| Vitest                                                     | 32 testes passaram |
-| Cobertura V8 de linhas nos arquivos medidos                | 86,95%             |
-| Build Angular de produção                                  | Concluído          |
-| Revisão visual em navegador                                | Pendente           |
-| Análise SonarQube deste código                             | Não executada      |
-
-A suíte verifica os limites do DTO, a separação dos campos do cadastro, erros e nova tentativa, bloqueio de envios repetidos, limpeza da senha, busca, filtros e salvos. Os testes de componentes exercitam a lógica em contexto de injeção; não substituem navegação real em navegador, revisão de acessibilidade ou testes integrados com a API.
-
-A prévia mantém somente e-mails e IDs salvos em memória. Não grava senha, não cria conta real e não adiciona o cadastro simulado à lista fixa de perfis. A integração dependerá das rotas, respostas, erros e regras definitivas do backend.
+Envie a entrega pela branch `feature/frontend-v0.4.2` e abra um PR para `main`. Os arquivos a versionar pertencem a `frontend/`, `docs/` e `.github/workflows/ci-cd.yml`. O pacote não inclui Git, dependências instaladas nem builds. A execução real dos Actions e a aprovação do Quality Gate precisam ser conferidas após o push, antes do merge.

@@ -21,17 +21,24 @@ import {
 } from "../../core/registration.gateway";
 import { ProfileKind } from "../../core/profiles.store";
 import { IconComponent } from "../../shared/icon.component";
+import { ProfileSessionStore } from "../../core/profile-session.store";
+import { ProfileDraft } from "../../core/profile.models";
+import { ProfileSetupComponent } from "../profile/profile-setup.component";
+import { ProfileCompleteComponent } from "../profile/profile-complete.component";
+import { LumenGuideComponent } from "../../shared/lumen-guide.component";
 
 @Component({
   selector: "app-register",
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent, ProfileSetupComponent, ProfileCompleteComponent, LumenGuideComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./register.component.html",
   styleUrl: "./register.component.css",
 })
 export class RegisterComponent {
   private readonly gateway = inject(RegistrationGateway);
+  readonly session = inject(ProfileSessionStore);
+  readonly profileReady = signal(false);
   readonly form = new FormGroup({
     nome: new FormControl("", {
       nonNullable: true,
@@ -81,8 +88,8 @@ export class RegisterComponent {
   readonly error = signal("");
   readonly receipt = signal<RegistrationReceipt | null>(null);
   readonly passwordVisible = signal(false);
-  @ViewChild("receiptHeading") private receiptHeading?: ElementRef<HTMLElement>;
-  @ViewChild("errorSummary") private errorSummary?: ElementRef<HTMLElement>;
+  @ViewChild("receiptHeading") private readonly receiptHeading?: ElementRef<HTMLElement>;
+  @ViewChild("errorSummary") private readonly errorSummary?: ElementRef<HTMLElement>;
 
   invalid(field: "nome" | "email" | "senha" | "demoConsent"): boolean {
     return (
@@ -130,9 +137,18 @@ export class RegisterComponent {
   }
 
   restart(): void {
+    this.profileReady.set(false);
+    this.session.clear();
     this.receipt.set(null);
     this.error.set("");
     this.passwordVisible.set(false);
     this.form.reset({ tipoUsuario: "STARTUP", demoConsent: false });
+  }
+
+  completeProfile(answers: ProfileDraft): void {
+    const receipt = this.receipt();
+    if (answers.kind !== receipt?.tipoUsuario) return;
+    this.session.save(receipt.nome, answers);
+    this.profileReady.set(true);
   }
 }
