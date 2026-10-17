@@ -298,3 +298,83 @@
 ---
 
 > ⚠️ **Ponto de atenção para o time:** pelo SRS (RN12), startup só pesquisa mentores e investidores, e mentor/investidor só pesquisa startups. O protótipo atual mostra as abas "Todos / Mentores / Startups" para qualquer usuário. Na integração com o backend, a tela precisa respeitar o papel de quem está logado.
+
+---
+
+## 🎯 Épico 4: Matching e recomendações (MATCH)
+
+> Regra de cálculo: proposta **match-1.0** do SRS (seção 7). Pontuação de 0 a 100, corte em 60, até 20 recomendações, empate pelo identificador. A pontuação indica compatibilidade, não garantia de mentoria ou investimento.
+
+### 🔹 `US-16`: Receber recomendações de mentoria
+* **Como** startup que busca mentoria (ou mentor procurando startups),
+* **Quero** receber uma lista de perfis compatíveis, ordenada pela pontuação,
+* **Para que** eu comece pelas conexões com mais chance de fazer sentido.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Exemplo de referência do SRS):**
+>   * **Dado** um par com setor e estágio compatíveis, 1 de 2 necessidades atendidas, disponibilidade em comum, formato remoto em comum e sem preferência de modelo de negócio,
+>   * **Quando** a recomendação é calculada,
+>   * **Então** a pontuação exibida é **88,2** (75 de 85 pontos aplicáveis).
+> * **Cenário 2 (Corte):**
+>   * **Dado** candidatos com pontuação bruta 59,96 e 60,
+>   * **Quando** a lista é montada,
+>   * **Então** o de 59,96 fica de fora e o de 60 aparece.
+> * **Cenário 3 (Perfil inelegível):**
+>   * **Dado** um mentor sem formato de encontro em comum comigo,
+>   * **Quando** a lista é calculada,
+>   * **Então** ele é excluído antes da pontuação.
+* *Prioridade:* P1 · *Rastreabilidade:* RF16, RN11, RN15–RN17, CA13, CA32.
+
+---
+
+### 🔹 `US-17`: Receber recomendações de investimento
+* **Como** startup que busca investimento (ou investidor procurando startups),
+* **Quero** receber perfis compatíveis considerando a faixa de investimento,
+* **Para que** eu não perca tempo com quem investe em valores muito diferentes.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Faixas que se encostam):**
+>   * **Dado** que a startup busca R$ 50.000 a R$ 100.000 e o investidor oferece R$ 100.000 a R$ 150.000,
+>   * **Quando** as recomendações são geradas,
+>   * **Então** o par é considerado compatível, porque o limite em comum conta.
+> * **Cenário 2 (Faixas sem interseção):**
+>   * **Dado** que a startup busca R$ 50.000 a R$ 99.000 e o investidor oferece R$ 100.000 a R$ 150.000,
+>   * **Quando** as recomendações são geradas,
+>   * **Então** o investidor é excluído antes da pontuação.
+* *Prioridade:* P1 · *Rastreabilidade:* RF17, RN09, RN11, RN15–RN17, CA14, CA32.
+
+---
+
+### 🔹 `US-18`: Entender por que recebi uma recomendação
+* **Como** participante,
+* **Quero** ver a pontuação, o peso e a contribuição de cada critério, o que não se aplicou e a versão do cálculo,
+* **Para que** eu confie na indicação e saiba o que pesou a favor ou contra.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Explicação completa):**
+>   * **Dado** que recebi uma recomendação,
+>   * **Quando** abro os detalhes,
+>   * **Então** vejo cada critério com peso e contribuição, os itens não aplicáveis e a versão (ex.: match-1.0), e consigo refazer a conta.
+> * **Cenário 2 (Dado faltando):**
+>   * **Dado** que não preenchi um dado obrigatório para o meu objetivo,
+>   * **Quando** peço recomendações,
+>   * **Então** o sistema avisa o que falta e não mostra uma pontuação como se o dado fosse compatível.
+* *Prioridade:* P1 · *Rastreabilidade:* RF18, RN16, RN19, CA13, CA14, CA15.
+
+---
+
+### 🔹 `US-19`: Recomendações atualizadas depois de mudanças
+* **Como** participante,
+* **Quero** que as recomendações sejam refeitas quando eu ou a outra pessoa mudarmos dados importantes,
+* **Para que** eu não veja indicações baseadas em informações antigas.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Mudança de setor):**
+>   * **Dado** que já recebi recomendações,
+>   * **Quando** altero meu setor, objetivo ou faixa e consulto de novo,
+>   * **Então** o resultado usa os dados atuais e mostra a data e a versão do cálculo.
+* *Prioridade:* P1 · *Rastreabilidade:* RF19, RN14, RN15, CA16.
+
+---
+
+> ⚠️ **Ponto de atenção para o time:** o protótipo do frontend (`matching.engine.ts`, regra `damatch-rules-v1`) usa pesos diferentes da proposta match-1.0 do SRS. É preciso decidir qual regra vale antes de implementar o cálculo no backend.
