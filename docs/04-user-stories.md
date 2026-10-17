@@ -486,3 +486,90 @@
 >   * **Quando** alguém tenta marcar reunião nela,
 >   * **Então** o sistema recusa. Para conectar de novo, os dois precisam demonstrar interesse outra vez.
 * *Prioridade:* P1 · *Rastreabilidade:* RF25, RN23, RN25, CA20.
+
+---
+
+## 🎯 Épico 6: Reuniões (REUNIAO)
+
+> Estados da reunião: PROPOSTA → CONFIRMADA ou RECUSADA → REALIZADA (ou CANCELADA). Só existe reunião dentro de uma conexão ATIVA. A reunião acontece fora da plataforma (presencial ou por link); o DaMatch só organiza o registro.
+
+### 🔹 `US-26`: Propor uma reunião
+* **Como** participante de uma conexão ativa,
+* **Quero** propor data, horário, duração, formato e local ou link,
+* **Para que** a gente combine a conversa dentro da plataforma.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Proposta válida):**
+>   * **Dado** que a conexão está ativa e escolhi um horário futuro, com duração entre 15 e 120 minutos (de 15 em 15),
+>   * **Quando** envio a proposta,
+>   * **Então** a reunião fica PROPOSTA, o horário fica reservado para os dois e aguarda a decisão da outra parte.
+> * **Cenário 2 (Conflito de horário):**
+>   * **Dado** que um de nós já tem reunião das 14h às 15h,
+>   * **Quando** proponho das 14h30 às 15h30,
+>   * **Então** a proposta é recusada. Já uma reunião começando às 15h é aceita.
+* *Prioridade:* P1 · *Rastreabilidade:* RF26, RN24, RN26, CA21.
+
+---
+
+### 🔹 `US-27`: Confirmar ou recusar uma reunião
+* **Como** quem recebeu a proposta,
+* **Quero** confirmar ou recusar a reunião,
+* **Para que** a outra pessoa saiba se o encontro vai acontecer.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Decisão):**
+>   * **Dado** que recebi uma proposta ainda válida,
+>   * **Quando** confirmo ou recuso,
+>   * **Então** a reunião fica CONFIRMADA ou RECUSADA e quem propôs vê a decisão.
+> * **Cenário 2 (Confirmar pelo outro):**
+>   * **Dado** que fui eu quem propôs,
+>   * **Quando** tento confirmar minha própria proposta,
+>   * **Então** o sistema não permite.
+* *Prioridade:* P1 · *Rastreabilidade:* RF27, RN24, RN27, CA22.
+
+---
+
+### 🔹 `US-28`: Remarcar uma reunião
+* **Como** participante da reunião,
+* **Quero** propor nova data, horário, formato ou local para uma reunião futura,
+* **Para que** a gente ajuste o encontro se surgir um imprevisto.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Nova proposta):**
+>   * **Dado** que a reunião futura está PROPOSTA ou CONFIRMADA,
+>   * **Quando** proponho novos dados válidos,
+>   * **Então** a versão anterior fica no histórico, a reunião volta para PROPOSTA e a outra parte precisa aceitar de novo.
+* *Prioridade:* P1 · *Rastreabilidade:* RF28, RN26, RN27, CA23.
+
+---
+
+### 🔹 `US-29`: Cancelar uma reunião
+* **Como** participante da reunião,
+* **Quero** cancelar uma reunião futura, podendo informar o motivo,
+* **Para que** o horário seja liberado e a outra pessoa fique sabendo.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Cancelamento):**
+>   * **Dado** que a reunião futura está PROPOSTA ou CONFIRMADA,
+>   * **Quando** confirmo o cancelamento,
+>   * **Então** ela fica CANCELADA, o horário é liberado e ela não pode mais ser marcada como realizada.
+* *Prioridade:* P1 · *Rastreabilidade:* RF29, RN25, RN27, CA24.
+
+---
+
+### 🔹 `US-30`: Registrar que a reunião aconteceu
+* **Como** participante da reunião,
+* **Quero** marcar a reunião como realizada depois do horário e deixar uma observação curta,
+* **Para que** fique o histórico do acompanhamento.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Depois do horário):**
+>   * **Dado** que a reunião estava CONFIRMADA e o horário final já passou,
+>   * **Quando** registro a realização,
+>   * **Então** ela fica REALIZADA, com meu nome e a data do registro.
+> * **Cenário 2 (Antes da hora ou cancelada):**
+>   * **Dado** que a reunião ainda não aconteceu, foi recusada ou foi cancelada,
+>   * **Quando** tento marcar como realizada,
+>   * **Então** o sistema recusa.
+* *Prioridade:* P1 · *Rastreabilidade:* RF30, RN19, RN27, CA25.
+* *Observação:* "realizada" é uma declaração do participante. Não comprova investimento, contrato ou resultado.
