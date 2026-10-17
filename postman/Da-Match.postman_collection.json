@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "89f937f0-df1e-43b4-92d1-19b7680021bb",
     "name": "Da-Match API",
-    "description": "Coleção baseada na análise do backend em 15/10/2026. As requisições na pasta PENDENTE representam contratos propostos: elas ainda retornam 404 porque não existe MentorController.",
+    "description": "Coleção baseada no backend atual. As requisições na pasta PENDENTE representam contratos propostos que ainda não possuem endpoint implementado.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -13,6 +13,11 @@
     },
     {
       "key": "mentorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "csrfToken",
       "value": "",
       "type": "string"
     }
@@ -35,7 +40,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () {", 
+                  "pm.test('Status 200', function () {",
                   "    pm.response.to.have.status(200);",
                   "});",
                   "pm.test('Resposta contém status e timestamp', function () {",
@@ -73,7 +78,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () {", 
+                  "pm.test('Status 200', function () {",
                   "    pm.response.to.have.status(200);",
                   "});",
                   "pm.test('Resposta contém mensagem', function () {",
@@ -99,13 +104,14 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () {", 
+                  "pm.test('Status 200', function () {",
                   "    pm.response.to.have.status(200);",
                   "});",
                   "pm.test('Resposta contém os dados do token', function () {",
                   "    const body = pm.response.json();",
                   "    pm.expect(body).to.have.property('headerName');",
                   "    pm.expect(body).to.have.property('token');",
+                  "    pm.collectionVariables.set('csrfToken', body.token);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -117,17 +123,21 @@
       ]
     },
     {
-      "name": "PENDENTE — Mentor (sem controller)",
-      "description": "Nenhuma rota de mentor está exposta pelo backend. As três requisições abaixo foram separadas conforme solicitado e usam convenções REST propostas; valide os paths e os códigos de resposta ao criar o MentorController.",
+      "name": "Mentor",
+      "description": "Execute primeiro a requisição 'Obter token CSRF'. O Postman preserva o cookie XSRF-TOKEN e o teste armazena o token para a requisição de cadastro.",
       "item": [
         {
-          "name": "PENDENTE — Registrar mentor",
+          "name": "Registrar mentor",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
               }
             ],
             "body": {
@@ -140,10 +150,16 @@
               }
             },
             "url": "{{baseUrl}}/api/v1/mentores",
-            "description": "Rota proposta. Contrato derivado de CadastrarMentorRequest. Ainda não existe MentorController; o backend atual responderá 404. Não inclua senhas reais."
+            "description": "Cria uma conta com o papel MENTOR e o respectivo perfil. Execute 'Obter token CSRF' antes desta requisição. Use apenas dados fictícios e e-mails únicos."
           },
           "response": []
-        },
+        }
+      ]
+    },
+    {
+      "name": "PENDENTE — Mentor",
+      "description": "Contratos propostos para busca e listagem de mentores. Estes endpoints ainda não foram implementados e retornam 404.",
+      "item": [
         {
           "name": "PENDENTE — Buscar mentor",
           "request": {
