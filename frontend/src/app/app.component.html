@@ -1,61 +1,62 @@
-<div class="container">
-  <header class="header">
-    <div class="badge">SENAC Fullstack Extension 2026.2 &bull; Enterprise Starter</div>
-    <h1>{{ title() }}</h1>
-    <p class="subtitle">Scaffolding com Quality Gates no SonarQube & Pipelines GitHub Actions</p>
-  </header>
-
-  <main class="content-grid">
-    <!-- Hello World Card -->
-    <div class="card hello-card">
-      <div class="card-header">
-        <span class="dot online"></span>
-        <h2>🎉 Hello World API Integration</h2>
-      </div>
-      <div class="card-body">
-        <p class="hello-text">{{ helloMessage() }}</p>
-        <div class="endpoint-badge">GET /api/v1/hello &bull; HTTP 200 OK</div>
-      </div>
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="app-layout">
+  <aside class="sidebar" aria-label="Navegação principal">
+    <a class="brand" routerLink="/" aria-label="DaMatch, início"
+      ><span class="brand-mark" aria-hidden="true"><i></i><i></i></span
+      ><span>DaMatch<span class="brand-dot">.</span></span></a
+    >
+    <p class="sidebar-label">SEU PRÓXIMO PASSO</p>
+    <nav class="main-nav">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+        ><app-icon name="compass" />Descobrir</a
+      >
+      <a
+        routerLink="/salvos"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        ><app-icon name="bookmark" />Perfis salvos</a
+      >
+      <a
+        routerLink="/como-funciona"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        ><app-icon name="network" />Como funciona</a
+      >
+    </nav>
+    <div class="sidebar-invite">
+      <span class="invite-symbol"><app-icon name="spark" /></span>
+      <h2>Boas conexões.<br />Novos caminhos.</h2>
+      <p>Ideias em formação encontram experiência para começar.</p>
+      <a class="button button-light" routerLink="/cadastro"
+        >Testar cadastro<app-icon name="arrow"
+      /></a>
     </div>
-
-    <!-- Backend Health Status Card -->
-    <div class="card status-card">
-      <div class="card-header">
-        <span class="dot" [class.online]="healthStatus()?.status === 'UP'"></span>
-        <h2>Status do Backend Spring Boot</h2>
+    <div class="sidebar-footer">
+      <span class="status-dot"></span>Feito para o Nordeste<span
+        >Projeto Integrador · Senac PE</span
+      >
+    </div>
+  </aside>
+  <div class="main-layout">
+    <header class="topbar">
+      <span class="workspace-name"
+        >Ecossistema de inovação<span>Recife, Pernambuco</span></span
+      >
+      <div class="topbar-actions">
+        <span class="demo-pill"><span></span>Demonstração</span
+        ><a routerLink="/cadastro" class="button button-primary button-small"
+          >Cadastrar<app-icon name="arrow"
+        /></a>
       </div>
-      @if (healthStatus(); as health) {
-        <div class="card-body">
-          <div class="metric-row">
-            <span class="label">Status:</span>
-            <span class="value" [class.badge-pass]="health.status === 'UP'">{{ health.status }}</span>
-          </div>
-          <div class="metric-row">
-            <span class="label">Aplicação:</span>
-            <span class="value">{{ health.application }}</span>
-          </div>
-          <div class="metric-row">
-            <span class="label">Ambiente:</span>
-            <span class="value">{{ health.environment }}</span>
-          </div>
-          <div class="metric-row">
-            <span class="label">Uptime:</span>
-            <span class="value">{{ health.uptimeMillis }} ms</span>
-          </div>
-        </div>
-      } @else {
-        <p class="loading-text">Verificando conectividade com o Backend...</p>
-      }
-    </div>
-
-    <div class="card info-card">
-      <h2>Pilares de Engenharia & Qualidade</h2>
-      <ul class="features-list">
-        <li><strong>Backend:</strong> Java 21 LTS, Spring Boot 3.3, ArchUnit, JaCoCo</li>
-        <li><strong>Frontend:</strong> Angular 18 LTS (Signals, Standalone, OnPush, Vitest)</li>
-        <li><strong>Quality Gate:</strong> SonarQube em <a href="https://sonar.fchicout.dev" target="_blank">sonar.fchicout.dev</a></li>
-        <li><strong>CI/CD:</strong> GitHub Actions (Branch <code>development</code> &rarr; Staging, <code>main</code> &rarr; Produção)</li>
-      </ul>
-    </div>
-  </main>
+    </header>
+    <main id="conteudo" tabindex="-1"><router-outlet /></main>
+    <footer class="page-footer">
+      <span>DaMatch · Conexões com propósito</span
+      ><span>Demonstração com perfis fictícios e cadastros simulados.</span>
+    </footer>
+  </div>
 </div>

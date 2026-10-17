@@ -109,7 +109,7 @@ O sistema não realizará investimentos, contratos ou movimentações financeira
 * Spring Boot;
 * Spring Security;
 * LLDAP;
-* SQLite3.
+* PostgreSQL (Supabase).
 
 #### Davi Maia — Full Stack Lead / Front-End:
 
@@ -232,7 +232,8 @@ A comunicação principal entre Frontend e Backend será realizada através de u
            │           │
            ▼           ▼
 ┌────────────────┐ ┌────────────────┐
-│    SQLite3     │ │     LLDAP      │
+│  PostgreSQL    │ │     LLDAP      │
+│  (Supabase)    │ │                │
 │                │ │                │
 │ Dados de       │ │ Credenciais    │
 │ negócio        │ │ Grupos         │
@@ -245,20 +246,21 @@ A comunicação principal entre Frontend e Backend será realizada através de u
 
 ## Frontend
 
-* Angular Standalone
+* Angular 22 (Standalone)
 * RxJS
 * Angular Forms
 
 ## Backend
 
-* Java
-* Spring Boot
+* Java 21
+* Spring Boot 3
 * Spring Security
+* Spring Data JPA
 * REST API
 
 ## Banco de Dados
 
-* SQLite3
+* PostgreSQL, hospedado no Supabase
 
 ## Autenticação e Autorização
 
@@ -285,23 +287,26 @@ O LLDAP será responsável pelo gerenciamento de:
 * Credenciais;
 * Grupos de acesso.
 
-O SQLite3 será responsável pelos dados relacionados ao negócio.
+O PostgreSQL será responsável pelos dados relacionados ao negócio.
 
-### Roles inicialmente previstas
+### Roles previstas
 
-| Grupo LLDAP              | Spring Security     |
-| ------------------------ | ------------------- |
-| `[projeto]_admin`        | `ROLE_ADMIN`        |
-| `[projeto]_operador`     | `ROLE_OPERADOR`     |
-| `[projeto]_beneficiario` | `ROLE_BENEFICIARIO` |
+Conforme a Documentação de Requisitos v1.0 (seção 3.1):
 
-> ⚠️ A relação dessas roles com os perfis de Startup, Mentor e Investidor ainda precisa ser validada.
+| Grupo LLDAP          | Spring Security   | Perfil        |
+| -------------------- | ----------------- | ------------- |
+| `damatch_admin`      | `ROLE_ADMIN`      | Administrador |
+| `damatch_startup`    | `ROLE_STARTUP`    | Startup       |
+| `damatch_mentor`     | `ROLE_MENTOR`     | Mentor        |
+| `damatch_investidor` | `ROLE_INVESTIDOR` | Investidor    |
+
+> ⚠️ Login e controle de acesso ainda não estão implementados: hoje todas as rotas da API estão liberadas.
 
 ---
 
 # 🗄️ Banco de Dados
 
-O banco de dados de negócio utilizará **SQLite3**.
+O banco de dados de negócio utiliza **PostgreSQL**, hospedado no **Supabase**. A conexão é configurada pela variável de ambiente `SUPABASE_DB_URL`.
 
 Entre os dados inicialmente previstos estão:
 
@@ -313,13 +318,7 @@ Entre os dados inicialmente previstos estão:
 * Conexões;
 * Reuniões.
 
-A modelagem relacional será definida antes da implementação das funcionalidades.
-
-Arquivo previsto para o banco:
-
-```text
-extensao.db
-```
+As tabelas são criadas a partir das entidades JPA. Hoje existem `Usuario` e, na branch `feature/database-models`, `Mentor`.
 
 ---
 
@@ -456,16 +455,16 @@ A versão MVP deverá ser homologada em **Staging** antes do deploy definitivo.
 ## 🟦 Baseline — 28/08/2026
 
 * [x] Project Charter
-* [ ] Modelagem relacional SQLite3
-* [ ] Banco `extensao.db`
+* [ ] Modelagem relacional
+* [x] Banco PostgreSQL configurado no Supabase
 
 ---
 
 ## 🟨 `v0.1.0-alpha` — 19/09/2026
 
-* [ ] Protótipo navegável Angular
-* [ ] Arquitetura Spring Boot
-* [ ] Pipeline CI/CD
+* [ ] Protótipo navegável Angular (em andamento na branch `feature/frontend-profile-lumen`)
+* [x] Arquitetura Spring Boot
+* [x] Pipeline CI/CD
 
 ---
 
@@ -480,8 +479,12 @@ A versão MVP deverá ser homologada em **Staging** antes do deploy definitivo.
 ## 🟩 `v1.0.0` — 28/11/2026
 
 * [ ] Deploy em Produção
+* [ ] Quality Gate SonarQube aprovado
+* [ ] Pitch / apresentação na banca
 
-## Deploy do backend no Render
+---
+
+# ☁️ Deploy do backend no Render
 
 O backend é publicado como uma imagem Docker definida em `Dockerfile`. O
 arquivo `render.yaml` descreve o Web Service, usa o endpoint
@@ -498,9 +501,6 @@ gates de segurança, o job `deploy-production` chama esse hook e solicita ao
 Render o deploy do SHA exato do workflow. O `autoDeployTrigger` permanece
 desativado para impedir que o Render publique commits antes da aprovação do
 pipeline.
-
-* [ ] Quality Gate SonarQube aprovado
-* [ ] Pitch / apresentação na banca
 
 ---
 
@@ -559,7 +559,7 @@ Este README representa o estado atual do projeto e contém decisões ainda abert
 * [ ] Definir FKs;
 * [ ] Definir cardinalidades;
 * [ ] Validar normalização;
-* [ ] Criar `extensao.db`.
+* [x] Configurar o banco PostgreSQL no Supabase.
 
 ### Backend
 
@@ -581,7 +581,7 @@ Este README representa o estado atual do projeto e contém decisões ainda abert
 
 * [ ] Configurar LLDAP;
 * [ ] Integrar Spring Security;
-* [ ] Configurar GitHub Actions;
+* [x] Configurar GitHub Actions;
 * [ ] Configurar SonarQube;
 * [ ] Definir Staging;
 * [ ] Definir Produção.
@@ -597,6 +597,11 @@ Este README representa o estado atual do projeto e contém decisões ainda abert
 ---
 
 # 📚 Documentação
+
+Documentos já disponíveis:
+
+* [Documentação de Requisitos v1.0](docs/DaMatch-Documentacao-de-Requisitos-v1.0.pdf): requisitos funcionais e não funcionais, regras de negócio, proposta de matching, casos de uso e critérios de aceitação;
+* [Project Charter](PROJECT_CHARTER.md).
 
 Durante o desenvolvimento serão produzidos documentos relacionados a:
 

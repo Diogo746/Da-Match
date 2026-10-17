@@ -1,11 +1,2 @@
-import '@analogjs/vitest-angular/setup-zone';
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting,
-} from '@angular/platform-browser-dynamic/testing';
-import { getTestBed } from '@angular/core/testing';
-
-getTestBed().initTestEnvironment(
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
-);
+// O Vitest executa a lógica dos componentes; o build verifica os templates Angular.
+import "@angular/compiler";

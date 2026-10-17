@@ -1,0 +1,203 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.profile-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 9px 23px #1137490b;
+}
+.profile-cover {
+  height: 87px;
+  position: relative;
+  overflow: hidden;
+  padding: 21px 17px;
+}
+.profile-cover:before,
+.profile-cover:after {
+  content: "";
+  position: absolute;
+  width: 135px;
+  height: 135px;
+  border: 1px solid #ffffff85;
+  border-radius: 50%;
+  right: 25px;
+  top: 13px;
+}
+.profile-cover:after {
+  right: -47px;
+  top: -75px;
+  border-width: 24px;
+  border-color: #ffffff35;
+}
+.mint {
+  background: #dcece3;
+  color: #235849;
+}
+.sand {
+  background: #ede5d4;
+  color: #735c31;
+}
+.blue {
+  background: #dce7ec;
+  color: #2a536a;
+}
+.cover-word {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  position: relative;
+  z-index: 1;
+}
+.save-button {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffffffd9;
+  background: #ffffffd9;
+  color: #45605c;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 2;
+}
+.save-button app-icon {
+  width: 15px;
+  height: 15px;
+}
+.save-button.saved {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.card-body {
+  padding: 0 17px 16px;
+}
+.identity-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: -19px;
+  position: relative;
+  z-index: 1;
+}
+.avatar {
+  width: 47px;
+  height: 47px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #fff;
+  border-radius: 13px;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+  box-shadow: 0 2px 4px #14334208;
+}
+.kind-label {
+  font-size: 9px;
+  color: var(--muted);
+  padding-top: 20px;
+}
+.profile-card h3 {
+  font-size: 15px;
+  letter-spacing: -0.3px;
+  margin: 13px 0 5px;
+}
+.profile-title {
+  font-size: 11px;
+  color: #5e7076;
+  line-height: 1.6;
+  min-height: 35px;
+  margin: 0;
+}
+.location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 10px 0;
+}
+.location app-icon {
+  width: 13px;
+  height: 13px;
+}
+.tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.tags > span {
+  background: #f1f5f3;
+  border: 1px solid #e7ede9;
+  color: #556962;
+  padding: 5px 7px;
+  border-radius: 5px;
+  font-size: 9px;
+}
+.card-bottom {
+  border-top: 1px solid #edf1ee;
+  margin-top: 18px;
+  padding-top: 12px;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 11px;
+}
+.card-bottom > span {
+  font-size: 9px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.card-bottom > span app-icon {
+  width: 12px;
+  height: 12px;
+}
+.profile-link {
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  color: #165e51;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.profile-link app-icon {
+  width: 16px;
+  height: 16px;
+}
+@media (max-width: 430px) {
+  .profile-cover {
+    height: 98px;
+  }
+  .card-bottom {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .profile-link {
+    width: auto;
+    gap: 15px;
+  }
+}

@@ -1,0 +1,182 @@
+.mint {
+  background: #dcece3;
+  color: #235849;
+}
+.sand {
+  background: #ede5d4;
+  color: #735c31;
+}
+.blue {
+  background: #dce7ec;
+  color: #2a536a;
+}
+.avatar {
+  width: 47px;
+  height: 47px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #fff;
+  border-radius: 13px;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+  box-shadow: 0 2px 4px #14334208;
+}
+.location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 10px 0;
+}
+.location app-icon {
+  width: 13px;
+  height: 13px;
+}
+.tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.tags > span {
+  background: #f1f5f3;
+  border: 1px solid #e7ede9;
+  color: #556962;
+  padding: 5px 7px;
+  border-radius: 5px;
+  font-size: 9px;
+}
+.save-button {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffffffd9;
+  background: #ffffffd9;
+  color: #45605c;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 2;
+}
+.save-button app-icon {
+  width: 15px;
+  height: 15px;
+}
+.save-button.saved {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.profile-dialog {
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  width: min(560px, calc(100vw - 32px));
+  max-height: 85dvh;
+  color: var(--navy);
+  box-shadow: 0 24px 90px #082d4960;
+}
+.profile-dialog::backdrop {
+  background: #082c44a6;
+  backdrop-filter: blur(4px);
+}
+.dialog-cover {
+  height: 85px;
+  padding: 25px;
+  position: relative;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+.dialog-body {
+  padding: 0 28px 28px;
+}
+.avatar.large {
+  width: 62px;
+  height: 62px;
+  font-size: 22px;
+  margin-top: -26px;
+  position: relative;
+  margin-bottom: 21px;
+}
+.dialog-body .eyebrow {
+  font-size: 9px;
+}
+.dialog-body h2 {
+  font-size: 27px;
+  letter-spacing: -1px;
+  margin: 10px 0 5px;
+}
+.dialog-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+.dialog-description {
+  font-size: 13px;
+  line-height: 1.85;
+  margin: 23px 0;
+}
+.dialog-body h3 {
+  font-size: 12px;
+  margin: 22px 0 12px;
+}
+.dialog-body .tags > span {
+  font-size: 10px;
+}
+.reasons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.reasons li {
+  font-size: 12px;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin: 12px 0;
+  line-height: 1.6;
+}
+.reasons app-icon {
+  width: 16px;
+  color: var(--teal);
+}
+.dialog-note {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--muted);
+  padding: 12px;
+  background: #f2f6f3;
+  border-radius: 7px;
+  margin: 20px 0;
+}
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+}
+.dialog-actions .button {
+  font-size: 11px;
+  flex: 1;
+  padding: 12px;
+}
+@media (max-width: 760px) {
+  .dialog-actions {
+    flex-wrap: wrap;
+  }
+  .dialog-actions .button {
+    min-width: 160px;
+  }
+}
+@media (max-width: 430px) {
+  .dialog-body {
+    padding: 0 20px 22px;
+  }
+}

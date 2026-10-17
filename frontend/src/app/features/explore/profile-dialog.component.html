@@ -1,0 +1,61 @@
+<dialog #profileDialog class="profile-dialog" aria-labelledby="dialog-title">
+  @if (selected(); as profile) {
+    <div [class]="'dialog-cover ' + profile.theme">
+      <span>CONHEÇA O PERFIL</span
+      ><button
+        type="button"
+        class="save-button"
+        aria-label="Fechar perfil"
+        autofocus
+        (click)="close()"
+      >
+        <app-icon name="close" />
+      </button>
+    </div>
+    <div class="dialog-body">
+      <span [class]="'avatar large ' + profile.theme" aria-hidden="true">{{
+        profile.initials
+      }}</span>
+      <p class="eyebrow">{{ label(profile.kind) }} · PERFIL FICTÍCIO</p>
+      <h2 id="dialog-title">{{ profile.name }}</h2>
+      <p class="dialog-subtitle">{{ profile.title }}</p>
+      <p class="location">
+        <app-icon name="pin" />{{ profile.city }} · {{ profile.availability }}
+      </p>
+      <p class="dialog-description">{{ profile.description }}</p>
+      <h3>Áreas de interesse</h3>
+      <div class="tags">
+        @for (tag of profile.tags; track tag) {
+          <span>{{ tag }}</span>
+        }
+      </div>
+      <h3>Pontos para uma possível conexão</h3>
+      <ul class="reasons">
+        @for (reason of profile.reasons; track reason) {
+          <li><app-icon name="check" />{{ reason }}</li>
+        }
+      </ul>
+      <p class="dialog-note">
+        Exemplo de apresentação dos motivos. Nenhuma pontuação de matching foi
+        calculada.
+      </p>
+      <div class="dialog-actions">
+        <button
+          class="button button-secondary"
+          type="button"
+          [attr.aria-pressed]="store.isSaved(profile.id)"
+          (click)="store.toggleSaved(profile.id)"
+        >
+          <app-icon name="bookmark" />{{
+            store.isSaved(profile.id) ? "Perfil salvo" : "Salvar perfil"
+          }}</button
+        ><a
+          class="button button-primary"
+          routerLink="/cadastro"
+          (click)="close()"
+          >Testar cadastro<app-icon name="arrow"
+        /></a>
+      </div>
+    </div>
+  }
+</dialog>
