@@ -1,0 +1,288 @@
+:host {
+  display: block;
+}
+.back-link {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.register-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(350px, 470px);
+  gap: 65px;
+  max-width: 1060px;
+  margin: 35px auto;
+}
+.register-intro {
+  padding: 26px 0;
+}
+.register-intro h1 {
+  font-size: clamp(28px, 3.2vw, 43px);
+  letter-spacing: -1.7px;
+  line-height: 1.2;
+  margin: 18px 0 22px;
+}
+.register-intro > p:not(.eyebrow) {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+  max-width: 380px;
+}
+.register-steps {
+  list-style: none;
+  padding: 0;
+  margin: 37px 0;
+}
+.register-steps li {
+  display: flex;
+  gap: 15px;
+  margin: 25px 0;
+}
+.register-steps li > span {
+  width: 33px;
+  height: 33px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0ece5;
+  color: var(--teal);
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.register-steps h2 {
+  font-size: 13px;
+  margin: 0 0 5px;
+}
+.register-steps p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0;
+}
+.privacy-note {
+  display: flex;
+  gap: 11px;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  color: var(--muted);
+}
+.privacy-note app-icon {
+  width: 18px;
+  color: var(--teal);
+}
+.privacy-note p {
+  font-size: 11px;
+  line-height: 1.9;
+  margin: 0;
+}
+.register-card {
+  min-width: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 31px;
+  box-shadow: 0 10px 35px #163c4e05;
+  align-self: start;
+}
+.register-card h2 {
+  font-size: 26px;
+  letter-spacing: -0.8px;
+  line-height: 1.3;
+  margin: 12px 0 8px;
+}
+.form-intro {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 26px;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.role-options {
+  display: grid;
+  gap: 9px;
+  margin-bottom: 27px;
+}
+.role-option {
+  display: flex;
+  gap: 11px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  cursor: pointer;
+}
+.role-option:has(input:checked) {
+  background: #edf6f0;
+  border-color: #6ba794;
+}
+.role-option input {
+  accent-color: var(--teal);
+  margin: 3px 0;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+.role-option strong {
+  font-size: 12px;
+}
+.role-option small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.6;
+}
+.consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 24px 0 0;
+  font-size: 10px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.consent input {
+  margin-top: 3px;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--teal);
+  flex-shrink: 0;
+}
+.submit-button {
+  margin-top: 25px;
+  width: 100%;
+  font-size: 12px;
+}
+.form-footnote {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  margin: 13px 0 0;
+}
+.receipt-view > p:not(.eyebrow) {
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.success-symbol {
+  display: flex;
+  width: 53px;
+  height: 53px;
+  align-items: center;
+  justify-content: center;
+  background: #e1f0e6;
+  color: var(--teal);
+  border-radius: 50%;
+  margin-bottom: 25px;
+}
+.success-symbol app-icon {
+  width: 28px;
+  height: 28px;
+}
+.receipt-view dl {
+  background: #f3f7f4;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 19px;
+  margin: 23px 0;
+}
+.receipt-view dl > div + div {
+  margin-top: 20px;
+}
+.receipt-view dt {
+  font-size: 10px;
+  color: var(--muted);
+}
+.receipt-view dd {
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: 0.3px;
+  margin: 9px 0 0;
+}
+.receipt-note {
+  font-size: 10px !important;
+}
+.receipt-view > .button {
+  width: 100%;
+  margin-top: 20px;
+  font-size: 12px;
+}
+.receipt-view > .text-button {
+  display: flex;
+  margin: 18px auto 0;
+  font-size: 11px;
+}
+@media (max-width: 1000px) {
+  .register-layout {
+    gap: 30px;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr);
+  }
+  .register-card {
+    padding: 25px;
+  }
+  .register-intro h1 {
+    font-size: 31px;
+  }
+}
+@media (max-width: 800px) {
+  .register-layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .register-intro {
+    padding: 10px 0 20px;
+  }
+  .register-intro h1 {
+    max-width: 480px;
+    font-size: 34px;
+  }
+  .register-steps {
+    display: none;
+  }
+  .privacy-note {
+    margin-top: 20px;
+  }
+  .register-card {
+    max-width: 540px;
+    width: 100%;
+    margin: auto;
+  }
+  .register-intro > p:not(.eyebrow) {
+    max-width: 100%;
+  }
+}
+@media (max-width: 430px) {
+  .register-card {
+    padding: 23px 20px;
+  }
+  .register-intro h1 {
+    font-size: 29px;
+  }
+}
+
+.password-field {
+  position: relative;
+}
+.password-field input {
+  padding-right: 78px;
+}
+.password-toggle {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  padding: 7px 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--teal);
+  cursor: pointer;
+}

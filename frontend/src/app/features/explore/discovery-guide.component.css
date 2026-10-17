@@ -1,0 +1,145 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.discovery-aside {
+  padding-top: 4px;
+}
+.next-step {
+  border: 1px solid #d4e5db;
+  border-radius: 13px;
+  background: #eaf2eb;
+  padding: 23px 20px;
+}
+.panel-icon {
+  width: 37px;
+  height: 37px;
+  background: #d0e4d6;
+  color: #315f46;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  margin-bottom: 21px;
+}
+.next-step .eyebrow {
+  font-size: 9px;
+  color: #486957;
+}
+.next-step h2 {
+  font-size: 21px;
+  letter-spacing: -0.6px;
+  line-height: 1.35;
+  margin: 12px 0;
+}
+.next-step > p:not(.eyebrow) {
+  font-size: 11px;
+  line-height: 1.9;
+  color: #587063;
+  margin-bottom: 20px;
+}
+.next-step .button {
+  font-size: 11px;
+  width: 100%;
+  padding: 11px 13px;
+}
+.step-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 17px;
+  color: #587063;
+  font-size: 9px;
+  line-height: 1.8;
+}
+.step-note app-icon {
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+}
+.journey-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 22px 18px;
+  margin-top: 19px;
+}
+.journey-card h3 {
+  font-size: 13px;
+  margin: 0 0 21px;
+}
+.journey-card ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.journey-card li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0 0 21px;
+}
+.journey-card li > span {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #edf3ee;
+  border-radius: 7px;
+  color: #577667;
+  font-size: 9px;
+  flex-shrink: 0;
+}
+.journey-card strong {
+  font-size: 10px;
+  line-height: 1.6;
+  display: block;
+}
+.journey-card li p {
+  font-size: 10px;
+  line-height: 1.7;
+  margin: 5px 0 0;
+  color: var(--muted);
+}
+.journey-card > a {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  text-decoration: none;
+  font-size: 10px;
+  color: var(--teal);
+  font-weight: 650;
+}
+.journey-card > a app-icon {
+  width: 14px;
+}
+.demo-note {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--muted);
+  padding: 0 8px;
+  margin-top: 18px;
+}
+@media (max-width: 1150px) {
+  .discovery-aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .journey-card {
+    margin-top: 0;
+  }
+  .demo-note {
+    grid-column: 1/-1;
+    margin: 0;
+  }
+}
+@media (max-width: 760px) {
+  .discovery-aside {
+    grid-template-columns: 1fr;
+  }
+  .demo-note {
+    grid-column: auto;
+  }
+}
