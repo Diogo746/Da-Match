@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { FormControl, Validators } from "@angular/forms";
 import { Observable, defer, delay, of, throwError } from "rxjs";
 import { ProfileKind } from "./profiles.store";
 
@@ -32,6 +33,12 @@ export abstract class RegistrationGateway {
   ): Observable<RegistrationReceipt>;
 }
 
+function isValidEmail(email: string): boolean {
+  return email.length <= 254 &&
+    Validators.email(new FormControl(email)) === null &&
+    email.slice(email.lastIndexOf("@") + 1).includes(".");
+}
+
 @Injectable()
 export class DemoRegistrationGateway extends RegistrationGateway {
   private readonly registeredEmails = new Set<string>();
@@ -45,7 +52,7 @@ export class DemoRegistrationGateway extends RegistrationGateway {
       const email = request.email.trim().toLowerCase();
       if (
         nome.length < 4 ||
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+        !isValidEmail(email) ||
         request.senha.length < 6 ||
         request.senha.trim().length === 0 ||
         !["STARTUP", "MENTOR"].includes(tipoUsuario)

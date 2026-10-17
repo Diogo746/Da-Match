@@ -8,7 +8,7 @@
 }
 .sidebar {
   background: var(--navy);
-  color: #fff;
+  color:var(--on-navy);
   padding: 36px 22px 24px;
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@
   display: flex;
   gap: 11px;
   align-items: center;
-  color: #fff;
+  color:var(--on-navy);
   font-size: 27px;
   font-weight: 750;
   letter-spacing: -1.4px;
@@ -48,7 +48,7 @@
 .brand-mark i + i {
   top: 8px;
   left: 8px;
-  border-color: #fff;
+  border-color:var(--on-navy);
 }
 .sidebar-label {
   font-size: 10px;
@@ -144,7 +144,7 @@
 .topbar {
   height: 83px;
   border-bottom: 1px solid var(--border);
-  background: #fff;
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -170,7 +170,7 @@
 .demo-pill {
   font-size: 11px;
   font-weight: 600;
-  color: #456572;
+  color: var(--muted);
   display: flex;
   align-items: center;
   gap: 7px;
@@ -191,6 +191,7 @@ main {
   margin: 0 40px;
   padding: 20px 0;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 15px;
   color: var(--muted);
@@ -249,12 +250,15 @@ main {
     display: flex;
     gap: 6px;
     margin-top: 19px;
+    overflow-x: auto;
+    padding-bottom: 2px;
   }
   .main-nav a {
     font-size: 11px;
     padding: 11px 9px;
     gap: 7px;
-    flex: 1;
+    flex: 0 0 auto;
+    min-height: 42px;
     justify-content: center;
   }
   .main-nav app-icon {

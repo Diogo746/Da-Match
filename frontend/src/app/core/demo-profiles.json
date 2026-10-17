@@ -1,0 +1,396 @@
+[
+  {
+    "id": "mentor-1",
+    "name": "Marina Albuquerque",
+    "kind": "MENTOR",
+    "title": "Estratégia de produto e validação",
+    "description": "Apoia fundadores a transformar hipóteses em experimentos, conversar com clientes e definir um primeiro produto com foco.",
+    "tags": [
+      "Ideação",
+      "Produto",
+      "Pesquisa"
+    ],
+    "reasons": [
+      "Experiência em validação de negócios",
+      "Apoio a startups em ideação",
+      "Disponibilidade para encontros online"
+    ],
+    "availability": "2 encontros por mês",
+    "theme": "mint",
+    "matching": {
+      "format": "AMBOS",
+      "cityId": "PE_RECIFE",
+      "days": [
+        "MON",
+        "WED",
+        "THU"
+      ],
+      "periods": [
+        "AFTERNOON",
+        "EVENING"
+      ],
+      "sectors": [
+        "TECH",
+        "EDUCATION"
+      ],
+      "topics": [
+        "VALIDATION",
+        "CUSTOMERS",
+        "PITCH"
+      ]
+    }
+  },
+  {
+    "id": "mentor-2",
+    "name": "Rafael Nascimento",
+    "kind": "MENTOR",
+    "title": "Tecnologia para ideias em construção",
+    "description": "Ajuda equipes em ideação a entender possibilidades técnicas, organizar hipóteses e escolher os primeiros experimentos para uma ideia.",
+    "tags": [
+      "Ideação",
+      "Tecnologia",
+      "Experimentos"
+    ],
+    "reasons": [
+      "Orientação para primeiros experimentos",
+      "Atuação em tecnologia",
+      "Apoio a equipes em ideação"
+    ],
+    "availability": "1 encontro por mês",
+    "theme": "blue",
+    "matching": {
+      "format": "ONLINE",
+      "cityId": "PE_RECIFE",
+      "days": [
+        "TUE",
+        "THU",
+        "SAT"
+      ],
+      "periods": [
+        "EVENING"
+      ],
+      "sectors": [
+        "TECH"
+      ],
+      "topics": [
+        "PROTOTYPE",
+        "VALIDATION",
+        "BUSINESS"
+      ]
+    }
+  },
+  {
+    "id": "mentor-3",
+    "name": "Camila Duarte",
+    "kind": "MENTOR",
+    "title": "Público e posicionamento de novas ideias",
+    "description": "Ajuda projetos criativos em ideação a conhecer seu público, investigar problemas e construir uma proposta de valor.",
+    "tags": [
+      "Marketing",
+      "Posicionamento",
+      "Design"
+    ],
+    "reasons": [
+      "Foco em economia criativa",
+      "Apoio à descoberta do público",
+      "Mentoria remota disponível"
+    ],
+    "availability": "2 encontros por mês",
+    "theme": "sand",
+    "matching": {
+      "format": "ONLINE",
+      "cityId": "PB_JOAO_PESSOA",
+      "days": [
+        "MON",
+        "WED",
+        "SAT"
+      ],
+      "periods": [
+        "AFTERNOON",
+        "EVENING"
+      ],
+      "sectors": [
+        "CREATIVE",
+        "EDUCATION"
+      ],
+      "topics": [
+        "CUSTOMERS",
+        "PITCH",
+        "PROTOTYPE"
+      ]
+    }
+  },
+  {
+    "id": "mentor-4",
+    "name": "André Monteiro",
+    "kind": "MENTOR",
+    "title": "Modelo de negócio e finanças",
+    "description": "Contribui com modelos de receita, planejamento financeiro e estruturação de iniciativas de impacto social.",
+    "tags": [
+      "Finanças",
+      "Modelo de negócio",
+      "Impacto"
+    ],
+    "reasons": [
+      "Apoio à estruturação financeira",
+      "Experiência com negócios de impacto",
+      "Atendimento a projetos em ideação"
+    ],
+    "availability": "1 encontro por mês",
+    "theme": "mint",
+    "matching": {
+      "format": "ONLINE",
+      "cityId": "BA_SALVADOR",
+      "days": [
+        "TUE",
+        "THU",
+        "FRI"
+      ],
+      "periods": [
+        "EVENING"
+      ],
+      "sectors": [
+        "SOCIAL",
+        "COMMERCE"
+      ],
+      "topics": [
+        "BUSINESS",
+        "PRICING",
+        "PITCH"
+      ]
+    }
+  },
+  {
+    "id": "startup-1",
+    "name": "Semente Labs",
+    "kind": "STARTUP",
+    "title": "Tecnologia para aprender melhor",
+    "description": "Startup fictícia em ideação que investiga dificuldades de aprendizagem. Busca mentoria para entender o problema e estruturar sua proposta inicial.",
+    "tags": [
+      "Educação",
+      "Ideação",
+      "Pesquisa"
+    ],
+    "reasons": [
+      "Busca apoio para estruturar uma ideia",
+      "Atua no setor de tecnologia",
+      "Está no estágio de ideação"
+    ],
+    "availability": "Busca mentoria para sua ideia",
+    "theme": "sand",
+    "matching": {
+      "format": "ONLINE",
+      "cityId": "PE_RECIFE",
+      "days": [
+        "MON",
+        "WED",
+        "THU"
+      ],
+      "periods": [
+        "AFTERNOON",
+        "EVENING"
+      ],
+      "sectors": [
+        "TECH"
+      ],
+      "topics": [
+        "VALIDATION",
+        "PROTOTYPE"
+      ]
+    }
+  },
+  {
+    "id": "startup-2",
+    "name": "Maré Studio",
+    "kind": "STARTUP",
+    "title": "Novas experiências na economia criativa",
+    "description": "Projeto fictício de experiências digitais para a economia criativa. Procura apoio em modelo de negócio e descoberta de clientes.",
+    "tags": [
+      "Design",
+      "Experiências digitais",
+      "Negócio"
+    ],
+    "reasons": [
+      "Busca apoio em modelo de negócio",
+      "Atua na economia criativa",
+      "Está no estágio de ideação"
+    ],
+    "availability": "Busca mentoria de negócio",
+    "theme": "blue",
+    "matching": {
+      "format": "ONLINE",
+      "cityId": "PB_JOAO_PESSOA",
+      "days": [
+        "MON",
+        "WED",
+        "THU"
+      ],
+      "periods": [
+        "AFTERNOON",
+        "EVENING"
+      ],
+      "sectors": [
+        "CREATIVE"
+      ],
+      "topics": [
+        "BUSINESS",
+        "CUSTOMERS"
+      ]
+    }
+  },
+  {
+    "id": "mentor-5",
+    "name": "Beatriz Lima",
+    "kind": "MENTOR",
+    "title": "Validação para negócios de saúde",
+    "description": "Mentora fictícia que apoia equipes a ouvir usuários, testar hipóteses e estruturar modelos de negócio na saúde.",
+    "tags": [
+      "Saúde",
+      "Validação",
+      "Clientes"
+    ],
+    "reasons": [
+      "Experiência em saúde e bem-estar",
+      "Orientação para descoberta de clientes"
+    ],
+    "availability": "Novas mentorias disponíveis",
+    "theme": "mint",
+    "matching": {
+      "format": "PRESENCIAL",
+      "cityId": "PE_RECIFE",
+      "days": [
+        "MON",
+        "WED"
+      ],
+      "periods": [
+        "MORNING",
+        "AFTERNOON"
+      ],
+      "sectors": [
+        "HEALTH"
+      ],
+      "topics": [
+        "VALIDATION",
+        "CUSTOMERS",
+        "BUSINESS"
+      ]
+    }
+  },
+  {
+    "id": "mentor-6",
+    "name": "Lucas Azevedo",
+    "kind": "MENTOR",
+    "title": "Do primeiro plano à proposta de valor",
+    "description": "Mentor fictício com atuação geral em organização da ideia, modelo de negócio e comunicação da proposta.",
+    "tags": [
+      "Negócio",
+      "Apresentação",
+      "Ideação"
+    ],
+    "reasons": [
+      "Atuação geral em diferentes setores",
+      "Apoio ao modelo de negócio"
+    ],
+    "availability": "Novas mentorias disponíveis",
+    "theme": "blue",
+    "matching": {
+      "format": "ONLINE",
+      "cityId": "PE_RECIFE",
+      "days": [
+        "MON",
+        "TUE",
+        "WED",
+        "THU",
+        "FRI",
+        "SAT"
+      ],
+      "periods": [
+        "MORNING",
+        "AFTERNOON",
+        "EVENING"
+      ],
+      "sectors": [
+        "GENERAL"
+      ],
+      "topics": [
+        "BUSINESS",
+        "PRICING",
+        "PITCH"
+      ]
+    }
+  },
+  {
+    "id": "startup-3",
+    "name": "Raiz Circular",
+    "kind": "STARTUP",
+    "title": "Uma ideia para reaproveitar melhor",
+    "description": "Ideia fictícia que investiga o desperdício no comércio local. Busca orientação para pensar em custos e em um modelo sustentável.",
+    "tags": [
+      "Impacto social",
+      "Custos",
+      "Negócio"
+    ],
+    "reasons": [
+      "Busca apoio em preços e custos",
+      "Investiga um problema do comércio local"
+    ],
+    "availability": "Busca orientação para a ideia",
+    "theme": "sand",
+    "matching": {
+      "format": "ONLINE",
+      "cityId": "BA_SALVADOR",
+      "days": [
+        "TUE",
+        "THU",
+        "FRI"
+      ],
+      "periods": [
+        "EVENING"
+      ],
+      "sectors": [
+        "SOCIAL"
+      ],
+      "topics": [
+        "PRICING",
+        "BUSINESS"
+      ]
+    }
+  },
+  {
+    "id": "startup-4",
+    "name": "Cuidado Perto",
+    "kind": "STARTUP",
+    "title": "Escutar antes de construir uma solução",
+    "description": "Projeto fictício em ideação que quer entender dificuldades de famílias no acompanhamento de cuidados de saúde.",
+    "tags": [
+      "Saúde",
+      "Pesquisa",
+      "Validação"
+    ],
+    "reasons": [
+      "Busca validar o problema",
+      "Quer conhecer melhor seu público"
+    ],
+    "availability": "Busca orientação para a ideia",
+    "theme": "mint",
+    "matching": {
+      "format": "PRESENCIAL",
+      "cityId": "PE_RECIFE",
+      "days": [
+        "MON",
+        "WED"
+      ],
+      "periods": [
+        "MORNING",
+        "AFTERNOON"
+      ],
+      "sectors": [
+        "HEALTH"
+      ],
+      "topics": [
+        "CUSTOMERS",
+        "VALIDATION"
+      ]
+    }
+  }
+]

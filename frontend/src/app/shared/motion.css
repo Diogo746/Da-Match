@@ -1,0 +1,78 @@
+/* Movimentos curtos orientam a navegação. O único ciclo contínuo é a luz do Lumen. */
+:root {
+  --motion-fast: 160ms;
+  --motion-enter: 240ms;
+  --motion-ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+app-explore, app-register, app-profile, app-about {
+  animation: page-enter var(--motion-enter) var(--motion-ease) both;
+}
+
+.choice-grid, .format-choices, .day-choices, .period-choices, .complete-layout {
+  animation: step-enter 200ms var(--motion-ease) both;
+}
+
+.button, .text-button, .main-nav a, .role-option, .save-button,
+.soft-choice, .day-choice, .period-choice, .motion-toggle, .theme-toggle {
+  transition: background-color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease, color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease, transform var(--motion-fast) ease;
+}
+
+.motion-toggle {
+  align-self: flex-start;
+  min-height: 32px;
+  border: 0;
+  background: transparent;
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.7;
+  padding: 6px 0;
+  cursor: pointer;
+  text-underline-offset: 3px;
+}
+.motion-toggle:hover { text-decoration: underline; }
+
+.button:not(:disabled):active { transform: translateY(1px); }
+.choice-check { transition: opacity var(--motion-fast) ease; }
+.form-input { transition: border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease; }
+.real-progress progress::-webkit-progress-value { transition: width 350ms var(--motion-ease); }
+
+dialog[open] { animation: dialog-enter 200ms var(--motion-ease) both; }
+dialog[open]::backdrop { animation: backdrop-enter 180ms ease both; }
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes step-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes dialog-enter {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes backdrop-enter { from { opacity: 0; } to { opacity: 1; } }
+
+.motion-paused, .motion-paused *, .motion-paused *::before,
+.motion-paused *::after, .motion-paused *::backdrop {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+.motion-paused progress::-webkit-progress-value { transition: none !important; }
+.motion-paused .profile-card:hover, .motion-paused .choice:active,
+.motion-paused .button:active { transform: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after, *::backdrop {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  progress::-webkit-progress-value { transition: none !important; }
+  .profile-card:hover, .choice:active, .button:active { transform: none !important; }
+}

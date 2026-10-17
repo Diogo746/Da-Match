@@ -77,6 +77,22 @@ describe("Cadastro demonstrativo baseado em CadastrarUsuarioRequest", () => {
     ).rejects.toBeInstanceOf(RegistrationError);
   });
 
+  it.each([
+    "",
+    "maria@@example.test",
+    "maria silva@example.test",
+    "maria@localhost",
+    "maria@.test",
+    "maria@example.",
+    "maria..silva@example.test",
+    `${"a".repeat(65)}@example.test`,
+    `${"a".repeat(10000)}@example.test`,
+  ])("recusa e-mail malformado ou acima dos limites: caso %#", async (email) => {
+    await expect(
+      firstValueFrom(new DemoRegistrationGateway().register("MENTOR", { ...request, email })),
+    ).rejects.toMatchObject({ code: "INVALID_INPUT" });
+  });
+
   it("identifica o mesmo e-mail entre os dois tipos e normaliza espaços e caixa", async () => {
     vi.useFakeTimers();
     const gateway = new DemoRegistrationGateway();

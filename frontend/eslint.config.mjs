@@ -1,7 +1,8 @@
+import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import angular from 'angular-eslint';
 
-export default tseslint.config(
+export default defineConfig(
   {
     files: ['**/*.ts'],
     extends: [
@@ -10,6 +11,7 @@ export default tseslint.config(
     ],
     processor: angular.processInlineTemplates,
     rules: {
+      'no-nested-ternary': 'error',
       '@angular-eslint/directive-selector': [
         'error',
         {

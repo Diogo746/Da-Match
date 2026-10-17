@@ -6,6 +6,7 @@ import {
 } from "@angular/core";
 import { DemoProfile } from "../../core/profiles.store";
 import { IconComponent } from "../../shared/icon.component";
+import { MatchResult } from "../../core/matching.engine";
 @Component({
   selector: "app-profile-card",
   standalone: true,
@@ -17,6 +18,7 @@ import { IconComponent } from "../../shared/icon.component";
 export class ProfileCardComponent {
   readonly profile = input.required<DemoProfile>();
   readonly saved = input(false);
+  readonly match = input<MatchResult | null>(null);
   readonly saveToggled = output<void>();
   readonly profileOpened = output<void>();
   label(): string {

@@ -1,94 +1,21 @@
 <a class="back-link" routerLink="/">← Voltar para descobrir</a>
-<div class="register-layout">
-  <section class="register-intro">
-    <p class="eyebrow">IDEIAS ENCONTRAM EXPERIÊNCIA</p>
-    <h1>Toda ideia merece uma boa primeira conversa.</h1>
-    <p>
-      Conecte sua startup em ideação a quem pode orientar o começo. Ou participe
-      como mentor e ajude uma nova ideia a encontrar seu caminho.
-    </p>
-    <ol class="register-steps">
-      <li>
-        <span>01</span>
-        <div>
-          <h2>Escolha como participar</h2>
-          <p>
-            Startup em ideação ou mentor: cada experiência tem algo a somar.
-          </p>
-        </div>
-      </li>
-      <li>
-        <span>02</span>
-        <div>
-          <h2>Preencha seus dados</h2>
-          <p>Comece com nome, e-mail e uma senha para a conta.</p>
-        </div>
-      </li>
-      <li>
-        <span>03</span>
-        <div>
-          <h2>Explore as possibilidades</h2>
-          <p>
-            Conheça os perfis e encontre experiências que combinam com sua
-            ideia.
-          </p>
-        </div>
-      </li>
-    </ol>
-    <div class="privacy-note">
-      <app-icon name="shield" />
-      <p>
-        Esta é uma demonstração. Use nome, e-mail e senha inventados. Os dados
-        do teste são temporários e a senha não é armazenada.
-      </p>
-    </div>
-  </section>
-  <section class="register-card" aria-labelledby="register-title">
-    @if (receipt(); as result) {
-      <div class="receipt-view">
-        <span class="success-symbol"><app-icon name="check" /></span>
-        <p class="eyebrow">TESTE CONCLUÍDO</p>
-        <h2 id="register-title" #receiptHeading tabindex="-1">
-          {{ result.nome }}, seu cadastro foi simulado.
-        </h2>
-        <p>
-          Você percorreu o formulário de
-          {{
-            result.tipoUsuario === "STARTUP" ? "startup em ideação" : "mentor"
-          }}. Nenhuma conta real foi criada.
-        </p>
-        <dl>
-          <div>
-            <dt>Perfil escolhido</dt>
-            <dd>
-              {{
-                result.tipoUsuario === "STARTUP"
-                  ? "Startup em ideação"
-                  : "Mentor"
-              }}
-            </dd>
-          </div>
-          <div>
-            <dt>E-mail de teste</dt>
-            <dd>{{ result.email }}</dd>
-          </div>
-        </dl>
-        <p class="receipt-note">
-          Os dados não foram enviados a um servidor. A senha já foi removida do
-          formulário. Você pode continuar explorando os perfis fictícios.
-        </p>
-        <a class="button button-primary" routerLink="/"
-          >Descobrir perfis<app-icon name="arrow"
-        /></a>
-        <button class="text-button" type="button" (click)="restart()">
-          Testar outro cadastro
-        </button>
-      </div>
-    } @else {
+@if (profileReady()) {
+  @if (session.profile(); as profile) { <app-profile-complete [profile]="profile" /> }
+  <button class="text-button new-registration" type="button" (click)="restart()">Testar outro cadastro</button>
+} @else if (receipt(); as result) {
+  <header class="setup-intro"><p class="eyebrow">PRAZER EM CONHECER VOCÊ, {{ result.nome.split(' ')[0] }}</p><h1 #receiptHeading tabindex="-1">Agora, um perfil com a sua cara.</h1><p>Suas respostas ajudam a personalizar as indicações. Você pode mudar tudo depois.</p></header>
+  <app-profile-setup [kind]="result.tipoUsuario" [name]="result.nome" (finished)="completeProfile($event)" />
+} @else {
+  <div class="register-layout">
+    <section class="register-intro"><app-lumen-guide class="register-guide" message="Vamos começar pelo básico. Depois, conto com você em quatro escolhas rápidas." /><p class="eyebrow">IDEIAS ENCONTRAM EXPERIÊNCIA</p><h1>Uma boa conexão começa com você.</h1><p>Uma ideia para tirar do papel ou uma experiência para compartilhar. Conte um pouco sobre você e encontre novos caminhos.</p>
+      <ol class="register-steps"><li><span>01</span><div><h2>Seu lugar nessa história</h2><p>Startup em ideação ou mentor.</p></div></li><li><span>02</span><div><h2>Quatro pequenos passos</h2><p>Mais escolhas por toque, menos digitação.</p></div></li><li><span>03</span><div><h2>Indicações com contexto</h2><p>Conheça perfis e entenda o que aproxima vocês.</p></div></li></ol>
+      <div class="privacy-note"><app-icon name="shield" /><p>Demonstração: use nome, e-mail e senha inventados. O teste é temporário e a senha não é armazenada.</p></div>
+    </section>
+    <section class="register-card" aria-labelledby="register-title">
       <p class="eyebrow">CADASTRO · DEMONSTRAÇÃO</p>
       <h2 id="register-title">Como você quer participar?</h2>
       <p class="form-intro">
-        Escolha seu perfil e teste o cadastro com dados fictícios.
+        Comece pelos dados da conta. Depois, quatro pequenas etapas para montar seu perfil.
       </p>
       <form
         [formGroup]="form"
@@ -224,7 +151,7 @@
             type="submit"
             [disabled]="loading()"
           >
-            {{ loading() ? "Simulando cadastro…" : "Testar cadastro" }}
+            {{ loading() ? "Preparando seu perfil…" : "Continuar para meu perfil" }}
             @if (!loading()) {
               <app-icon name="arrow" />
             }
@@ -232,6 +159,7 @@
         </fieldset>
         <p class="form-footnote">Demonstração local com dados temporários.</p>
       </form>
-    }
-  </section>
-</div>
+
+    </section>
+  </div>
+}
