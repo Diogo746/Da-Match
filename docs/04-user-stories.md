@@ -378,3 +378,111 @@
 ---
 
 > ⚠️ **Ponto de atenção para o time:** o protótipo do frontend (`matching.engine.ts`, regra `damatch-rules-v1`) usa pesos diferentes da proposta match-1.0 do SRS. É preciso decidir qual regra vale antes de implementar o cálculo no backend.
+
+---
+
+## 🎯 Épico 5: Interesses e conexões (CONEXAO)
+
+> Fluxo: interesse de A para B → interesse de B para A → conexão ATIVA. Interesse de um lado só não cria conexão.
+
+### 🔹 `US-20`: Demonstrar interesse
+* **Como** participante,
+* **Quero** demonstrar interesse em um perfil que encontrei na busca ou nas recomendações,
+* **Para que** a outra pessoa saiba que quero conversar.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Interesse registrado):**
+>   * **Dado** que o perfil é complementar ao meu (startup ↔ mentor/investidor), ativo e publicado,
+>   * **Quando** clico em "Tenho interesse",
+>   * **Então** é criado um único interesse ATIVO, visível só para nós dois, sem criar conexão.
+> * **Cenário 2 (Clique repetido):**
+>   * **Dado** que já demonstrei interesse nesse perfil,
+>   * **Quando** clico de novo,
+>   * **Então** nenhum interesse duplicado é criado.
+> * **Cenário 3 (Par inválido):**
+>   * **Dado** que tento demonstrar interesse em mim mesmo ou em alguém do mesmo tipo (startup → startup),
+>   * **Quando** envio,
+>   * **Então** a operação é recusada.
+* *Prioridade:* P1 · *Rastreabilidade:* RF20, RN18, RN21, CA17.
+
+---
+
+### 🔹 `US-21`: Ver interesses enviados e recebidos
+* **Como** participante,
+* **Quero** ver quem demonstrou interesse em mim e em quem eu demonstrei, com data e estado,
+* **Para que** eu possa retribuir os que me interessam.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Minhas listas):**
+>   * **Dado** que tenho interesses enviados e recebidos,
+>   * **Quando** abro a tela de interesses,
+>   * **Então** vejo só os que envolvem a mim, com o estado atualizado.
+* *Prioridade:* P1 · *Rastreabilidade:* RF21, RN20, CA17.
+
+---
+
+### 🔹 `US-22`: Retirar um interesse
+* **Como** autor de um interesse,
+* **Quero** desfazer o interesse antes de virar conexão,
+* **Para que** eu possa mudar de ideia.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Retirada):**
+>   * **Dado** que tenho um interesse ATIVO sem conexão,
+>   * **Quando** retiro o interesse,
+>   * **Então** ele fica RETIRADO e não gera mais conexão.
+> * **Cenário 2 (Interesse de outra pessoa):**
+>   * **Dado** que o interesse foi criado por outro usuário,
+>   * **Quando** tento retirá-lo,
+>   * **Então** a operação é recusada.
+* *Prioridade:* P1 · *Rastreabilidade:* RF22, RN21, CA18.
+
+---
+
+### 🔹 `US-23`: Virar conexão quando o interesse é mútuo
+* **Como** participante,
+* **Quero** que a conexão seja criada sozinha quando os dois lados demonstrarem interesse,
+* **Para que** a gente possa partir para uma conversa.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Reciprocidade):**
+>   * **Dado** que A tem interesse ativo em B,
+>   * **Quando** B demonstra interesse em A,
+>   * **Então** é criada uma conexão ATIVA e as duas partes a veem.
+> * **Cenário 2 (Cliques ao mesmo tempo):**
+>   * **Dado** que A e B clicam em "Tenho interesse" quase ao mesmo tempo ou várias vezes,
+>   * **Quando** o sistema processa,
+>   * **Então** existe exatamente uma conexão ativa para o par.
+* *Prioridade:* P1 · *Rastreabilidade:* RF23, RN22, CA19.
+
+---
+
+### 🔹 `US-24`: Acompanhar minhas conexões
+* **Como** participante,
+* **Quero** ver minhas conexões com estado, datas, o perfil da outra parte e as reuniões ligadas a cada uma,
+* **Para que** eu acompanhe cada relacionamento.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Só as minhas):**
+>   * **Dado** que tenho conexões ativas e encerradas,
+>   * **Quando** abro a tela de conexões,
+>   * **Então** vejo só as minhas, e uma conexão encerrada não aparece como ativa.
+* *Prioridade:* P1 · *Rastreabilidade:* RF24, RN20, RN23, CA19, CA20.
+
+---
+
+### 🔹 `US-25`: Encerrar uma conexão
+* **Como** participante de uma conexão,
+* **Quero** encerrá-la com uma confirmação,
+* **Para que** eu termine um relacionamento que não faz mais sentido.
+
+> **Critérios de aceitação:**
+> * **Cenário 1 (Encerramento):**
+>   * **Dado** que a conexão tem reuniões já realizadas e reuniões futuras em aberto,
+>   * **Quando** confirmo o encerramento,
+>   * **Então** a conexão fica ENCERRADA, as reuniões futuras são CANCELADAS e as realizadas continuam no histórico.
+> * **Cenário 2 (Depois de encerrar):**
+>   * **Dado** que a conexão foi encerrada,
+>   * **Quando** alguém tenta marcar reunião nela,
+>   * **Então** o sistema recusa. Para conectar de novo, os dois precisam demonstrar interesse outra vez.
+* *Prioridade:* P1 · *Rastreabilidade:* RF25, RN23, RN25, CA20.
