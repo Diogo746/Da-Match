@@ -207,4 +207,11 @@ describe("Do cadastro ao perfil", () => {
     component.completeProfile(emptyProfile("STARTUP"));
     expect(component.session.profile()).toBeNull();
   });
+  it("não ativa um perfil com papel diferente do cadastro confirmado", async () => {
+    const { component } = create();
+    fill(component); await component.submit();
+    component.completeProfile(emptyProfile("MENTOR"));
+    expect(component.profileReady()).toBe(false);
+    expect(component.session.profile()).toBeNull();
+  });
 });

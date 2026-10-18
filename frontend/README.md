@@ -103,7 +103,7 @@ npm.cmd run build
 npm.cmd run build:api
 ```
 
-Nesta entrega: **168 testes passaram em 15 arquivos**. Cobertura: linhas **97,60%**, declarações **96,19%**, ramificações **95,36%** e funções **92,60%**. Os tipos dos testes também passaram. Os limites globais continuam em 80% nas quatro métricas.
+Nesta entrega: **172 testes passaram em 15 arquivos**. Cobertura: linhas **97,61%**, declarações **96,20%**, ramificações **95,36%** e funções **92,63%**. Os tipos dos testes também passaram. Os limites globais continuam em 80% nas quatro métricas.
 
 - Cobertura HTML: `coverage/frontend/index.html`.
 - LCOV para Sonar: `coverage/frontend/lcov.info`.

@@ -65,7 +65,10 @@ describe("Compatibilidade v2 entre necessidades e experiência", () => {
     const before = structuredClone(startup);
     calculateMatch(startup, mentor);
     expect(startup).toEqual(before);
-    expect(calculateMatch({ ...startup, topics: ["VALIDATION", "VALIDATION"] }, mentor)!.score).toBe(100);
+    const duplicate = calculateMatch({ ...startup, topics: ["VALIDATION", "VALIDATION"] }, mentor)!;
+    const single = calculateMatch({ ...startup, topics: ["VALIDATION"] }, mentor)!;
+    expect(duplicate).toEqual(single);
+    expect(duplicate.score).toBe(100);
   });
   it("não calcula entre dois perfis do mesmo público", () => {
     expect(calculateMatch(startup, startup)).toBeNull();

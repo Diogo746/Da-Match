@@ -95,12 +95,14 @@ describe("Perfil em cinco etapas com o Lumen", () => {
   });
   it("guarda somente os pares de dia e período selecionados e permite removê-los", async () => {
     await render("STARTUP", filled(), true, 4);
+    expect(root.querySelector("output.selection-note")?.textContent).toContain("1 janela adicionada");
     aria("Quinta-feira"); click("Tarde");
     expect(fixture.componentInstance.draft().availability).toEqual([{ day: "MON", period: "EVENING" }, { day: "THU", period: "AFTERNOON" }]);
+    expect(root.querySelector("output.selection-note")?.textContent).toContain("2 janelas adicionadas");
     expect(fixture.componentInstance.slotSelected("MON", "AFTERNOON")).toBe(false);
     aria("Remover Segunda-feira · Noite");
     expect(fixture.componentInstance.draft().availability).toEqual([{ day: "THU", period: "AFTERNOON" }]);
-    expect(root.querySelector(".selection-note")?.textContent).toContain("1 janela");
+    expect(root.querySelector("output.selection-note")?.textContent).toContain("1 janela adicionada");
   });
   it("solicita cidade no presencial e informa a alternativa online quando a modalidade é flexível", async () => {
     await render("STARTUP", filled(), true, 3);
@@ -134,6 +136,20 @@ describe("Perfil em cinco etapas com o Lumen", () => {
     click("Revisar meu perfil"); aria("Rever Setor e apresentação"); click("Educação"); next();
     expect(root.querySelector(".review-list")?.textContent).toContain("Educação");
     expect(fixture.componentInstance.reviewing()).toBe(true);
+  });
+  it("mostra a prioridade e a necessidade secundária na revisão da startup", async () => {
+    await render("STARTUP", { ...filled(), topics: ["PRICING", "VALIDATION"] });
+    for (let i = 0; i < 4; i++) next();
+    click("Revisar meu perfil");
+    expect(root.querySelector(".review-list")?.textContent).toContain("Principal: Preços e custos · Também busca: Validar a ideia");
+  });
+  it("distingue experiência prática e conhecimento na revisão do mentor", async () => {
+    await render("MENTOR", { ...filled("MENTOR"), topics: ["VALIDATION", "BUSINESS"], experience: { VALIDATION: "PRACTICAL", BUSINESS: "KNOWLEDGE" } });
+    for (let i = 0; i < 4; i++) next();
+    click("Revisar meu perfil");
+    const review = root.querySelector(".review-list")?.textContent;
+    expect(review).toContain("Validar a ideia (experiência prática)");
+    expect(review).toContain("Modelo de negócio (conhecimento para orientar)");
   });
   it("leva ao nome inválido mesmo quando a edição foi salva a partir de outra seção", async () => {
     await render("STARTUP",filled(),true,1);

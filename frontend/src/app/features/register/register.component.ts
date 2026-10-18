@@ -194,7 +194,7 @@ export class RegisterComponent {
 
   completeProfile(answers: ProfileDraft): void {
     const receipt = this.receipt();
-    if (!receipt || receipt.mode !== "DEMO" || answers.kind !== receipt.tipoUsuario) return;
+    if (receipt?.mode !== "DEMO" || answers.kind !== receipt.tipoUsuario) return;
     this.session.save(receipt.nome, answers);
     this.profileReady.set(true);
   }

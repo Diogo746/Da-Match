@@ -14,3 +14,9 @@ it("mantém as cores por papel e uma variação estável ao reordenar perfis", (
   }
 });
 
+it("trata identificadores Unicode completos sem depender de pares substitutos", () => {
+  expect(profileTone("MENTOR", "😀")).toBe("mentor-deep");
+  expect(profileTone("STARTUP", "😀a")).toBe("startup-soft");
+  expect(profileTone("MENTOR", "")).toBe("mentor-deep");
+});
+

@@ -51,7 +51,7 @@ interface MatchDescription { reasons: string[]; limitations: string[]; }
 function describeNeeds(startup: MatchProfile, mentor: MatchProfile): MatchDescription {
   const reasons: string[] = [];
   const limitations: string[] = [];
-  for (const topic of [...new Set(startup.topics)]) {
+  for (const topic of new Set(startup.topics)) {
     if (mentor.topics.includes(topic)) {
       reasons.push("Pode orientar em " + topicLabel(topic).toLocaleLowerCase("pt-BR") + ".");
       if (mentor.experience[topic] === "PRACTICAL") reasons.push("Relata experiência prática em " + topicLabel(topic).toLocaleLowerCase("pt-BR") + ".");
@@ -72,8 +72,10 @@ function describeResult(startup: MatchProfile, mentor: MatchProfile, criteria: M
   else limitations.push("O momento da ideia não está entre os momentos de atuação declarados pelo mentor.");
   if (startup.format !== "PRESENCIAL" && mentor.format !== "PRESENCIAL") reasons.push("Vocês aceitam encontros online.");
   else reasons.push("Encontros presenciais em " + cityLabel(startup.cityId) + ".");
-  reasons.push("Janela em comum: " + slotLabel(commonSlots(startup, mentor)[0]) + ". O horário exato ainda precisa ser combinado.");
-  reasons.push(startup.cadence === mentor.cadence && startup.cadence !== "FLEXIBLE" ? "Vocês escolheram a mesma frequência de encontros." : "Há flexibilidade para combinar a frequência.");
+  reasons.push(
+    "Janela em comum: " + slotLabel(commonSlots(startup, mentor)[0]) + ". O horário exato ainda precisa ser combinado.",
+    startup.cadence === mentor.cadence && startup.cadence !== "FLEXIBLE" ? "Vocês escolheram a mesma frequência de encontros." : "Há flexibilidade para combinar a frequência.",
+  );
   return { reasons, limitations };
 }
 // Regra pura e simétrica; os pesos do MVP expressam aderência declarada, não probabilidade.

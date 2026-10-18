@@ -82,15 +82,19 @@ Para integrar o perfil completo, o backend precisa oferecer autenticação, cada
 | --- | --- |
 | Lint | Aprovado |
 | Tipos dos testes | Aprovados |
-| Angular + Vitest | 168 testes em 15 arquivos |
-| Linhas | 97,60% |
-| Declarações | 96,19% |
+| Angular + Vitest | 172 testes em 15 arquivos |
+| Linhas | 97,61% |
+| Declarações | 96,20% |
 | Ramificações | 95,36% |
-| Funções | 92,60% |
+| Funções | 92,63% |
 | Builds DEMO/API | Concluídos |
 | Dependências | Preservadas, com alteração apenas da versão do frontend |
 
 Os testes cobrem agenda cruzada, frequência, prioridades, atuação geral, momento, experiência prática, simetria, indicação parcial, revisão, edição/cancelamento, temas, pausa, salvos, cadastro e respostas/erros HTTP.
+
+### Correção dos apontamentos do SonarQube
+
+A revisão corrige os oito apontamentos da análise do PR #8: Unicode na escolha de cores, condições do resumo do questionário, saída semântica do contador de agenda, seletor CSS duplicado, iteração das necessidades, inserção de justificativas e proteção na conclusão do cadastro. Os testes também verificam os rótulos da revisão, o contador singular/plural, identificadores Unicode e a rejeição de um perfil com papel diferente do cadastro confirmado. A tabela acima registra a validação local após essas correções; a aprovação do Quality Gate depende de uma nova execução do pipeline.
 
 O ambiente não conseguiu instalar o navegador de teste; a revisão visual real não foi concluída. A homologação com Java/Supabase, leitor de tela e participantes não foi executada. Esta entrega também não executou uma análise remota nova do SonarQube.
 

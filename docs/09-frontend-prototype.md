@@ -34,7 +34,7 @@ Abra http://localhost:4200. O [README do frontend](../frontend/README.md) conté
 
 ## Verificações locais
 
-Lint, tipos dos testes, 168 testes em 15 arquivos e builds DEMO/API concluídos. Cobertura: linhas 97,60%; declarações 96,19%; ramificações 95,36%; funções 92,60%. Os limites globais de 80% foram mantidos.
+Lint, tipos dos testes, 172 testes em 15 arquivos e builds DEMO/API concluídos. Cobertura: linhas 97,61%; declarações 96,20%; ramificações 95,36%; funções 92,63%. Os limites globais de 80% foram mantidos.
 
 A revisão visual em navegador real não foi concluída por indisponibilidade do navegador no ambiente. A homologação com Java/Supabase, leitor de tela e participantes também continua pendente. Os testes HTTP usam respostas simuladas.
 

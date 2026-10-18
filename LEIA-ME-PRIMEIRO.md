@@ -1,6 +1,12 @@
 # DaMatch — frontend v0.5.0
 
-Esta entrega reúne a main enviada em 17/10/2026 e o frontend v0.5.0. O backend foi preservado. As novidades estão no frontend e na documentação correspondente.
+Esta entrega reúne o frontend v0.5.0 com as correções dos oito apontamentos do SonarQube e a main e8132da, conferida em 17/10/2026. O código do backend foi preservado. O pipeline mantém a atualização do colega que isola o banco usado nos testes de segurança.
+
+## Correção incluída
+
+O projeto completo já contém as correções de Unicode nas cores, resumo do questionário, contador acessível de agenda, CSS do perfil, justificativas de compatibilidade e proteção na conclusão do cadastro.
+
+Validação local: **172 testes passaram em 15 arquivos**, cobertura de linhas de **97,61%**, lint, tipos e builds DEMO/API aprovados. A aprovação do SonarQube depende de uma nova execução do pipeline após o envio ao GitHub.
 
 ## Começar pelo teste das telas
 

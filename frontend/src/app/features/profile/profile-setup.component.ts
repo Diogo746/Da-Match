@@ -82,7 +82,7 @@ export class ProfileSetupComponent implements OnInit, AfterViewInit {
   readonly summary = computed(() => [
     { step: 0, title: "Momento da ideia", value: this.draft().moments.map(momentLabel).join(" · ") },
     { step: 1, title: "Setor e apresentação", value: [this.draft().projectName, ...this.draft().sectors.map(sectorLabel)].filter(Boolean).join(" · ") },
-    { step: 2, title: this.isStartup() ? "Necessidades" : "Especialidades", value: this.draft().topics.map((topic, index) => this.isStartup() ? (index === 0 ? "Principal: " : "Também busca: ") + topicLabel(topic) : topicLabel(topic) + (this.draft().experience[topic] === "PRACTICAL" ? " (experiência prática)" : " (conhecimento para orientar)")).join(" · ") },
+    { step: 2, title: this.isStartup() ? "Necessidades" : "Especialidades", value: this.draft().topics.map((topic, index) => this.describeTopic(topic, index)).join(" · ") },
     { step: 3, title: "Encontro", value: (FORMATS.find((format) => format.id === this.draft().format)?.label ?? "") + (this.draft().cityId ? " · " + cityLabel(this.draft().cityId) : "") },
     { step: 4, title: "Agenda", value: cadenceLabel(this.draft().cadence) + " · " + this.draft().availability.map(slotLabel).join("; ") },
   ]);
@@ -166,6 +166,14 @@ export class ProfileSetupComponent implements OnInit, AfterViewInit {
     if (this.returnToReview) { this.returnToReview = false; this.reviewing.set(true); queueMicrotask(() => this.guide?.focusQuestion()); return; }
     if (this.step() < 4) this.selectStep(this.step() + 1);
     else { this.reviewing.set(true); queueMicrotask(() => this.guide?.focusQuestion()); }
+  }
+  private describeTopic(topic: TopicId, index: number): string {
+    if (this.isStartup()) {
+      const priority = index === 0 ? "Principal: " : "Também busca: ";
+      return priority + topicLabel(topic);
+    }
+    const experience = this.draft().experience[topic] === "PRACTICAL" ? " (experiência prática)" : " (conhecimento para orientar)";
+    return topicLabel(topic) + experience;
   }
   private showInvalidStep(step: number): void {
     this.selectStep(step);
