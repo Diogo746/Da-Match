@@ -28,3 +28,10 @@ Project Charter (Visão & Dores)
                     └── GitHub Issues / Pull Requests (Branches feature/US-*)
                           └── Commits & Pipeline CI/CD (SonarQube Quality Gate)
 ```
+
+## Frontend atual
+
+- [Guia do protótipo v0.5.0](09-frontend-prototype.md).
+- [Contrato do cadastro conectado de mentor](17-mentor-api-integration.md).
+- [Questionário, compatibilidade e validação v0.5.0](18-frontend-v0.5.0.md).
+- [Paleta e poses do Lumen](19-visual-identity.md).

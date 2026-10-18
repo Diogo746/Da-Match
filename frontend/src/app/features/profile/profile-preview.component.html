@@ -1,0 +1,17 @@
+<article [class]="'preview ' + tone()" aria-label="Prévia do seu perfil">
+  <div class="preview-cover"><span>BOAS CONEXÕES COMEÇAM AQUI</span><app-icon name="network" /></div>
+  <div class="preview-body">
+    <span class="preview-avatar" aria-hidden="true">{{ initials() }}</span>
+    <span class="preview-kind">{{ draft().kind === 'STARTUP' ? 'Startup · Ideação' : 'Mentor' }}</span>
+    <h3>{{ displayName() }}</h3>
+    <div class="preview-tags">
+      @for (sector of draft().sectors; track sector) { <span>{{ sectorLabel(sector) }}</span> }
+      @if (!draft().sectors.length) { <span class="placeholder">Seu setor</span> }
+    </div>
+    <div class="preview-detail"><app-icon name="compass" /><span>{{ moment() }}</span></div>
+    <div class="preview-detail"><app-icon name="spark" /><span>{{ focus() }}</span></div>
+    <div class="preview-detail"><app-icon name="pin" /><span>{{ location() }}</span></div>
+    <div class="preview-detail"><app-icon name="clock" /><span>{{ schedule() }}</span></div>
+  </div>
+</article>
+

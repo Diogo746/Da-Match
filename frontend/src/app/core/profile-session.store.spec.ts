@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ProfileSessionStore } from "./profile-session.store";
 import { cityLabel, emptyProfile, profileIsComplete, sectorLabel, stepIsComplete, topicLabel, ProfileDraft } from "./profile.models";
-const answers: ProfileDraft = { ...emptyProfile("STARTUP"), projectName: "  Minha ideia  ", sectors: ["TECH"], topics: ["VALIDATION"], format: "ONLINE", days: ["MON"], periods: ["EVENING"] };
+const answers: ProfileDraft = { ...emptyProfile("STARTUP"), projectName: "  Minha ideia  ", sectors: ["TECH"], topics: ["VALIDATION"], format: "ONLINE", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "MON", period: "EVENING" }] };
 
 describe("Perfil temporário", () => {
   it("salva uma cópia sem informações de credenciais e permite limpar", () => {
@@ -12,7 +12,7 @@ describe("Perfil temporário", () => {
     expect(store.profile()!.displayName).toBe("Minha ideia");
     expect(store.profile()!.name).toBe("Maria Teste");
     expect(store.profile()!.answers.topics).toEqual(["VALIDATION"]);
-    expect(Object.keys(store.profile()!)).toEqual(["name", "displayName", "answers"]);
+    expect(Object.keys(store.profile()!)).toEqual(["questionnaireVersion", "name", "displayName", "answers"]);
     store.clear();
     expect(store.profile()).toBeNull();
     expect(new ProfileSessionStore().profile()).toBeNull();
@@ -24,12 +24,12 @@ describe("Perfil temporário", () => {
     store.save("Maria Teste", { ...answers, projectName: "" });
     expect(store.profile()!.displayName).toBe("Ideia de Maria");
   });
-  it("exige as quatro etapas antes de ativar um perfil", () => {
+  it("exige as cinco etapas antes de ativar um perfil", () => {
     const store = new ProfileSessionStore();
     expect(() => store.save("Maria", emptyProfile("STARTUP"))).toThrow("Perfil incompleto");
     expect(profileIsComplete(answers)).toBe(true);
-    expect(stepIsComplete(answers, 4)).toBe(false);
-    expect(stepIsComplete({ ...answers, format: "PRESENCIAL", cityId: "" }, 2)).toBe(false);
+    expect(stepIsComplete(answers, 5)).toBe(false);
+    expect(stepIsComplete({ ...answers, format: "PRESENCIAL", cityId: "" }, 3)).toBe(false);
   });
   it("apresenta os códigos e as alternativas do perfil em português", () => {
     expect(sectorLabel("GENERAL")).toBe("Atuação geral");

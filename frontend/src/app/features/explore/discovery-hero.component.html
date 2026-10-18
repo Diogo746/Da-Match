@@ -4,5 +4,5 @@
     <p>{{ savedOnly() ? 'Reúna os perfis que você quer conhecer melhor. Seus salvos ficam disponíveis durante esta sessão.' : session.profile() ? 'Explore indicações a partir do seu momento, conheça os perfis e descubra o que aproxima vocês.' : 'Startups em ideação e mentores do Nordeste. Uma boa conversa pode ajudar a ideia a ganhar forma.' }}</p>
     <div class="hero-actions"><a [routerLink]="session.profile() ? '/meu-perfil' : '/cadastro'" class="button button-primary">{{ session.profile() ? 'Revisar meu perfil' : 'Montar meu perfil' }}<app-icon name="arrow" /></a><a routerLink="/como-funciona" class="hero-link">Como funciona<app-icon name="arrow" /></a></div>
   </div>
-  <div class="hero-character"><app-lumen-guide [stacked]="true" [message]="session.profile() ? 'Seu perfil está pronto. Vamos conhecer suas indicações?' : 'Sou o Lumen. Vou ajudar você a dar o primeiro passo.'" /></div>
+  <div class="hero-character"><app-lumen-guide [stacked]="true" pose="welcome" [priority]="true" [message]="session.profile() ? 'Seu perfil está pronto. Vamos conhecer suas indicações?' : 'Sou o Lumen. Vou ajudar você a dar o primeiro passo.'" /></div>
 </section>

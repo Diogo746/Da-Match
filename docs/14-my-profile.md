@@ -1,5 +1,7 @@
 # Meu perfil — consulta e edição v0.4.1
 
+> Referência histórica das versões anteriores. O comportamento atual está em [18-frontend-v0.5.0.md](18-frontend-v0.5.0.md) e a identidade visual em [19-visual-identity.md](19-visual-identity.md).
+
 ## Comportamento
 
 As quatro etapas fazem parte da criação inicial do perfil. Depois de concluídas, **Meu perfil** abre um resumo: nome do participante, nome da ideia quando aplicável, setores, necessidades ou especialidades, modalidade, cidade quando aplicável e disponibilidade. Mentores também veem se estão recebendo novas startups.

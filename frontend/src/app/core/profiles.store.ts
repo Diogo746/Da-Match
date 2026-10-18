@@ -1,5 +1,6 @@
 import { Injectable, signal } from "@angular/core";
 import { MatchProfile, cityLabel, sectorLabel } from "./profile.models";
+import { ProfileTone, profileTone } from "./profile-appearance";
 import catalog from "./demo-profiles.json";
 export type { ProfileKind } from "./profile.models";
 
@@ -16,18 +17,19 @@ export interface DemoProfile {
   tags: string[];
   reasons: string[];
   availability: string;
-  theme: "mint" | "sand" | "blue";
+  theme: ProfileTone;
   matching: MatchProfile;
 }
 // Pessoas e organizações inventadas exclusivamente para o protótipo.
 type DemoProfileSeed = Omit<DemoProfile,
-  "initials" | "city" | "sector" | "stage" | "matching"
+  "initials" | "city" | "sector" | "stage" | "matching" | "theme"
 > & { matching: Omit<MatchProfile, "kind" | "accepting"> };
 
 function createDemoProfile(seed: DemoProfileSeed): DemoProfile {
   const matching: MatchProfile = { ...seed.matching, kind: seed.kind, accepting: true };
   return {
     ...seed,
+    theme: profileTone(seed.kind, seed.id),
     initials: seed.name.split(" ").map((part) => part.charAt(0)).join(""),
     city: cityLabel(matching.cityId),
     sector: sectorLabel(matching.sectors[0]),

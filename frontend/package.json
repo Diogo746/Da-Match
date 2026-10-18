@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -9,7 +9,9 @@
     "lint": "eslint src",
     "test": "ng test --watch=false",
     "test:watch": "ng test --watch",
-    "test:coverage": "ng test --watch=false --coverage"
+    "test:coverage": "ng test --watch=false --coverage",
+    "start:api": "ng serve --configuration api",
+    "build:api": "ng build --configuration production,api"
   },
   "private": true,
   "dependencies": {

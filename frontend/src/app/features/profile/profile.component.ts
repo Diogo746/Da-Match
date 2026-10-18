@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, inject, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import { DAYS, PERIODS, ProfileDraft, cityLabel, sectorLabel, topicLabel } from "../../core/profile.models";
+import { ProfileDraft, cadenceLabel, cityLabel, momentLabel, sectorLabel, slotLabel, topicLabel } from "../../core/profile.models";
 import { ProfileSessionStore } from "../../core/profile-session.store";
 import { ProfileSetupComponent } from "./profile-setup.component";
 import { ProfilePreviewComponent } from "./profile-preview.component";
@@ -14,14 +14,16 @@ import { IconComponent } from "../../shared/icon.component";
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./profile.component.html",
   styleUrl: "./profile.component.css",
+  host: { "[class.mentor-deep]": "session.profile()?.answers?.kind === 'MENTOR'", "[class.startup-deep]": "session.profile()?.answers?.kind === 'STARTUP'" },
 })
 export class ProfileComponent {
   readonly session = inject(ProfileSessionStore);
   readonly editing = signal(false);
   readonly startStep = signal(0);
   readonly notice = signal("");
-  readonly days = DAYS;
-  readonly periods = PERIODS;
+  readonly momentLabel = momentLabel;
+  readonly cadenceLabel = cadenceLabel;
+  readonly slotLabel = slotLabel;
   readonly sectorLabel = sectorLabel;
   readonly topicLabel = topicLabel;
   readonly cityLabel = cityLabel;

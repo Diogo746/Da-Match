@@ -26,14 +26,14 @@
         ariaCurrentWhenActive="page"
         ><app-icon name="network" />Como funciona</a
       >
-      <a routerLink="/meu-perfil" routerLinkActive="active" ariaCurrentWhenActive="page"><app-icon name="spark" />Meu perfil</a>
+      @if (!apiMode) { <a routerLink="/meu-perfil" routerLinkActive="active" ariaCurrentWhenActive="page"><app-icon name="spark" />Meu perfil</a> }
     </nav>
     <div class="sidebar-invite">
       <span class="invite-symbol"><app-icon name="spark" /></span>
       <h2>Boas conexões.<br />Novos caminhos.</h2>
       <p>Ideias em formação encontram experiência para começar.</p>
       <a class="button button-light" [routerLink]="session.profile() ? '/meu-perfil' : '/cadastro'"
-        >{{ session.profile() ? 'Meu próximo passo' : 'Montar meu perfil' }}<app-icon name="arrow"
+        >{{ invitationLabel() }}<app-icon name="arrow"
       /></a>
     </div>
     <div class="sidebar-footer">
@@ -52,16 +52,16 @@
           [attr.aria-label]="theme.isDark() ? 'Ativar modo claro' : 'Ativar modo escuro'"
           (click)="theme.toggle()"><app-icon [name]="theme.isDark() ? 'sun' : 'moon'" />
           <span>{{ theme.isDark() ? 'Modo claro' : 'Modo escuro' }}</span></button>
-        <span class="demo-pill"><span></span>Demonstração</span
+        <span class="demo-pill"><span></span>{{ apiMode ? 'Integração de mentor' : 'Demonstração' }}</span
         ><a [routerLink]="session.profile() ? '/meu-perfil' : '/cadastro'" class="button button-primary button-small"
-          >{{ session.profile() ? 'Meu perfil' : 'Criar perfil' }}<app-icon name="arrow"
+          >{{ accountLabel() }}<app-icon name="arrow"
         /></a>
       </div>
     </header>
     <main id="conteudo" tabindex="-1"><router-outlet /></main>
     <footer class="page-footer">
       <span>DaMatch · Conexões com propósito</span
-      ><span>Demonstração com perfis fictícios e cadastros simulados.</span>
+      ><span>{{ apiMode ? 'Cadastro de mentor conectado. Descoberta e compatibilidade demonstrativas.' : 'Demonstração com perfis fictícios e cadastros simulados.' }}</span>
       <button class="motion-toggle" type="button" [attr.aria-pressed]="motionPaused()"
         title="A preferência de redução de movimento do dispositivo é sempre respeitada."
         (click)="motionPaused.set(!motionPaused())">{{ motionPaused() ? 'Retomar animações' : 'Pausar animações' }}</button>

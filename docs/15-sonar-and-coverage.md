@@ -75,3 +75,11 @@ Este pacote não altera a proteção de branches. Exigir um check aprovado para 
 - [GitHub Actions: armazenar e compartilhar artefatos entre jobs](https://docs.github.com/en/actions/tutorials/store-and-share-data).
 - [GitHub Actions: eventos de pull request](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request).
 - [SonarQube: cobertura JavaScript/TypeScript e LCOV](https://docs.sonarsource.com/sonarqube-server/2025.5/analyzing-source-code/test-coverage/javascript-typescript-test-coverage).
+
+## Continuidade na v0.4.3
+
+A revisão v0.4.3 preserva as correções de cobertura e acrescenta o checkout do repositório no job de detecção, conforme a main recebida. O CI passa a compilar os modos DEMO e API. A entrega teve 153 testes em 12 arquivos, com 97,37% de linhas, 96,05% de declarações, 95,80% de ramificações e 91,19% de funções. A validação dos contratos HTTP usa respostas simuladas. O novo commit ainda precisa ser analisado pelo pipeline e pelo Sonar; a aprovação anterior não comprova o resultado desta versão.
+
+## Frontend v0.5.0
+
+O pipeline e os limites foram preservados. A v0.5.0 acrescenta testes do questionário e das regras v2. Os resultados locais atuais e as limitações estão no [documento 18](18-frontend-v0.5.0.md). A aprovação remota depende de novo push e execução no SonarQube.
