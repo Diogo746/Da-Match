@@ -329,6 +329,23 @@ jobs:
       (needs.sonar-frontend.result == 'success' || needs.sonar-frontend.result == 'skipped')
     runs-on: ubuntu-latest
 
+    # Banco exclusivo e descartável para o scan. Cada execução recebe um
+    # container novo, destruído automaticamente quando o job termina.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: damatch_dast
+          POSTGRES_USER: dast
+          POSTGRES_PASSWORD: dast
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dast -d damatch_dast"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v7
@@ -346,12 +363,20 @@ jobs:
           path: target
 
       - name: 🚀 Start Backend API for Nuclei Scan
+        env:
+          # A aplicação ainda usa este nome de variável, mas o destino é o
+          # PostgreSQL efêmero do job, nunca o Supabase.
+          SUPABASE_DB_URL: jdbc:postgresql://localhost:5432/damatch_dast?user=dast&password=dast
         run: |
           JAR_FILE=$(ls target/*.jar | head -n 1)
           echo "Iniciando backend API em background: $JAR_FILE"
           java -jar "$JAR_FILE" > backend-runtime.log 2>&1 &
           echo "Aguardando endpoint de healthcheck subir..."
-          timeout 60 bash -c 'until curl -s http://localhost:8080/api/v1/health | grep -q "UP"; do sleep 2; done'
+          if ! timeout 60 bash -c 'until curl -fs http://localhost:8080/api/v1/health | grep -q "UP"; do sleep 2; done'; then
+            echo "::error::A API não ficou pronta em 60 segundos. Log de inicialização:"
+            tail -n 200 backend-runtime.log || true
+            exit 1
+          fi
           echo "✅ Backend API está UP e pronto para análise Nuclei!"
 
       - name: 🎯 Execute Nuclei DAST Scan (Vulnerabilities, Misconfigurations & API Flaws)
@@ -374,6 +399,23 @@ jobs:
       (needs.sonar-frontend.result == 'success' || needs.sonar-frontend.result == 'skipped')
     runs-on: ubuntu-latest
 
+    # Banco exclusivo e descartável para o scan. Cada execução recebe um
+    # container novo, destruído automaticamente quando o job termina.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: damatch_dast
+          POSTGRES_USER: dast
+          POSTGRES_PASSWORD: dast
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dast -d damatch_dast"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v7
@@ -391,12 +433,20 @@ jobs:
           path: target
 
       - name: 🚀 Start Backend API for OWASP ZAP Scan
+        env:
+          # A aplicação ainda usa este nome de variável, mas o destino é o
+          # PostgreSQL efêmero do job, nunca o Supabase.
+          SUPABASE_DB_URL: jdbc:postgresql://localhost:5432/damatch_dast?user=dast&password=dast
         run: |
           JAR_FILE=$(ls target/*.jar | head -n 1)
           echo "Iniciando backend API em background: $JAR_FILE"
           java -jar "$JAR_FILE" > backend-runtime.log 2>&1 &
           echo "Aguardando endpoint de healthcheck subir..."
-          timeout 60 bash -c 'until curl -s http://localhost:8080/api/v1/health | grep -q "UP"; do sleep 2; done'
+          if ! timeout 60 bash -c 'until curl -fs http://localhost:8080/api/v1/health | grep -q "UP"; do sleep 2; done'; then
+            echo "::error::A API não ficou pronta em 60 segundos. Log de inicialização:"
+            tail -n 200 backend-runtime.log || true
+            exit 1
+          fi
           echo "✅ Backend API está UP e pronto para o OWASP ZAP scan!"
 
       - name: 🕷️ Run OWASP ZAP Baseline Scan
