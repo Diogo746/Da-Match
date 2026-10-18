@@ -1,10 +1,7 @@
 @if (session.profile(); as profile) {
   @if (editing()) {
-    <header class="profile-heading">
-      <div><p class="eyebrow">MEU PERFIL</p><h1>Editar respostas</h1><p>Atualize o que mudou. Suas informações atuais já estão preenchidas.</p></div>
-    </header>
-    <app-profile-setup [kind]="profile.answers.kind" [name]="profile.name" [initial]="profile.answers"
-      [editing]="true" [startStep]="startStep()" (finished)="save($event)" (cancelled)="cancel()" />
+    <header class="profile-heading"><div><p class="eyebrow">MEU PERFIL</p><h1>Editar respostas</h1><p>Atualize o que mudou. Suas informações atuais já estão preenchidas.</p></div></header>
+    <app-profile-setup [kind]="profile.answers.kind" [name]="profile.name" [initial]="profile.answers" [editing]="true" [startStep]="startStep()" (finished)="save($event)" (cancelled)="cancel()" />
   } @else {
     <header class="profile-heading">
       <div><p class="eyebrow">SEU PERFIL, SEU MOMENTO</p><h1 #profileHeading id="my-profile-title" tabindex="-1">Meu perfil</h1><p>Suas informações e preferências, reunidas em um só lugar.</p></div>
@@ -14,39 +11,38 @@
     <div class="profile-layout">
       <div class="profile-details">
         <section class="profile-section" aria-labelledby="profile-identity-title">
-          <div class="section-top"><h2 id="profile-identity-title">{{ profile.answers.kind === 'STARTUP' ? 'Sua startup em ideação' : 'Sua atuação como mentor' }}</h2><button class="text-button" type="button" aria-label="Editar setor e apresentação" (click)="edit(0)">Alterar</button></div>
+          <div class="section-top"><h2 id="profile-identity-title">{{ profile.answers.kind === 'STARTUP' ? 'Sua startup em ideação' : 'Sua atuação como mentor' }}</h2><button class="text-button" type="button" aria-label="Editar setor e apresentação" (click)="edit(1)">Alterar</button></div>
           <dl><div><dt>{{ profile.answers.kind === 'STARTUP' ? 'Responsável' : 'Nome' }}</dt><dd>{{ profile.name }}</dd></div>
             @if (profile.answers.kind === 'STARTUP') { <div><dt>Nome da ideia</dt><dd>{{ profile.answers.projectName || 'Ainda não definido' }}</dd></div> }
             <div><dt>{{ profile.answers.kind === 'STARTUP' ? 'Setor' : 'Setores' }}</dt><dd class="profile-tags">@for (sector of profile.answers.sectors; track sector) { <span>{{ sectorLabel(sector) }}</span> }</dd></div>
           </dl>
         </section>
+        <section class="profile-section" aria-labelledby="profile-moment-title">
+          <div class="section-top"><h2 id="profile-moment-title">{{ profile.answers.kind === 'STARTUP' ? 'O momento da sua ideia' : 'Momentos em que você orienta' }}</h2><button class="text-button" type="button" aria-label="Editar momento da ideia" (click)="edit(0)">Alterar</button></div>
+          <ul class="topic-summary">@for (moment of profile.answers.moments; track moment) { <li><span>{{ momentLabel(moment) }}</span></li> }</ul>
+        </section>
         <section class="profile-section" aria-labelledby="profile-topics-title">
-          <div class="section-top"><h2 id="profile-topics-title">{{ profile.answers.kind === 'STARTUP' ? 'O que sua ideia precisa' : 'Suas especialidades' }}</h2><button class="text-button" type="button" [attr.aria-label]="profile.answers.kind === 'STARTUP' ? 'Editar necessidades' : 'Editar especialidades'" (click)="edit(1)">Alterar</button></div>
+          <div class="section-top"><h2 id="profile-topics-title">{{ profile.answers.kind === 'STARTUP' ? 'O que sua ideia precisa' : 'Suas especialidades' }}</h2><button class="text-button" type="button" [attr.aria-label]="profile.answers.kind === 'STARTUP' ? 'Editar necessidades' : 'Editar especialidades'" (click)="edit(2)">Alterar</button></div>
           <ul class="topic-summary">@for (topic of profile.answers.topics; track topic; let index = $index) {
-            <li>@if (profile.answers.kind === 'STARTUP') { <small>{{ index === 0 ? 'PRIORIDADE' : 'TAMBÉM BUSCA' }}</small> }<span>{{ topicLabel(topic) }}</span></li>
+            <li><small>{{ profile.answers.kind === 'STARTUP' ? (index === 0 ? 'PRIORIDADE' : 'TAMBÉM BUSCA') : (profile.answers.experience[topic] === 'PRACTICAL' ? 'EXPERIÊNCIA PRÁTICA' : 'CONHECIMENTO PARA ORIENTAR') }}</small><span>{{ topicLabel(topic) }}</span></li>
           }</ul>
         </section>
         <section class="profile-section" aria-labelledby="profile-format-title">
-          <div class="section-top"><h2 id="profile-format-title">Formato das conversas</h2><button class="text-button" type="button" aria-label="Editar modalidade" (click)="edit(2)">Alterar</button></div>
-          <dl><div><dt>Modalidade</dt><dd>{{ formatLabels[profile.answers.format] }}</dd></div>
-            @if (profile.answers.format !== 'ONLINE') { <div><dt>Cidade</dt><dd>{{ profile.answers.cityId ? cityLabel(profile.answers.cityId) : 'A combinar para encontros presenciais' }}</dd></div> }
-          </dl>
+          <div class="section-top"><h2 id="profile-format-title">Formato das conversas</h2><button class="text-button" type="button" aria-label="Editar modalidade" (click)="edit(3)">Alterar</button></div>
+          <dl><div><dt>Modalidade</dt><dd>{{ formatLabels[profile.answers.format] }}</dd></div>@if (profile.answers.format !== 'ONLINE') { <div><dt>Cidade</dt><dd>{{ profile.answers.cityId ? cityLabel(profile.answers.cityId) : 'A combinar para encontros presenciais' }}</dd></div> }</dl>
         </section>
         <section class="profile-section" aria-labelledby="profile-schedule-title">
-          <div class="section-top"><h2 id="profile-schedule-title">Disponibilidade</h2><button class="text-button" type="button" aria-label="Editar disponibilidade" (click)="edit(3)">Alterar</button></div>
-          <dl><div><dt>Dias</dt><dd class="profile-tags">@for (day of days; track day.id) { @if (profile.answers.days.includes(day.id)) { <span>{{ day.full }}</span> } }</dd></div>
-            <div><dt>Períodos</dt><dd class="period-summary">@for (period of periods; track period.id) { @if (profile.answers.periods.includes(period.id)) { <span>{{ period.label }} <small>{{ period.detail }}</small></span> } }</dd></div>
+          <div class="section-top"><h2 id="profile-schedule-title">Disponibilidade</h2><button class="text-button" type="button" aria-label="Editar disponibilidade" (click)="edit(4)">Alterar</button></div>
+          <dl><div><dt>Frequência</dt><dd>{{ cadenceLabel(profile.answers.cadence) }}</dd></div><div><dt>Dias e períodos</dt><dd class="profile-tags">@for (slot of profile.answers.availability; track slot.day + slot.period) { <span>{{ slotLabel(slot) }}</span> }</dd></div>
             @if (profile.answers.kind === 'MENTOR') { <div><dt>Novas mentorias</dt><dd class="mentoring-status">{{ profile.answers.accepting ? 'Recebendo novas startups' : 'Novas mentorias em pausa' }}</dd></div> }
-          </dl><p class="section-note">Horário de Recife. Estas preferências não reservam uma reunião.</p>
+          </dl><p class="section-note">Horário de Recife. Os horários exatos serão combinados entre vocês.</p>
         </section>
       </div>
-      <aside class="profile-card-preview" aria-label="Resumo do seu perfil">
-        <p class="eyebrow">SEU CARTÃO</p><app-profile-preview [name]="profile.name" [draft]="profile.answers" />
-        <p>Você pode ajustar as respostas quando seu momento mudar. As indicações acompanham as alterações salvas.</p>
-      </aside>
+      <aside class="profile-card-preview" aria-label="Resumo do seu perfil"><p class="eyebrow">SEU CARTÃO</p><app-profile-preview [name]="profile.name" [draft]="profile.answers" /><p>Você pode ajustar as respostas quando seu momento mudar. As indicações acompanham as alterações salvas.</p></aside>
     </div>
     <footer class="profile-session-note"><p>Perfil de demonstração. Nesta versão, recarregar a página reinicia os dados do teste.</p><button class="text-button" type="button" (click)="clear()">Limpar perfil de teste</button></footer>
   }
 } @else {
-  <section class="no-profile"><app-lumen /><p class="eyebrow">PRAZER EM CONHECER VOCÊ</p><h1>Seu próximo passo começa pelo seu perfil.</h1><p>Um cadastro breve, quatro pequenas etapas e indicações com mais contexto.</p><a class="button button-primary" routerLink="/cadastro">Montar meu perfil</a><a class="text-button" routerLink="/">Explorar os perfis</a></section>
+  <section class="no-profile"><app-lumen pose="welcome" /><p class="eyebrow">PRAZER EM CONHECER VOCÊ</p><h1>Seu próximo passo começa pelo seu perfil.</h1><p>Um cadastro breve, cinco etapas com o Lumen e indicações com mais contexto.</p><a class="button button-primary" routerLink="/cadastro">Montar meu perfil</a><a class="text-button" routerLink="/">Explorar os perfis</a></section>
 }
+

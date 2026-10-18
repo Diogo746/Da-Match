@@ -117,7 +117,9 @@ jobs:
       - name: 🏗️ Frontend - Production Build
         if: github.event_name != 'pull_request' || needs.changes.outputs.frontend == 'true'
         working-directory: ./frontend
-        run: npm run build
+        run: |
+          npm run build
+          npm run build:api
 
       - name: 📤 Upload JaCoCo Coverage Report
         if: github.event_name != 'pull_request' || needs.changes.outputs.backend == 'true'

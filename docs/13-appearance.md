@@ -1,5 +1,7 @@
 # Aparência — tema e Lumen
 
+> Referência histórica das versões anteriores. O comportamento atual está em [18-frontend-v0.5.0.md](18-frontend-v0.5.0.md) e a identidade visual em [19-visual-identity.md](19-visual-identity.md).
+
 A v0.4 acrescenta tema claro/escuro, brilho mais visível e balões de fala. O questionário, as regras de compatibilidade e o contrato básico do cadastro permanecem iguais.
 
 ## Tema

@@ -59,6 +59,8 @@ export class ExploreComponent {
       if (this.personalized()) {
         const difference = (this.matches().get(b.id)?.score ?? -1) - (this.matches().get(a.id)?.score ?? -1);
         if (difference) return difference;
+        const practical = (this.matches().get(b.id)?.practicalMatches ?? 0) - (this.matches().get(a.id)?.practicalMatches ?? 0);
+        if (practical) return practical;
       }
       return a.name.localeCompare(b.name, "pt-BR") || a.id.localeCompare(b.id);
     });

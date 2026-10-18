@@ -1,4 +1,4 @@
-<article class="profile-card">
+<article [class]="'profile-card ' + profile().theme">
   <div [class]="'profile-cover ' + profile().theme">
     <span class="cover-word">{{
       profile().kind === "MENTOR"
@@ -43,6 +43,7 @@
               <span class="compatibility-label"><strong>{{ result.score }}%</strong> de compatibilidade</span>
               <div class="compatibility-track" aria-hidden="true"><i [style.width.%]="result.score"></i></div>
             } @else { <span class="partial-label">Compatibilidade em construção</span> }
+            <p class="fit-label">{{ result.criteria[0].points ? 'Atende à prioridade da ideia' : 'Apoio a uma necessidade secundária' }}</p>
             <p>{{ result.reasons[0] }}</p>
           </div>
         }

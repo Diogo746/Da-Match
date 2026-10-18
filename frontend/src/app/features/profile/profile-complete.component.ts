@@ -11,7 +11,7 @@ import { ProfilePreviewComponent } from "./profile-preview.component";
   imports: [RouterLink, IconComponent, LumenComponent, ProfilePreviewComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<section class="complete-layout" aria-labelledby="complete-title">
-    <div class="complete-copy"><app-lumen /><span class="complete-badge"><app-icon name="check" />Perfil concluído</span>
+    <div class="complete-copy"><app-lumen pose="complete" /><span class="complete-badge"><app-icon name="check" />Perfil concluído</span>
       <h1 #completeHeading id="complete-title" tabindex="-1">Boas conexões começam com quem você é.</h1>
       <p>{{ profile().answers.kind === 'STARTUP' ? 'Agora podemos apresentar mentores que ajudam no próximo passo da sua ideia.' : 'Agora podemos apresentar ideias que precisam da experiência que você compartilha.' }}</p>
       @if (profile().answers.kind === 'MENTOR' && !profile().answers.accepting) { <p class="pause-note">Seu perfil está em pausa para novas mentorias. Você pode retomar em Meu perfil.</p> }

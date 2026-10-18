@@ -11,6 +11,7 @@ const request: RegistrationRequest = {
   nome: "Maria Teste",
   email: "maria@example.test",
   senha: "senha-de-teste",
+  mentor: { biografia: "Mentora em produtos digitais." },
 };
 afterEach(() => vi.useRealTimers());
 async function register(
@@ -112,5 +113,10 @@ describe("Cadastro demonstrativo baseado em CadastrarUsuarioRequest", () => {
     await expect(
       register(new DemoRegistrationGateway()),
     ).resolves.toMatchObject({ mode: "DEMO" });
+  });
+
+  it.each([undefined, { biografia: "   " }, { biografia: "a".repeat(1001) }])("exige biografia válida no cadastro de mentor: %o", async (mentor) => {
+    await expect(firstValueFrom(new DemoRegistrationGateway().register("MENTOR", { ...request, mentor })))
+      .rejects.toMatchObject({ code: "INVALID_INPUT" });
   });
 });

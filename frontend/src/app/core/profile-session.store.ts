@@ -1,5 +1,5 @@
 import { Injectable, signal } from "@angular/core";
-import { ProfileDraft, SessionProfile, profileIsComplete } from "./profile.models";
+import { ProfileDraft, SessionProfile, QUESTIONNAIRE_VERSION, profileIsComplete } from "./profile.models";
 
 @Injectable({ providedIn: "root" })
 export class ProfileSessionStore {
@@ -11,6 +11,7 @@ export class ProfileSessionStore {
     const copy = structuredClone(answers);
     copy.projectName = copy.projectName.trim().slice(0, 60);
     this.current.set({
+      questionnaireVersion: QUESTIONNAIRE_VERSION,
       name: name.trim(),
       displayName: copy.kind === "STARTUP" ? copy.projectName || `Ideia de ${name.trim().split(" ")[0]}` : name.trim(),
       answers: copy,

@@ -20,14 +20,14 @@ describe("Catálogo de demonstração", () => {
     expect(profile.sector.length).toBeGreaterThan(0);
     expect(profile.tags.length).toBeGreaterThan(0);
     expect(profile.reasons.length).toBeGreaterThan(0);
-    expect(["mint", "sand", "blue"]).toContain(profile.theme);
+    expect(profile.theme.startsWith(profile.kind === "MENTOR" ? "mentor-" : "startup-")).toBe(true);
     expect(["MENTOR", "STARTUP"]).toContain(profile.kind);
     expect(CITIES.map((city) => city.id)).toContain(matching.cityId);
     expect(FORMATS.map((format) => format.id)).toContain(matching.format);
     const sectors = new Set<string>([...SECTORS.map((sector) => sector.id), "GENERAL", "DISCOVERING"]);
     expect(matching.sectors.every((sector) => sectors.has(sector))).toBe(true);
     expect(matching.topics.every((topic) => TOPICS.some((item) => item.id === topic))).toBe(true);
-    expect(matching.days.every((day) => DAYS.some((item) => item.id === day))).toBe(true);
-    expect(matching.periods.every((period) => PERIODS.some((item) => item.id === period))).toBe(true);
+    expect(matching.availability.every((slot) => DAYS.some((item) => item.id === slot.day))).toBe(true);
+    expect(matching.availability.every((slot) => PERIODS.some((item) => item.id === slot.period))).toBe(true);
   });
 });

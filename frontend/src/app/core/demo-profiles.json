@@ -15,20 +15,10 @@
       "Apoio a startups em ideação",
       "Disponibilidade para encontros online"
     ],
-    "availability": "2 encontros por mês",
-    "theme": "mint",
+    "availability": "Frequência a combinar",
     "matching": {
       "format": "AMBOS",
       "cityId": "PE_RECIFE",
-      "days": [
-        "MON",
-        "WED",
-        "THU"
-      ],
-      "periods": [
-        "AFTERNOON",
-        "EVENING"
-      ],
       "sectors": [
         "TECH",
         "EDUCATION"
@@ -37,7 +27,44 @@
         "VALIDATION",
         "CUSTOMERS",
         "PITCH"
-      ]
+      ],
+      "availability": [
+        {
+          "day": "MON",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "MON",
+          "period": "EVENING"
+        },
+        {
+          "day": "WED",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "WED",
+          "period": "EVENING"
+        },
+        {
+          "day": "THU",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "THU",
+          "period": "EVENING"
+        }
+      ],
+      "moments": [
+        "PROBLEM",
+        "AUDIENCE",
+        "VALIDATING"
+      ],
+      "experience": {
+        "VALIDATION": "PRACTICAL",
+        "CUSTOMERS": "PRACTICAL",
+        "PITCH": "KNOWLEDGE"
+      },
+      "cadence": "FLEXIBLE"
     }
   },
   {
@@ -56,19 +83,10 @@
       "Atuação em tecnologia",
       "Apoio a equipes em ideação"
     ],
-    "availability": "1 encontro por mês",
-    "theme": "blue",
+    "availability": "Frequência a combinar",
     "matching": {
       "format": "ONLINE",
       "cityId": "PE_RECIFE",
-      "days": [
-        "TUE",
-        "THU",
-        "SAT"
-      ],
-      "periods": [
-        "EVENING"
-      ],
       "sectors": [
         "TECH"
       ],
@@ -76,7 +94,32 @@
         "PROTOTYPE",
         "VALIDATION",
         "BUSINESS"
-      ]
+      ],
+      "availability": [
+        {
+          "day": "TUE",
+          "period": "EVENING"
+        },
+        {
+          "day": "THU",
+          "period": "EVENING"
+        },
+        {
+          "day": "SAT",
+          "period": "EVENING"
+        }
+      ],
+      "moments": [
+        "PROBLEM",
+        "SOLUTION",
+        "VALIDATING"
+      ],
+      "experience": {
+        "PROTOTYPE": "PRACTICAL",
+        "VALIDATION": "PRACTICAL",
+        "BUSINESS": "KNOWLEDGE"
+      },
+      "cadence": "FLEXIBLE"
     }
   },
   {
@@ -95,20 +138,10 @@
       "Apoio à descoberta do público",
       "Mentoria remota disponível"
     ],
-    "availability": "2 encontros por mês",
-    "theme": "sand",
+    "availability": "Frequência a combinar",
     "matching": {
       "format": "ONLINE",
       "cityId": "PB_JOAO_PESSOA",
-      "days": [
-        "MON",
-        "WED",
-        "SAT"
-      ],
-      "periods": [
-        "AFTERNOON",
-        "EVENING"
-      ],
       "sectors": [
         "CREATIVE",
         "EDUCATION"
@@ -117,7 +150,43 @@
         "CUSTOMERS",
         "PITCH",
         "PROTOTYPE"
-      ]
+      ],
+      "availability": [
+        {
+          "day": "MON",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "MON",
+          "period": "EVENING"
+        },
+        {
+          "day": "WED",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "WED",
+          "period": "EVENING"
+        },
+        {
+          "day": "SAT",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "SAT",
+          "period": "EVENING"
+        }
+      ],
+      "moments": [
+        "AUDIENCE",
+        "SOLUTION"
+      ],
+      "experience": {
+        "CUSTOMERS": "PRACTICAL",
+        "PITCH": "PRACTICAL",
+        "PROTOTYPE": "KNOWLEDGE"
+      },
+      "cadence": "FLEXIBLE"
     }
   },
   {
@@ -136,19 +205,10 @@
       "Experiência com negócios de impacto",
       "Atendimento a projetos em ideação"
     ],
-    "availability": "1 encontro por mês",
-    "theme": "mint",
+    "availability": "Frequência a combinar",
     "matching": {
       "format": "ONLINE",
       "cityId": "BA_SALVADOR",
-      "days": [
-        "TUE",
-        "THU",
-        "FRI"
-      ],
-      "periods": [
-        "EVENING"
-      ],
       "sectors": [
         "SOCIAL",
         "COMMERCE"
@@ -157,7 +217,31 @@
         "BUSINESS",
         "PRICING",
         "PITCH"
-      ]
+      ],
+      "availability": [
+        {
+          "day": "TUE",
+          "period": "EVENING"
+        },
+        {
+          "day": "THU",
+          "period": "EVENING"
+        },
+        {
+          "day": "FRI",
+          "period": "EVENING"
+        }
+      ],
+      "moments": [
+        "PROBLEM",
+        "SOLUTION"
+      ],
+      "experience": {
+        "BUSINESS": "PRACTICAL",
+        "PRICING": "PRACTICAL",
+        "PITCH": "KNOWLEDGE"
+      },
+      "cadence": "FLEXIBLE"
     }
   },
   {
@@ -177,26 +261,47 @@
       "Está no estágio de ideação"
     ],
     "availability": "Busca mentoria para sua ideia",
-    "theme": "sand",
     "matching": {
       "format": "ONLINE",
       "cityId": "PE_RECIFE",
-      "days": [
-        "MON",
-        "WED",
-        "THU"
-      ],
-      "periods": [
-        "AFTERNOON",
-        "EVENING"
-      ],
       "sectors": [
         "TECH"
       ],
       "topics": [
         "VALIDATION",
         "PROTOTYPE"
-      ]
+      ],
+      "availability": [
+        {
+          "day": "MON",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "MON",
+          "period": "EVENING"
+        },
+        {
+          "day": "WED",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "WED",
+          "period": "EVENING"
+        },
+        {
+          "day": "THU",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "THU",
+          "period": "EVENING"
+        }
+      ],
+      "moments": [
+        "PROBLEM"
+      ],
+      "experience": {},
+      "cadence": "FLEXIBLE"
     }
   },
   {
@@ -216,26 +321,47 @@
       "Está no estágio de ideação"
     ],
     "availability": "Busca mentoria de negócio",
-    "theme": "blue",
     "matching": {
       "format": "ONLINE",
       "cityId": "PB_JOAO_PESSOA",
-      "days": [
-        "MON",
-        "WED",
-        "THU"
-      ],
-      "periods": [
-        "AFTERNOON",
-        "EVENING"
-      ],
       "sectors": [
         "CREATIVE"
       ],
       "topics": [
         "BUSINESS",
         "CUSTOMERS"
-      ]
+      ],
+      "availability": [
+        {
+          "day": "MON",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "MON",
+          "period": "EVENING"
+        },
+        {
+          "day": "WED",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "WED",
+          "period": "EVENING"
+        },
+        {
+          "day": "THU",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "THU",
+          "period": "EVENING"
+        }
+      ],
+      "moments": [
+        "AUDIENCE"
+      ],
+      "experience": {},
+      "cadence": "FLEXIBLE"
     }
   },
   {
@@ -253,19 +379,10 @@
       "Experiência em saúde e bem-estar",
       "Orientação para descoberta de clientes"
     ],
-    "availability": "Novas mentorias disponíveis",
-    "theme": "mint",
+    "availability": "Frequência a combinar",
     "matching": {
       "format": "PRESENCIAL",
       "cityId": "PE_RECIFE",
-      "days": [
-        "MON",
-        "WED"
-      ],
-      "periods": [
-        "MORNING",
-        "AFTERNOON"
-      ],
       "sectors": [
         "HEALTH"
       ],
@@ -273,7 +390,35 @@
         "VALIDATION",
         "CUSTOMERS",
         "BUSINESS"
-      ]
+      ],
+      "availability": [
+        {
+          "day": "MON",
+          "period": "MORNING"
+        },
+        {
+          "day": "MON",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "WED",
+          "period": "MORNING"
+        },
+        {
+          "day": "WED",
+          "period": "AFTERNOON"
+        }
+      ],
+      "moments": [
+        "AUDIENCE",
+        "VALIDATING"
+      ],
+      "experience": {
+        "VALIDATION": "PRACTICAL",
+        "CUSTOMERS": "PRACTICAL",
+        "BUSINESS": "KNOWLEDGE"
+      },
+      "cadence": "FLEXIBLE"
     }
   },
   {
@@ -291,24 +436,10 @@
       "Atuação geral em diferentes setores",
       "Apoio ao modelo de negócio"
     ],
-    "availability": "Novas mentorias disponíveis",
-    "theme": "blue",
+    "availability": "Frequência a combinar",
     "matching": {
       "format": "ONLINE",
       "cityId": "PE_RECIFE",
-      "days": [
-        "MON",
-        "TUE",
-        "WED",
-        "THU",
-        "FRI",
-        "SAT"
-      ],
-      "periods": [
-        "MORNING",
-        "AFTERNOON",
-        "EVENING"
-      ],
       "sectors": [
         "GENERAL"
       ],
@@ -316,7 +447,93 @@
         "BUSINESS",
         "PRICING",
         "PITCH"
-      ]
+      ],
+      "availability": [
+        {
+          "day": "MON",
+          "period": "MORNING"
+        },
+        {
+          "day": "MON",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "MON",
+          "period": "EVENING"
+        },
+        {
+          "day": "TUE",
+          "period": "MORNING"
+        },
+        {
+          "day": "TUE",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "TUE",
+          "period": "EVENING"
+        },
+        {
+          "day": "WED",
+          "period": "MORNING"
+        },
+        {
+          "day": "WED",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "WED",
+          "period": "EVENING"
+        },
+        {
+          "day": "THU",
+          "period": "MORNING"
+        },
+        {
+          "day": "THU",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "THU",
+          "period": "EVENING"
+        },
+        {
+          "day": "FRI",
+          "period": "MORNING"
+        },
+        {
+          "day": "FRI",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "FRI",
+          "period": "EVENING"
+        },
+        {
+          "day": "SAT",
+          "period": "MORNING"
+        },
+        {
+          "day": "SAT",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "SAT",
+          "period": "EVENING"
+        }
+      ],
+      "moments": [
+        "PROBLEM",
+        "AUDIENCE",
+        "SOLUTION",
+        "VALIDATING"
+      ],
+      "experience": {
+        "BUSINESS": "PRACTICAL",
+        "PRICING": "PRACTICAL",
+        "PITCH": "KNOWLEDGE"
+      },
+      "cadence": "FLEXIBLE"
     }
   },
   {
@@ -335,25 +552,35 @@
       "Investiga um problema do comércio local"
     ],
     "availability": "Busca orientação para a ideia",
-    "theme": "sand",
     "matching": {
       "format": "ONLINE",
       "cityId": "BA_SALVADOR",
-      "days": [
-        "TUE",
-        "THU",
-        "FRI"
-      ],
-      "periods": [
-        "EVENING"
-      ],
       "sectors": [
         "SOCIAL"
       ],
       "topics": [
         "PRICING",
         "BUSINESS"
-      ]
+      ],
+      "availability": [
+        {
+          "day": "TUE",
+          "period": "EVENING"
+        },
+        {
+          "day": "THU",
+          "period": "EVENING"
+        },
+        {
+          "day": "FRI",
+          "period": "EVENING"
+        }
+      ],
+      "moments": [
+        "SOLUTION"
+      ],
+      "experience": {},
+      "cadence": "FLEXIBLE"
     }
   },
   {
@@ -372,25 +599,39 @@
       "Quer conhecer melhor seu público"
     ],
     "availability": "Busca orientação para a ideia",
-    "theme": "mint",
     "matching": {
       "format": "PRESENCIAL",
       "cityId": "PE_RECIFE",
-      "days": [
-        "MON",
-        "WED"
-      ],
-      "periods": [
-        "MORNING",
-        "AFTERNOON"
-      ],
       "sectors": [
         "HEALTH"
       ],
       "topics": [
         "CUSTOMERS",
         "VALIDATION"
-      ]
+      ],
+      "availability": [
+        {
+          "day": "MON",
+          "period": "MORNING"
+        },
+        {
+          "day": "MON",
+          "period": "AFTERNOON"
+        },
+        {
+          "day": "WED",
+          "period": "MORNING"
+        },
+        {
+          "day": "WED",
+          "period": "AFTERNOON"
+        }
+      ],
+      "moments": [
+        "AUDIENCE"
+      ],
+      "experience": {},
+      "cadence": "FLEXIBLE"
     }
   }
 ]

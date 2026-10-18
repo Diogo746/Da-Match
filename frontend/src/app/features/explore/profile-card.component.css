@@ -23,7 +23,9 @@
   }
 }
 .profile-cover {
-  height: 87px;
+  height: 95px;
+  background: var(--profile-cover);
+  color: #fff;
   position: relative;
   overflow: hidden;
   padding: 21px 17px;
@@ -45,20 +47,11 @@
   border-width: 24px;
   border-color: var(--cover-ring-soft);
 }
-.mint {
-  background: var(--tone-mint-bg);
-  color: var(--tone-mint-text);
-}
-.sand {
-  background: var(--tone-sand-bg);
-  color: var(--tone-sand-text);
-}
-.blue {
-  background: var(--tone-blue-bg);
-  color: var(--tone-blue-text);
-}
+
+
+
 .cover-word {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.2px;
   position: relative;
@@ -68,8 +61,8 @@
   position: absolute;
   right: 12px;
   top: 12px;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,6 +94,8 @@
   z-index: 1;
 }
 .avatar {
+  background: var(--profile-tint);
+  color: var(--profile-ink);
   width: 47px;
   height: 47px;
   display: flex;
@@ -114,27 +109,28 @@
   box-shadow: 0 2px 4px var(--shadow-soft);
 }
 .kind-label {
-  font-size: 9px;
+  font-weight: 650;
+  font-size: 12px;
   color: var(--muted);
   padding-top: 20px;
 }
 .profile-card h3 {
-  font-size: 15px;
+  font-size: 18px;
   letter-spacing: -0.3px;
   margin: 13px 0 5px;
 }
 .profile-title {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   line-height: 1.6;
-  min-height: 35px;
+  min-height: 42px;
   margin: 0;
 }
 .location {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
   line-height: 1.6;
   margin: 10px 0;
@@ -155,7 +151,7 @@
   color: var(--text-soft);
   padding: 5px 7px;
   border-radius: 5px;
-  font-size: 9px;
+  font-size: 12px;
 }
 .card-bottom {
   border-top: 1px solid var(--border-soft);
@@ -167,7 +163,7 @@
   gap: 11px;
 }
 .card-bottom > span {
-  font-size: 9px;
+  font-size: 12px;
   color: var(--muted);
   display: flex;
   align-items: center;
@@ -178,6 +174,7 @@
   height: 12px;
 }
 .profile-link {
+  min-height: 40px;
   border: 0;
   background: transparent;
   display: flex;
@@ -186,7 +183,7 @@
   width: 100%;
   padding: 0;
   color: var(--accent-ink);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -204,9 +201,12 @@
     justify-content: space-between;
   }
   .profile-link {
+  min-height: 40px;
     width: auto;
     gap: 15px;
   }
 }
 
 .compatibility-summary{width:100%;padding-bottom:3px}.compatibility-label{font-size:10px;color:var(--text-soft);display:flex;gap:5px;align-items:baseline}.compatibility-label strong{font-size:21px;letter-spacing:-.5px;color:var(--teal)}.compatibility-track{height:5px;background:var(--track);border-radius:8px;overflow:hidden;margin-top:7px}.compatibility-track i{display:block;height:100%;background:var(--track-fill);border-radius:8px}.compatibility-summary p{font-size:10px;color:var(--muted);line-height:1.7;margin:9px 0 0}.partial-label{font-size:10px;font-weight:650;color:var(--text-soft)}@media(max-width:430px){.card-bottom{flex-wrap:wrap}.compatibility-summary{flex-basis:100%}}
+
+.profile-card .kind-label{color:var(--profile-ink)}.profile-card .tags>span{background:var(--profile-tint);color:var(--profile-ink)}

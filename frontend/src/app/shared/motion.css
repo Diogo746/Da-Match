@@ -1,4 +1,4 @@
-/* Movimentos curtos orientam a navegação. O único ciclo contínuo é a luz do Lumen. */
+/* Movimentos curtos orientam a navegação. O Lumen mantém apenas luz e flutuação discretas em ciclos lentos. */
 :root {
   --motion-fast: 160ms;
   --motion-enter: 240ms;
@@ -14,7 +14,7 @@ app-explore, app-register, app-profile, app-about {
 }
 
 .button, .text-button, .main-nav a, .role-option, .save-button,
-.soft-choice, .day-choice, .period-choice, .motion-toggle, .theme-toggle {
+.soft-choice, .day-choice, .period-choice, .experience-choice button, .availability-chips button, .motion-toggle, .theme-toggle {
   transition: background-color var(--motion-fast) ease,
     border-color var(--motion-fast) ease, color var(--motion-fast) ease,
     box-shadow var(--motion-fast) ease, transform var(--motion-fast) ease;
@@ -76,3 +76,7 @@ dialog[open]::backdrop { animation: backdrop-enter 180ms ease both; }
   progress::-webkit-progress-value { transition: none !important; }
   .profile-card:hover, .choice:active, .button:active { transform: none !important; }
 }
+
+body,.topbar,.setup-panel,.profile-card{transition:background-color 200ms ease,border-color 200ms ease,color 200ms ease}.compatibility-track i{transition:width 240ms var(--motion-ease)}
+
+.profile-card{animation:card-enter 180ms ease-out both}@keyframes card-enter{from{opacity:0}to{opacity:1}}
