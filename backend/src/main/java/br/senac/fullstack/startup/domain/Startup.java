@@ -1,7 +1,16 @@
 package br.senac.fullstack.startup.domain;
 
 import br.senac.fullstack.startup.domain.enums.StatusValidacao;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,9 +51,10 @@ public class Startup {
     @Column(nullable = false)
     private String modeloDeNegocio;
 
-    @OneToMany(mappedBy = "startup", cascade = CascadeType.ALL,  orphanRemoval = true)
+    @OneToMany(mappedBy = "startup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MembroStartup> membros = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusValidacao statusValidacao;
 
