@@ -163,22 +163,21 @@ class StartupServiceTest {
 
     @Test
     void deveRejeitarDadosInvalidosAoAdicionarMembro() {
+        UUID startupId = UUID.randomUUID();
         UUID usuarioId = UUID.randomUUID();
+        AdicionarMembroStartupRequest membroSemUsuario =
+                new AdicionarMembroStartupRequest(null, PapelMembroStartup.MEMBRO);
+        AdicionarMembroStartupRequest membroSemPapel =
+                new AdicionarMembroStartupRequest(usuarioId, null);
 
-        assertThrows(IllegalArgumentException.class, () -> startupService.adicionarMembro(UUID.randomUUID(), null));
+        assertThrows(IllegalArgumentException.class, () -> startupService.adicionarMembro(startupId, null));
         assertThrows(
                 IllegalArgumentException.class,
-                () -> startupService.adicionarMembro(
-                        UUID.randomUUID(),
-                        new AdicionarMembroStartupRequest(null, PapelMembroStartup.MEMBRO)
-                )
+                () -> startupService.adicionarMembro(startupId, membroSemUsuario)
         );
         assertThrows(
                 IllegalArgumentException.class,
-                () -> startupService.adicionarMembro(
-                        UUID.randomUUID(),
-                        new AdicionarMembroStartupRequest(usuarioId, null)
-                )
+                () -> startupService.adicionarMembro(startupId, membroSemPapel)
         );
         verifyNoInteractions(startupRepository, usuarioRepository, membroRepository);
     }
@@ -191,34 +190,32 @@ class StartupServiceTest {
         startup.getMembros().add(membro(startup, usuarioId, PapelMembroStartup.MEMBRO));
         when(startupRepository.findById(startupId)).thenReturn(Optional.of(startup));
         when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(usuario(usuarioId, "Membro")));
+        AdicionarMembroStartupRequest membroDuplicado =
+                new AdicionarMembroStartupRequest(usuarioId, PapelMembroStartup.MEMBRO);
 
         assertThrows(
                 IllegalStateException.class,
-                () -> startupService.adicionarMembro(
-                        startupId,
-                        new AdicionarMembroStartupRequest(usuarioId, PapelMembroStartup.MEMBRO)
-                )
+                () -> startupService.adicionarMembro(startupId, membroDuplicado)
         );
         verify(membroRepository, never()).save(any());
 
         UUID startupInexistenteId = UUID.randomUUID();
+        UUID usuarioDaStartupInexistenteId = UUID.randomUUID();
+        AdicionarMembroStartupRequest membroDaStartupInexistente =
+                new AdicionarMembroStartupRequest(usuarioDaStartupInexistenteId, PapelMembroStartup.MEMBRO);
         when(startupRepository.findById(startupInexistenteId)).thenReturn(Optional.empty());
         assertThrows(
                 NoSuchElementException.class,
-                () -> startupService.adicionarMembro(
-                        startupInexistenteId,
-                        new AdicionarMembroStartupRequest(UUID.randomUUID(), PapelMembroStartup.MEMBRO)
-                )
+                () -> startupService.adicionarMembro(startupInexistenteId, membroDaStartupInexistente)
         );
 
         UUID usuarioInexistenteId = UUID.randomUUID();
+        AdicionarMembroStartupRequest membroInexistente =
+                new AdicionarMembroStartupRequest(usuarioInexistenteId, PapelMembroStartup.MEMBRO);
         when(usuarioRepository.findById(usuarioInexistenteId)).thenReturn(Optional.empty());
         assertThrows(
                 NoSuchElementException.class,
-                () -> startupService.adicionarMembro(
-                        startupId,
-                        new AdicionarMembroStartupRequest(usuarioInexistenteId, PapelMembroStartup.MEMBRO)
-                )
+                () -> startupService.adicionarMembro(startupId, membroInexistente)
         );
     }
 
@@ -291,29 +288,40 @@ class StartupServiceTest {
     @Test
     void deveRejeitarRemocaoDeUsuarioQueNaoPertenceAStartup() {
         UUID startupId = UUID.randomUUID();
+        UUID usuarioInexistenteId = UUID.randomUUID();
         Startup startup = startup(startupId);
         startup.getMembros().add(membro(startup, UUID.randomUUID(), PapelMembroStartup.FUNDADOR));
         when(startupRepository.findById(startupId)).thenReturn(Optional.of(startup));
 
-        assertThrows(NoSuchElementException.class, () -> startupService.removerMembro(startupId, UUID.randomUUID()));
+        assertThrows(
+                NoSuchElementException.class,
+                () -> startupService.removerMembro(startupId, usuarioInexistenteId)
+        );
     }
 
     @Test
     void deveRejeitarCriacaoSemDadosObrigatorios() {
+        CriarStartupRequest startupSemFundadora =
+                criarRequest(null, StatusValidacao.APENAS_IDEIA, "Da Match");
+        CriarStartupRequest startupSemStatus =
+                criarRequest(cadastrarFundadora(), null, "Da Match");
+        CriarStartupRequest startupComNomeEmBranco =
+                criarRequest(cadastrarFundadora(), StatusValidacao.APENAS_IDEIA, " ");
+
         assertThrows(IllegalArgumentException.class, () -> startupService.criarStartup(null));
         assertThrows(
                 IllegalArgumentException.class,
-                () -> startupService.criarStartup(criarRequest(null, StatusValidacao.APENAS_IDEIA, "Da Match"))
+                () -> startupService.criarStartup(startupSemFundadora)
         );
         assertThrows(
                 IllegalArgumentException.class,
-                () -> startupService.criarStartup(criarRequest(cadastrarFundadora(), null, "Da Match"))
+                () -> startupService.criarStartup(startupSemStatus)
         );
 
         when(usuarioService.criarConta(any(), any(), any(), any())).thenReturn(usuario(UUID.randomUUID(), "Fundadora"));
         assertThrows(
                 IllegalArgumentException.class,
-                () -> startupService.criarStartup(criarRequest(cadastrarFundadora(), StatusValidacao.APENAS_IDEIA, " "))
+                () -> startupService.criarStartup(startupComNomeEmBranco)
         );
     }
 
