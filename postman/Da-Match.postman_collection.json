@@ -17,6 +17,16 @@
       "type": "string"
     },
     {
+      "key": "startupId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "membroUsuarioId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "csrfToken",
       "value": "",
       "type": "string"
@@ -151,6 +161,122 @@
             },
             "url": "{{baseUrl}}/api/v1/mentores",
             "description": "Cria uma conta com o papel MENTOR e o respectivo perfil. Execute 'Obter token CSRF' antes desta requisição. Use apenas dados fictícios e e-mails únicos."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Startup",
+      "description": "Execute primeiro a requisição 'Obter token CSRF'. A criação cadastra a conta fictícia da fundadora e a vincula como FUNDADOR.",
+      "item": [
+        {
+          "name": "Criar startup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fundador\": {\n    \"nome\": \"Fundadora de Teste\",\n    \"email\": \"fundadora.startup+{{$timestamp}}@example.com\",\n    \"senha\": \"senha-teste-123\"\n  },\n  \"nomeProvisorio\": \"Startup de Teste\",\n  \"pitchCurto\": \"Conecta startups a mentores.\",\n  \"problemaCentral\": \"Poucas conexões qualificadas.\",\n  \"solucaoProposta\": \"Recomendação de mentores.\",\n  \"publicoAlvo\": \"Startups em ideação\",\n  \"modeloDeNegocio\": \"SaaS\",\n  \"statusValidacao\": \"APENAS_IDEIA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/v1/startups",
+            "description": "Cria a startup e a conta da fundadora. Use somente dados fictícios e e-mails únicos."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('startupId', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Listar startups",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups"
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar startup por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Adicionar membro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"{{membroUsuarioId}}\",\n  \"papelMembro\": \"MEMBRO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/membros",
+            "description": "O usuário precisa já existir. Informe em membroUsuarioId o UUID de uma conta de teste já cadastrada."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar membros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/membros"
+          },
+          "response": []
+        },
+        {
+          "name": "Remover membro",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/membros/{{membroUsuarioId}}",
+            "description": "Não é permitido remover o único membro ou o único fundador da startup."
           },
           "response": []
         }
