@@ -152,7 +152,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"usuario\": {\n    \"nome\": \"Mentor de Teste\",\n    \"email\": \"mentor.teste+{{$timestamp}}@example.com\",\n    \"senha\": \"senha-teste-123\"\n  },\n  \"biografia\": \"Mentor com experiência em produtos digitais.\"\n}",
+              "raw": "{\n  \"usuario\": {\n    \"nome\": \"Mentor de Teste\",\n    \"email\": \"mentor.teste+{{$timestamp}}@example.com\",\n    \"senha\": \"senha-teste-123\"\n  },\n  \"biografia\": \"Mentor com experiência em produtos digitais.\",\n  \"disponibilidades\": [\n    {\n      \"diaSemana\": 1,\n      \"periodo\": \"MANHA\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -161,6 +161,74 @@
             },
             "url": "{{baseUrl}}/api/v1/mentores",
             "description": "Cria uma conta com o papel MENTOR e o respectivo perfil. Execute 'Obter token CSRF' antes desta requisição. Use apenas dados fictícios e e-mails únicos."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('mentorId', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Atualizar status do perfil",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PUBLICADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/v1/mentores/{{mentorId}}/status",
+            "description": "Altera o estado entre RASCUNHO, PUBLICADO e PAUSADO. Execute antes 'Obter token CSRF' e use o mentorId retornado no cadastro."
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar perfil do mentor",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"biografia\": \"Mentor com experiência atualizada em produtos digitais.\",\n  \"site\": \"https://mentor.example.com\",\n  \"disponibilidades\": [\n    {\n      \"diaSemana\": 3,\n      \"periodo\": \"TARDE\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/v1/mentores/{{mentorId}}",
+            "description": "Atualiza somente os campos enviados. Se disponibilidades for informada, ela substitui a lista semanal completa e não pode estar vazia."
           },
           "response": []
         }
