@@ -17,14 +17,19 @@ import br.senac.fullstack.usuario.infrastructure.persistence.repository.UsuarioR
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
 public class StartupService {
+
+    private static final ZoneId PLATFORM_TIME_ZONE = ZoneId.of("America/Sao_Paulo");
+    private static final Clock PLATFORM_CLOCK = Clock.system(PLATFORM_TIME_ZONE);
 
     private final StartupRepository startupRepository;
     private final MembroStartupRepository membroRepository;
@@ -64,7 +69,7 @@ public class StartupService {
         startup.setPublicoAlvo(normalizarTextoObrigatorio(request.publicoAlvo(), "público-alvo"));
         startup.setModeloDeNegocio(normalizarTextoObrigatorio(request.modeloDeNegocio(), "modelo de negócio"));
         startup.setStatusValidacao(request.statusValidacao());
-        startup.setDataCriacao(new Date());
+        startup.setDataCriacao(Instant.now(PLATFORM_CLOCK));
 
         Startup startupSalva = startupRepository.save(startup);
         adicionarMembroInterno(startupSalva, fundador, PapelMembroStartup.FUNDADOR);
@@ -144,7 +149,7 @@ public class StartupService {
         membro.setStartup(startup);
         membro.setUsuario(usuario);
         membro.setPapelMembro(papelMembro);
-        membro.setDataEntrada(LocalDate.now());
+        membro.setDataEntrada(LocalDate.now(PLATFORM_TIME_ZONE));
 
         startup.getMembros().add(membro);
         return membroRepository.save(membro);

@@ -17,8 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -150,7 +150,7 @@ class StartupControllerTest {
                 "Startups em ideação.",
                 "SaaS",
                 StatusValidacao.APENAS_IDEIA,
-                new Date(),
+                Instant.parse("2026-10-19T12:00:00Z"),
                 List.of(membroResponse(UUID.randomUUID()))
         );
     }
