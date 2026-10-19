@@ -7,6 +7,7 @@ import br.senac.fullstack.startup.api.dto.StartupResponse;
 import br.senac.fullstack.startup.application.service.StartupService;
 import br.senac.fullstack.startup.domain.enums.PapelMembroStartup;
 import br.senac.fullstack.startup.domain.enums.StatusValidacao;
+import br.senac.fullstack.usuario.application.exception.EmailExistenteException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -138,6 +140,103 @@ class StartupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveRejeitarRequestsComCamposObrigatoriosAusentes() throws Exception {
+        UUID startupId = UUID.randomUUID();
+
+        mockMvc.perform(post("/api/v1/startups")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/api/v1/startups/{startupId}/membros", startupId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveRetornarErrosDoServicoComStatusCorretos() throws Exception {
+        UUID startupId = UUID.randomUUID();
+        UUID usuarioId = UUID.randomUUID();
+        when(startupService.buscarStartupPorId(startupId))
+                .thenThrow(new NoSuchElementException("Startup não encontrada."));
+
+        mockMvc.perform(get("/api/v1/startups/{startupId}", startupId))
+                .andExpect(status().isNotFound());
+
+        when(startupService.criarStartup(any()))
+                .thenThrow(new IllegalArgumentException("Dados inválidos."));
+
+        mockMvc.perform(post("/api/v1/startups")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(criarStartupJson()))
+                .andExpect(status().isBadRequest());
+
+        when(startupService.adicionarMembro(eq(startupId), any()))
+                .thenThrow(new IllegalStateException("Membro duplicado."));
+
+        mockMvc.perform(post("/api/v1/startups/{startupId}/membros", startupId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(adicionarMembroJson(usuarioId)))
+                .andExpect(status().isConflict());
+
+        when(startupService.criarStartup(any()))
+                .thenThrow(new EmailExistenteException("Email existente"));
+
+        mockMvc.perform(post("/api/v1/startups")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(criarStartupJson()))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void deveRejeitarEscritasDeMembroSemCsrf() throws Exception {
+        UUID startupId = UUID.randomUUID();
+        UUID usuarioId = UUID.randomUUID();
+
+        mockMvc.perform(post("/api/v1/startups/{startupId}/membros", startupId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(adicionarMembroJson(usuarioId)))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(delete("/api/v1/startups/{startupId}/membros/{usuarioId}", startupId, usuarioId))
+                .andExpect(status().isForbidden());
+    }
+
+    private String criarStartupJson() {
+        return """
+                {
+                  "fundador": {
+                    "nome": "Fundadora de Teste",
+                    "email": "fundadora.teste@example.com",
+                    "senha": "senha-ficticia"
+                  },
+                  "nomeProvisorio": "Startup de Teste",
+                  "pitchCurto": "Ajuda startups a encontrar mentores.",
+                  "problemaCentral": "Poucas conexões qualificadas.",
+                  "solucaoProposta": "Recomendação de mentores.",
+                  "publicoAlvo": "Startups em ideação.",
+                  "modeloDeNegocio": "SaaS",
+                  "statusValidacao": "APENAS_IDEIA"
+                }
+                """;
+    }
+
+    private String adicionarMembroJson(UUID usuarioId) {
+        return """
+                {
+                  "usuarioId": "%s",
+                  "papelMembro": "MEMBRO"
+                }
+                """.formatted(usuarioId);
     }
 
     private StartupResponse startupResponse(UUID startupId) {
