@@ -21,6 +21,7 @@ import java.util.UUID;
 @Service
 public class MentorService {
     private static final ZoneId PLATFORM_TIME_ZONE = ZoneId.of("America/Sao_Paulo");
+    private static final String MENTOR_NAO_ENCONTRADO = "Mentor não encontrado";
 
     private final MentorRepository mentorRepository;
     private final UsuarioService usuarioService;
@@ -64,7 +65,7 @@ public class MentorService {
         }
 
         Mentor mentor = mentorRepository.findById(mentorId)
-                .orElseThrow(() -> new MentorNaoEncontradoException("Mentor não encontrado"));
+                .orElseThrow(() -> new MentorNaoEncontradoException(MENTOR_NAO_ENCONTRADO));
         mentorMapper.atualizarPerfil(request, mentor);
 
         if (request.disponibilidades() != null) {
@@ -81,14 +82,15 @@ public class MentorService {
         }
 
         Mentor mentor = mentorRepository.findById(mentorId)
-                .orElseThrow(() -> new MentorNaoEncontradoException("Mentor não encontrado"));
+                .orElseThrow(() -> new MentorNaoEncontradoException(MENTOR_NAO_ENCONTRADO));
         mentor.setStatus(request.status());
         return mentorMapper.toResponse(mentor);
     }
 
 
     public MentorResponse buscarMentor(Usuario usuario) {
-        Mentor mentor = mentorRepository.findByUsuario(usuario).orElseThrow(() -> new MentorNaoEncontradoException("Mentor não encontrado"));
+        Mentor mentor = mentorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new MentorNaoEncontradoException(MENTOR_NAO_ENCONTRADO));
         return mentorMapper.toResponse(mentor);
     }
 }
