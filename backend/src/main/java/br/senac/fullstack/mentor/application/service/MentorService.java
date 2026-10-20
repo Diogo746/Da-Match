@@ -1,6 +1,7 @@
 package br.senac.fullstack.mentor.application.service;
 
 import br.senac.fullstack.mentor.api.dto.AtualizarPerfilMentorRequest;
+import br.senac.fullstack.mentor.api.dto.AtualizarStatusPerfilMentorRequest;
 import br.senac.fullstack.mentor.api.dto.CadastrarMentorRequest;
 import br.senac.fullstack.mentor.api.dto.MentorResponse;
 import br.senac.fullstack.mentor.api.mapper.MentorMapper;
@@ -15,10 +16,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.UUID;
 
 @Service
 public class MentorService {
     private static final ZoneId PLATFORM_TIME_ZONE = ZoneId.of("America/Sao_Paulo");
+    private static final String MENTOR_NAO_ENCONTRADO = "Mentor não encontrado";
 
     private final MentorRepository mentorRepository;
     private final UsuarioService usuarioService;
@@ -44,7 +47,8 @@ public class MentorService {
                 LocalDate.now(PLATFORM_TIME_ZONE),
                 request.biografia(),
                 request.linkedin(),
-                request.instagram()
+                request.instagram(),
+                mentorMapper.toEntities(request.disponibilidades())
         );
 
         Mentor mentorSalvo = mentorRepository.save(mentor);
@@ -52,15 +56,41 @@ public class MentorService {
     }
 
     @Transactional
-    public void atualizarPerfil(AtualizarPerfilMentorRequest  request) {
-        Mentor mentor = mentorRepository.findById(request.id()).orElseThrow(() -> new MentorNaoEncontradoException("Mentor não encontrado"));
+    public MentorResponse atualizarPerfil(UUID mentorId, AtualizarPerfilMentorRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Os dados do perfil são obrigatórios.");
+        }
+        if (request.disponibilidades() != null && request.disponibilidades().isEmpty()) {
+            throw new IllegalArgumentException("Disponibilidades não podem ficar vazias.");
+        }
+
+        Mentor mentor = mentorRepository.findById(mentorId)
+                .orElseThrow(() -> new MentorNaoEncontradoException(MENTOR_NAO_ENCONTRADO));
         mentorMapper.atualizarPerfil(request, mentor);
 
+        if (request.disponibilidades() != null) {
+            mentor.setDisponibilidades(mentorMapper.toEntities(request.disponibilidades()));
+        }
+
+        return mentorMapper.toResponse(mentor);
+    }
+
+    @Transactional
+    public MentorResponse atualizarStatus(UUID mentorId, AtualizarStatusPerfilMentorRequest request) {
+        if (request == null || request.status() == null) {
+            throw new IllegalArgumentException("O status do perfil é obrigatório.");
+        }
+
+        Mentor mentor = mentorRepository.findById(mentorId)
+                .orElseThrow(() -> new MentorNaoEncontradoException(MENTOR_NAO_ENCONTRADO));
+        mentor.setStatus(request.status());
+        return mentorMapper.toResponse(mentor);
     }
 
 
     public MentorResponse buscarMentor(Usuario usuario) {
-        Mentor mentor = mentorRepository.findByUsuario(usuario).orElseThrow(() -> new MentorNaoEncontradoException("Mentor não encontrado"));
+        Mentor mentor = mentorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new MentorNaoEncontradoException(MENTOR_NAO_ENCONTRADO));
         return mentorMapper.toResponse(mentor);
     }
 }

@@ -3,8 +3,11 @@ package br.senac.fullstack.mentor.api.dto;
 import br.senac.fullstack.usuario.api.dto.CadastrarUsuarioRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.util.Set;
 
 public record CadastrarMentorRequest(
         @NotNull
@@ -15,6 +18,9 @@ public record CadastrarMentorRequest(
         @Size(max = 1000, message = "Biografia deve ter no máximo 1000 caracteres")
         String biografia,
         String linkedin,
-        String instagram
+        String instagram,
+        @NotEmpty
+        @Valid
+        Set<DisponibilidadeMentorRequest> disponibilidades
 ) {
 }
