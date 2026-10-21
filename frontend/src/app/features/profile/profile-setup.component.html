@@ -1,0 +1,112 @@
+<div class="setup-layout">
+  <section class="setup-panel" aria-labelledby="lumen-question">
+    <div class="setup-top"><p class="eyebrow">{{ editing() ? 'EDITAR RESPOSTAS' : 'SEU PERFIL, SEU MOMENTO' }}</p><span>{{ reviewing() ? 'Revisão' : step() + 1 + ' de 5' }}</span></div>
+    <fieldset class="step-track" [class.edit-sections]="editing()">
+      <legend class="sr-only">{{ editing() ? 'Seções do perfil' : 'Etapas do perfil' }}</legend>
+      @for (label of steps; track label; let index = $index) {
+        @if (editing()) {
+          <button type="button" [class.current]="step() === index" [attr.aria-current]="step() === index ? 'true' : null" (click)="selectStep(index)">{{ label }}</button>
+        } @else {
+          <span [class.current]="!reviewing() && step() === index" [class.done]="reviewing() || index < step()" [attr.aria-current]="!reviewing() && step() === index ? 'step' : null"><b>{{ index + 1 }}</b><span>{{ label }}</span></span>
+        }
+      }
+    </fieldset>
+    <app-lumen-guide class="lumen-message" [question]="title()" [message]="message()" [pose]="pose()" questionId="lumen-question" />
+    <form [formGroup]="form" (ngSubmit)="next()" novalidate>
+      @if (error()) { <p #errorSummary class="error-summary" role="alert" tabindex="-1">{{ error() }}</p> }
+      @if (reviewing()) {
+        <dl class="review-list">
+          @for (section of summary(); track section.step) {
+            <div><dt>{{ section.title }}<button type="button" class="text-button" [attr.aria-label]="'Rever ' + section.title" (click)="selectStep(section.step)">Ajustar</button></dt><dd>{{ section.value }}</dd></div>
+          }
+        </dl>
+        @if (!isStartup()) { <p class="selection-note">{{ draft().accepting ? 'Você está recebendo novas startups.' : 'Seu perfil ficará em pausa para novas mentorias.' }}</p> }
+      } @else {
+        @switch (step()) {
+          @case (0) {
+            <fieldset class="choice-fieldset"><legend class="sr-only">Momento da ideação</legend><div class="choice-grid">
+              @for (moment of moments; track moment.id) {
+                <button type="button" class="choice topic-choice" [class.chosen]="draft().moments.includes(moment.id)" [attr.aria-pressed]="draft().moments.includes(moment.id)" (click)="selectMoment(moment.id)"><app-icon [name]="moment.icon" /><span><strong>{{ isStartup() ? moment.startup : moment.label }}</strong><small>{{ moment.detail }}</small></span><app-icon class="choice-check" name="check" /></button>
+              }
+            </div></fieldset>
+            <p class="selection-note">Todos os caminhos aqui são de ideação. Seu perfil pode acompanhar as mudanças da sua ideia.</p>
+          }
+          @case (1) {
+            <fieldset class="choice-fieldset"><legend class="sr-only">Setor de atuação</legend><div class="choice-grid sector-grid">
+              @for (sector of sectors; track sector.id) {
+                <button type="button" class="choice" [class.chosen]="draft().sectors.includes(sector.id)" [attr.aria-pressed]="draft().sectors.includes(sector.id)" (click)="selectSector(sector.id)"><app-icon [name]="sector.icon" /><span>{{ sector.label }}</span><app-icon class="choice-check" name="check" /></button>
+              }
+            </div>
+            @if (isStartup()) { <button type="button" class="soft-choice" [class.chosen]="draft().sectors.includes('DISCOVERING')" [attr.aria-pressed]="draft().sectors.includes('DISCOVERING')" (click)="selectSector('DISCOVERING')">Ainda estou descobrindo meu setor<app-icon name="compass" /></button> }
+            @else { <button type="button" class="soft-choice" [class.chosen]="draft().sectors.includes('GENERAL')" [attr.aria-pressed]="draft().sectors.includes('GENERAL')" (click)="selectSector('GENERAL')">Minha orientação serve a diferentes setores<app-icon name="network" /></button> }
+            </fieldset>
+            @if (isStartup()) {
+              <label class="field-label" for="project-name">Sua ideia já tem nome? <span>OPCIONAL</span></label>
+              <input id="project-name" class="form-input" formControlName="projectName" placeholder="Se tiver, conte para a gente" maxlength="60" autocomplete="organization" aria-describedby="project-name-hint" />
+              <p class="field-help" id="project-name-hint">Você pode escolher ou mudar esse nome depois.</p>
+            }
+          }
+          @case (2) {
+            <fieldset class="choice-fieldset"><legend class="sr-only">{{ isStartup() ? 'Suas necessidades' : 'Suas especialidades' }}</legend><div class="choice-grid topic-grid">
+              @for (topic of topics; track topic.id) {
+                <button type="button" class="choice topic-choice" [class.chosen]="draft().topics.includes(topic.id)" [attr.aria-pressed]="draft().topics.includes(topic.id)" (click)="toggleTopic(topic.id)"><app-icon [name]="topic.icon" /><span><strong>{{ topic.label }}</strong><small>{{ topic.detail }}</small></span>
+                  @if (draft().topics.includes(topic.id)) { <b class="choice-order">{{ isStartup() ? draft().topics.indexOf(topic.id) + 1 : '✓' }}</b> }
+                </button>
+              }
+            </div></fieldset>
+            @if (isStartup() && draft().topics.length) {
+              <ol class="priority-list">@for (topic of draft().topics; track topic; let index = $index) { <li><span><small>{{ index === 0 ? 'PRINCIPAL' : 'TAMBÉM BUSCA' }}</small>{{ topicLabel(topic) }}</span>@if (index > 0) { <button type="button" class="text-button" (click)="makePrimary(topic)">Tornar prioridade</button> }</li> }</ol>
+            }
+            @if (!isStartup()) {
+              @for (topic of draft().topics; track topic) {
+                <fieldset class="experience-choice"><legend>{{ topicLabel(topic) }}</legend>
+                  <button type="button" [class.chosen]="draft().experience[topic] === 'PRACTICAL'" [attr.aria-pressed]="draft().experience[topic] === 'PRACTICAL'" [attr.aria-label]="'Experiência prática em ' + topicLabel(topic)" (click)="chooseExperience(topic, 'PRACTICAL')">Já atuei na prática</button>
+                  <button type="button" [class.chosen]="draft().experience[topic] === 'KNOWLEDGE'" [attr.aria-pressed]="draft().experience[topic] === 'KNOWLEDGE'" [attr.aria-label]="'Conhecimento para orientar em ' + topicLabel(topic)" (click)="chooseExperience(topic, 'KNOWLEDGE')">Tenho conhecimento para orientar</button>
+                </fieldset>
+              }
+            }
+            <p class="selection-note">{{ draft().topics.length }} de {{ isStartup() ? 2 : 3 }} escolhidos. Você pode desmarcar para trocar.</p>
+          }
+          @case (3) {
+            <fieldset class="choice-fieldset"><legend class="sr-only">Modalidade dos encontros</legend><div class="format-choices">
+              @for (format of formats; track format.id) { <button type="button" class="choice topic-choice" [class.chosen]="draft().format === format.id" [attr.aria-pressed]="draft().format === format.id" (click)="chooseFormat(format.id)"><app-icon [name]="format.icon" /><span><strong>{{ format.label }}</strong><small>{{ format.detail }}</small></span><app-icon class="choice-check" name="check" /></button> }
+            </div></fieldset>
+            @if (draft().format && draft().format !== 'ONLINE') {
+              <label class="field-label" for="meeting-city">Em qual cidade? <span>{{ draft().format === 'AMBOS' ? 'OPCIONAL' : 'OBRIGATÓRIO' }}</span></label>
+              <select id="meeting-city" class="form-input" formControlName="cityId" [attr.aria-required]="draft().format === 'PRESENCIAL'" aria-describedby="city-hint"><option value="">Selecione uma cidade</option>@for (city of cities; track city.id) { <option [value]="city.id">{{ city.label }}</option> }</select>
+              <p class="field-help" id="city-hint">{{ draft().format === 'AMBOS' ? 'Sem uma cidade, suas indicações considerarão encontros online.' : 'Nesta prévia, o catálogo de cidades é reduzido. Se a sua não estiver aqui, você pode escolher online ou voltar depois.' }}</p>
+            }
+          }
+          @case (4) {
+            <fieldset class="choice-fieldset"><legend class="small-legend">Com qual frequência?</legend><div class="cadence-choices">
+              @for (cadence of cadences; track cadence.id) { <button type="button" class="period-choice" [class.chosen]="draft().cadence === cadence.id" [attr.aria-pressed]="draft().cadence === cadence.id" (click)="chooseCadence(cadence.id)"><strong>{{ cadence.label }}</strong><small>{{ cadence.detail }}</small></button> }
+            </div></fieldset>
+            <fieldset class="choice-fieldset"><legend class="small-legend">Escolha um dia para marcar seus períodos</legend><div class="day-choices">
+              @for (day of days; track day.id) { <button type="button" class="day-choice" [class.current-day]="activeDay() === day.id" [class.has-slots]="slotCount(day.id) > 0" [attr.aria-label]="day.full" [attr.aria-pressed]="activeDay() === day.id" (click)="activeDay.set(day.id)">{{ day.label }}@if (slotCount(day.id)) { <small>{{ slotCount(day.id) }}</small> }</button> }
+            </div></fieldset>
+            <fieldset class="choice-fieldset"><legend class="small-legend">{{ activeDayLabel() }}</legend><div class="period-choices">
+              @for (period of periods; track period.id) { <button type="button" class="period-choice" [class.chosen]="slotSelected(activeDay(), period.id)" [attr.aria-pressed]="slotSelected(activeDay(), period.id)" (click)="toggleSlot(activeDay(), period.id)"><strong>{{ period.label }}</strong><small>{{ period.detail }}</small></button> }
+            </div></fieldset>
+            <output class="selection-note">{{ draft().availability.length }} {{ draft().availability.length === 1 ? 'janela adicionada' : 'janelas adicionadas' }}. Marque outros dias se quiser.</output>
+            <div class="availability-chips">@for (slot of draft().availability; track slot.day + slot.period) { <button type="button" [attr.aria-label]="'Remover ' + slotLabel(slot)" (click)="toggleSlot(slot.day, slot.period)">{{ slotLabel(slot) }}<app-icon name="close" /></button> }</div>
+            <p class="field-help">Horário de Recife. São janelas de disponibilidade; o horário exato será combinado entre vocês.</p>
+            @if (!isStartup()) { <label class="accepting-choice"><input type="checkbox" formControlName="accepting" /><span><strong>Estou recebendo novas startups</strong><small>Você pode pausar e retomar quando quiser.</small></span></label> }
+          }
+        }
+      }
+      <div class="wizard-actions">
+        @if (editing()) { <button class="button button-secondary" type="button" (click)="cancelled.emit()">Cancelar</button> }
+        @else if (step() > 0 || reviewing()) { <button class="button button-secondary" type="button" (click)="back()">Voltar</button> }
+        @else { <span class="first-step-note">Um passo de cada vez.</span> }
+        <button class="button button-primary" type="submit">{{ editing() ? 'Salvar alterações' : reviewing() ? 'Concluir meu perfil' : step() === 4 ? 'Revisar meu perfil' : 'Continuar' }}<app-icon [name]="editing() || reviewing() ? 'check' : 'arrow'" /></button>
+      </div>
+    </form>
+  </section>
+  <aside class="preview-column" aria-label="Seu perfil em construção">
+    <p class="eyebrow">{{ editing() ? 'PRÉVIA DAS ALTERAÇÕES' : 'DO SEU JEITO' }}</p><h2>{{ editing() ? 'Veja como ficará.' : 'Seu perfil ganha forma.' }}</h2>
+    <app-profile-preview [name]="name()" [draft]="draft()" />
+    @if (!editing()) { <div class="real-progress"><label for="profile-progress">{{ completed() }} de 5 etapas preenchidas</label><progress id="profile-progress" max="5" [value]="completed()"></progress></div> }
+    <p class="preview-note"><app-icon name="shield" />{{ editing() ? 'As mudanças são aplicadas ao salvar. Você pode cancelar a edição.' : 'Suas respostas ajudam a personalizar as indicações. Você pode editar depois.' }}</p>
+  </aside>
+</div>
+

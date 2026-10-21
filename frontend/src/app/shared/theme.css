@@ -1,0 +1,160 @@
+:root {
+  color-scheme: light;
+  --navy: #0b3044;
+  --on-navy: #fff;
+  --bg: #f6f8f5;
+  --surface: #fff;
+  --surface-overlay: #ffffffed;
+  --surface-alt: #edf3ef;
+  --surface-soft: #f5f8f4;
+  --surface-hover: #edf5f0;
+  --surface-tint: #edf5ef;
+  --text-primary: #0b3044;
+  --muted: #526970;
+  --text-soft: #496659;
+  --placeholder: #607773;
+  --teal: #176b58;
+  --accent-ink: #165e51;
+  --focus: #349c81;
+  --border: #dce5df;
+  --border-soft: #e6ede7;
+  --field-border: #819a90;
+  --border-hover: #507d68;
+  --action-bg: #176b58;
+  --action-text: #fff;
+  --action-hover: #105544;
+  --button-soft-bg: #d5eadb;
+  --button-soft-text: #103f33;
+  --button-soft-hover: #c0dfce;
+  --selected-bg: #eaf5ee;
+  --saved-bg: #0b3044;
+  --saved-text: #fff;
+  --badge-bg: #e2efe7;
+  --badge-text: #2d6850;
+  --tag-bg: #f1f5f3;
+  --tag-text: #315a48;
+  --track: #e1ebe3;
+  --track-fill: #4e9d77;
+  --hero-bg: #edf4ef;
+  --help-bg: #eaf2eb;
+  --help-icon-bg: #d0e4d6;
+  --preview-cover-start: #dcefe4;
+  --preview-cover-end: #c5e5dc;
+  --success-bg: #e4f3e9;
+  --success-text: #236146;
+  --error-bg: #fff4f1;
+  --error-border: #ba7168;
+  --error-text: #963d3d;
+  --attention-text: #496659;
+  --shadow-soft: #1433420d;
+  --shadow-card: #1137490d;
+  --dialog-shadow: #082d4960;
+  --backdrop: #082c44a6;
+  --cover-ring: #ffffff85;
+  --cover-ring-soft: #ffffff35;
+  --lumen-bubble-bg: #fff;
+  --lumen-bubble-border: #cddfd2;
+  --lumen-bubble-text: #34564b;
+  --lumen-halo-rest: .22;
+  --lumen-halo-peak: .8;
+  --lumen-core: #f2ffe8;
+  --lumen-core-rest: .12;
+  --lumen-core-peak: .78;
+  --lumen-halo-inner: #dbffe8e6;
+  --lumen-halo-outer: #85d9c780;
+  --lumen-halo-shadow: #85d9c780;
+  --lumen-halo-blur: 5px;
+  --lumen-core-shadow: #d3f1e199;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b1820;
+  --surface: #14282e;
+  --surface-overlay: #1a343dee;
+  --surface-alt: #1b3338;
+  --surface-soft: #172e34;
+  --surface-hover: #213f41;
+  --surface-tint: #193a35;
+  --text-primary: #e6f2ee;
+  --muted: #b2c8c5;
+  --text-soft: #bfd4cc;
+  --placeholder: #93afaa;
+  --teal: #9adebf;
+  --accent-ink: #a4e2ca;
+  --focus: #b6f0d4;
+  --border: #30494e;
+  --border-soft: #2a4146;
+  --field-border: #6f908e;
+  --border-hover: #83b29e;
+  --action-bg: #96d8bc;
+  --action-text: #0b2a24;
+  --action-hover: #aeedce;
+  --button-soft-bg: #244e42;
+  --button-soft-text: #d3f1e1;
+  --button-soft-hover: #2d604f;
+  --selected-bg: #224b40;
+  --saved-bg: #a4e2ca;
+  --saved-text: #0b2a24;
+  --badge-bg: #234339;
+  --badge-text: #c1ead3;
+  --tag-bg: #213b36;
+  --tag-text: #c0dfd0;
+  --track: #294347;
+  --track-fill: #96d8bc;
+  --hero-bg: #142f32;
+  --help-bg: #17372f;
+  --help-icon-bg: #285041;
+  --preview-cover-start: #214a42;
+  --preview-cover-end: #1b3d39;
+  --success-bg: #214335;
+  --success-text: #bde6cd;
+  --error-bg: #402724;
+  --error-border: #bc796e;
+  --error-text: #ffc1b7;
+  --attention-text: #bfd4cc;
+  --shadow-soft: #00000024;
+  --shadow-card: #00000030;
+  --dialog-shadow: #00000099;
+  --backdrop: #030c13cf;
+  --cover-ring: #d9f4e528;
+  --cover-ring-soft: #d9f4e512;
+  --lumen-bubble-bg: #1b393d;
+  --lumen-bubble-border: #527575;
+  --lumen-bubble-text: #dfede6;
+  --lumen-halo-rest: .42;
+  --lumen-halo-peak: 1;
+  --lumen-core-rest: .25;
+  --lumen-core-peak: 1;
+  --lumen-halo-inner: #b6f0d4ff;
+  --lumen-halo-outer: #85d9c7b3;
+  --lumen-halo-shadow: #85d9c7b3;
+  --lumen-halo-blur: 8px;
+  --lumen-core-shadow: #d3f1e1cc;
+}
+
+input::placeholder { color: var(--placeholder); opacity: 1; }
+option { background: var(--surface); color: var(--text-primary); }
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 11px;
+  border: 1px solid var(--field-border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.theme-toggle:hover { background: var(--surface-hover); border-color: var(--border-hover); }
+.theme-toggle app-icon { width: 15px; height: 15px; }
+@media(max-width:480px) {
+  .topbar-actions > .demo-pill { display: none; }
+  .theme-toggle { padding: 8px; font-size: 10px; }
+}

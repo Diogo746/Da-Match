@@ -14,6 +14,8 @@ import {
   RegistrationError,
 } from "../../core/registration.gateway";
 
+import { ProfileSessionStore } from "../../core/profile-session.store";
+import { emptyProfile } from "../../core/profile.models";
 let injector: EnvironmentInjector;
 const receipt: RegistrationReceipt = {
   nome: "Maria Teste",
@@ -25,7 +27,7 @@ function create(
   register: RegistrationGateway["register"] = vi.fn(() => of(receipt)),
 ) {
   injector = createEnvironmentInjector(
-    [{ provide: RegistrationGateway, useValue: { register } }],
+    [{ provide: RegistrationGateway, useValue: { register } }, ProfileSessionStore],
     Injector.NULL as EnvironmentInjector,
   );
   return {
@@ -40,6 +42,9 @@ function fill(component: RegisterComponent) {
     senha: "senha-de-teste",
     tipoUsuario: "STARTUP",
     demoConsent: true,
+    biografia: "",
+    linkedin: "",
+    instagram: "",
   });
 }
 beforeEach(() => vi.useFakeTimers());
@@ -77,7 +82,7 @@ describe("Formulário de cadastro", () => {
   });
 
   it.each(["STARTUP", "MENTOR"] as const)(
-    "separa o tipo %s dos três campos do DTO e remove a senha após o teste",
+    "monta os dados de %s e remove a senha após o teste",
     async (tipoUsuario) => {
       const { component, register } = create();
       fill(component);
@@ -86,18 +91,19 @@ describe("Formulário de cadastro", () => {
         nome: "  Maria Teste  ",
         email: " MARIA@example.test ",
         senha: " senha de teste ",
+        biografia: "Mentora em produtos digitais.",
       });
       await component.submit();
-      expect(register).toHaveBeenCalledWith(tipoUsuario, {
+      const expected = {
         nome: "Maria Teste",
         email: "maria@example.test",
         senha: " senha de teste ",
-      });
-      expect(Object.keys(register.mock.calls[0][1]).sort()).toEqual([
-        "email",
-        "nome",
-        "senha",
-      ]);
+      };
+      if (tipoUsuario === "MENTOR") {
+        expect(register).toHaveBeenCalledWith(tipoUsuario, { ...expected,
+          mentor: { biografia: "Mentora em produtos digitais.", linkedin: "", instagram: "" },
+        });
+      } else expect(register).toHaveBeenCalledWith(tipoUsuario, expected);
       expect(component.form.controls.senha.value).toBe("");
       expect(component.receipt()?.mode).toBe("DEMO");
       expect(component.loading()).toBe(false);
@@ -149,6 +155,9 @@ describe("Formulário de cadastro", () => {
       senha: "",
       tipoUsuario: "STARTUP",
       demoConsent: false,
+      biografia: "",
+      linkedin: "",
+      instagram: "",
     });
     expect(component.form.untouched).toBe(true);
   });
@@ -167,5 +176,42 @@ describe("Formulário de cadastro", () => {
     expect(component.error()).toBe("");
     expect(component.receipt()).toEqual(receipt);
     expect(register).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(["", "   ", "a".repeat(1001)])("bloqueia mentor com biografia inválida: caso %#", async (biografia) => {
+    const { component, register } = create();
+    fill(component);
+    component.form.patchValue({ tipoUsuario: "MENTOR", biografia });
+    await component.submit();
+    expect(component.invalid("biografia")).toBe(true);
+    expect(register).not.toHaveBeenCalled();
+  });
+});
+
+describe("Do cadastro ao perfil", () => {
+  it("ativa o perfil somente após completar as etapas e não leva credenciais para ele", async () => {
+    const { component } = create();
+    fill(component); await component.submit();
+    expect(component.session.profile()).toBeNull();
+    component.completeProfile({ ...emptyProfile("STARTUP"), projectName: "Minha Ideia", sectors: ["TECH"], topics: ["VALIDATION"], format: "ONLINE", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "MON", period: "EVENING" }] });
+    expect(component.profileReady()).toBe(true);
+    expect(component.session.profile()!.displayName).toBe("Minha Ideia");
+    expect(component.form.controls.senha.value).toBe("");
+    expect(JSON.stringify(component.session.profile())).not.toContain("email");
+    component.restart();
+    expect(component.session.profile()).toBeNull();
+    expect(component.profileReady()).toBe(false);
+  });
+  it("não permite concluir o perfil antes do cadastro", () => {
+    const { component } = create();
+    component.completeProfile(emptyProfile("STARTUP"));
+    expect(component.session.profile()).toBeNull();
+  });
+  it("não ativa um perfil com papel diferente do cadastro confirmado", async () => {
+    const { component } = create();
+    fill(component); await component.submit();
+    component.completeProfile(emptyProfile("MENTOR"));
+    expect(component.profileReady()).toBe(false);
+    expect(component.session.profile()).toBeNull();
   });
 });

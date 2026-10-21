@@ -11,6 +11,7 @@ const request: RegistrationRequest = {
   nome: "Maria Teste",
   email: "maria@example.test",
   senha: "senha-de-teste",
+  mentor: { biografia: "Mentora em produtos digitais." },
 };
 afterEach(() => vi.useRealTimers());
 async function register(
@@ -77,6 +78,22 @@ describe("Cadastro demonstrativo baseado em CadastrarUsuarioRequest", () => {
     ).rejects.toBeInstanceOf(RegistrationError);
   });
 
+  it.each([
+    "",
+    "maria@@example.test",
+    "maria silva@example.test",
+    "maria@localhost",
+    "maria@.test",
+    "maria@example.",
+    "maria..silva@example.test",
+    `${"a".repeat(65)}@example.test`,
+    `${"a".repeat(10000)}@example.test`,
+  ])("recusa e-mail malformado ou acima dos limites: caso %#", async (email) => {
+    await expect(
+      firstValueFrom(new DemoRegistrationGateway().register("MENTOR", { ...request, email })),
+    ).rejects.toMatchObject({ code: "INVALID_INPUT" });
+  });
+
   it("identifica o mesmo e-mail entre os dois tipos e normaliza espaços e caixa", async () => {
     vi.useFakeTimers();
     const gateway = new DemoRegistrationGateway();
@@ -96,5 +113,10 @@ describe("Cadastro demonstrativo baseado em CadastrarUsuarioRequest", () => {
     await expect(
       register(new DemoRegistrationGateway()),
     ).resolves.toMatchObject({ mode: "DEMO" });
+  });
+
+  it.each([undefined, { biografia: "   " }, { biografia: "a".repeat(1001) }])("exige biografia válida no cadastro de mentor: %o", async (mentor) => {
+    await expect(firstValueFrom(new DemoRegistrationGateway().register("MENTOR", { ...request, mentor })))
+      .rejects.toMatchObject({ code: "INVALID_INPUT" });
   });
 });

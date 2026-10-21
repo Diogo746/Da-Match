@@ -1,94 +1,27 @@
 <a class="back-link" routerLink="/">← Voltar para descobrir</a>
-<div class="register-layout">
-  <section class="register-intro">
-    <p class="eyebrow">IDEIAS ENCONTRAM EXPERIÊNCIA</p>
-    <h1>Toda ideia merece uma boa primeira conversa.</h1>
-    <p>
-      Conecte sua startup em ideação a quem pode orientar o começo. Ou participe
-      como mentor e ajude uma nova ideia a encontrar seu caminho.
-    </p>
-    <ol class="register-steps">
-      <li>
-        <span>01</span>
-        <div>
-          <h2>Escolha como participar</h2>
-          <p>
-            Startup em ideação ou mentor: cada experiência tem algo a somar.
-          </p>
-        </div>
-      </li>
-      <li>
-        <span>02</span>
-        <div>
-          <h2>Preencha seus dados</h2>
-          <p>Comece com nome, e-mail e uma senha para a conta.</p>
-        </div>
-      </li>
-      <li>
-        <span>03</span>
-        <div>
-          <h2>Explore as possibilidades</h2>
-          <p>
-            Conheça os perfis e encontre experiências que combinam com sua
-            ideia.
-          </p>
-        </div>
-      </li>
-    </ol>
-    <div class="privacy-note">
-      <app-icon name="shield" />
-      <p>
-        Esta é uma demonstração. Use nome, e-mail e senha inventados. Os dados
-        do teste são temporários e a senha não é armazenada.
-      </p>
-    </div>
-  </section>
-  <section class="register-card" aria-labelledby="register-title">
-    @if (receipt(); as result) {
-      <div class="receipt-view">
-        <span class="success-symbol"><app-icon name="check" /></span>
-        <p class="eyebrow">TESTE CONCLUÍDO</p>
-        <h2 id="register-title" #receiptHeading tabindex="-1">
-          {{ result.nome }}, seu cadastro foi simulado.
-        </h2>
-        <p>
-          Você percorreu o formulário de
-          {{
-            result.tipoUsuario === "STARTUP" ? "startup em ideação" : "mentor"
-          }}. Nenhuma conta real foi criada.
-        </p>
-        <dl>
-          <div>
-            <dt>Perfil escolhido</dt>
-            <dd>
-              {{
-                result.tipoUsuario === "STARTUP"
-                  ? "Startup em ideação"
-                  : "Mentor"
-              }}
-            </dd>
-          </div>
-          <div>
-            <dt>E-mail de teste</dt>
-            <dd>{{ result.email }}</dd>
-          </div>
-        </dl>
-        <p class="receipt-note">
-          Os dados não foram enviados a um servidor. A senha já foi removida do
-          formulário. Você pode continuar explorando os perfis fictícios.
-        </p>
-        <a class="button button-primary" routerLink="/"
-          >Descobrir perfis<app-icon name="arrow"
-        /></a>
-        <button class="text-button" type="button" (click)="restart()">
-          Testar outro cadastro
-        </button>
-      </div>
-    } @else {
-      <p class="eyebrow">CADASTRO · DEMONSTRAÇÃO</p>
-      <h2 id="register-title">Como você quer participar?</h2>
+@if (profileReady()) {
+  @if (session.profile(); as profile) { <app-profile-complete [profile]="profile" /> }
+  <button class="text-button new-registration" type="button" (click)="restart()">Testar outro cadastro</button>
+} @else if (receipt(); as result) {
+  @if (result.mode === 'API') {
+    <app-mentor-registration-complete [mentor]="result.mentor" />
+  } @else {
+    <header class="setup-intro"><p class="eyebrow">PRAZER EM CONHECER VOCÊ, {{ result.nome.split(' ')[0] }}</p><h1 #receiptHeading tabindex="-1">Agora, um perfil com a sua cara.</h1><p>Suas respostas ajudam a personalizar as indicações. Você pode mudar tudo depois.</p></header>
+    <app-profile-setup [kind]="result.tipoUsuario" [name]="result.nome" (finished)="completeProfile($event)" />
+  }
+} @else {
+  <div class="register-layout">
+    <section class="register-intro"><app-lumen-guide class="register-guide" [message]="apiMode ? 'Sua experiência pode abrir caminhos. Conte um pouco sobre como você pode ajudar.' : 'Vamos começar pelo básico. Depois, conto com você em cinco etapas rápidas.'" /><p class="eyebrow">IDEIAS ENCONTRAM EXPERIÊNCIA</p><h1>Uma boa conexão começa com você.</h1><p>Uma ideia para tirar do papel ou uma experiência para compartilhar. Conte um pouco sobre você e encontre novos caminhos.</p>
+      @if (!apiMode) {
+      <ol class="register-steps"><li><span>01</span><div><h2>Seu lugar nessa história</h2><p>Startup em ideação ou mentor.</p></div></li><li><span>02</span><div><h2>Quatro pequenos passos</h2><p>Mais escolhas por toque, menos digitação.</p></div></li><li><span>03</span><div><h2>Indicações com contexto</h2><p>Conheça perfis e entenda o que aproxima vocês.</p></div></li></ol>
+      }
+      <div class="privacy-note"><app-icon name="shield" /><p>{{ apiMode ? 'Ao confirmar, seus dados serão enviados ao servidor para criar uma conta de mentor. A senha não fica salva neste navegador pela aplicação.' : 'Demonstração: use nome, e-mail e senha inventados. O teste é temporário e a senha não é armazenada.' }}</p></div>
+    </section>
+    <section class="register-card" aria-labelledby="register-title">
+      <p class="eyebrow">{{ apiMode ? 'CADASTRO · CONECTADO' : 'CADASTRO · DEMONSTRAÇÃO' }}</p>
+      <h2 id="register-title">{{ apiMode ? 'Compartilhe sua experiência.' : 'Como você quer participar?' }}</h2>
       <p class="form-intro">
-        Escolha seu perfil e teste o cadastro com dados fictícios.
+        {{ apiMode ? 'Crie seu cadastro de mentor. O cadastro de startups será disponibilizado em uma próxima etapa.' : 'Comece pelos dados da conta. Depois, cinco pequenas etapas para montar seu perfil.' }}
       </p>
       <form
         [formGroup]="form"
@@ -128,7 +61,7 @@
             formControlName="nome"
             placeholder="Ex.: Maria Teste"
             minlength="4"
-            autocomplete="off"
+            [attr.autocomplete]="apiMode ? 'name' : 'off'"
             required
             [attr.aria-invalid]="invalid('nome')"
             [attr.aria-describedby]="invalid('nome') ? 'name-error' : null"
@@ -147,7 +80,7 @@
             type="email"
             formControlName="email"
             placeholder="maria&#64;example.test"
-            autocomplete="off"
+            [attr.autocomplete]="apiMode ? 'email' : 'off'"
             required
             [attr.aria-invalid]="invalid('email')"
             [attr.aria-describedby]="invalid('email') ? 'email-error' : null"
@@ -158,7 +91,7 @@
             </p>
           }
           <label class="field-label" for="register-password"
-            >Senha de teste <span>Obrigatória</span></label
+            >{{ apiMode ? 'Senha' : 'Senha de teste' }} <span>Obrigatória</span></label
           >
           <div class="password-field">
             <input
@@ -166,7 +99,7 @@
               id="register-password"
               [type]="passwordVisible() ? 'text' : 'password'"
               formControlName="senha"
-              placeholder="Crie uma senha fictícia"
+              [placeholder]="apiMode ? 'Crie sua senha' : 'Crie uma senha fictícia'"
               minlength="6"
               autocomplete="new-password"
               required
@@ -191,7 +124,7 @@
             </button>
           </div>
           <p class="field-help" id="password-help">
-            Pelo menos 6 caracteres. Use uma senha inventada para este teste.
+            {{ apiMode ? 'Pelo menos 6 caracteres. Sua senha é enviada apenas para o cadastro.' : 'Pelo menos 6 caracteres. Use uma senha inventada para este teste.' }}
           </p>
           @if (invalid("senha")) {
             <p class="field-error" id="password-error">
@@ -199,6 +132,23 @@
               espaços.
             </p>
           }
+          @if (isMentor()) {
+            <label class="field-label" for="register-biography">Como você pode ajudar? <span>Obrigatório</span></label>
+            <textarea class="form-input biography-input" id="register-biography" formControlName="biografia"
+              placeholder="Conte, em poucas frases, sua experiência e os temas em que pode orientar."
+              rows="4" maxlength="1000" required [attr.aria-invalid]="invalid('biografia')"
+              [attr.aria-describedby]="invalid('biografia') ? 'biography-help biography-error' : 'biography-help'"></textarea>
+            <div class="biography-help"><p class="field-help" id="biography-help">Uma apresentação breve já é um bom começo.</p><span>{{ biography().length }}/1000</span></div>
+            @if (invalid('biografia')) { <p class="field-error" id="biography-error">Escreva uma biografia com até 1.000 caracteres, sem usar apenas espaços.</p> }
+            <details class="social-details">
+              <summary>Adicionar redes sociais <span>Opcional</span></summary>
+              <label class="field-label" for="register-linkedin">LinkedIn</label>
+              <input class="form-input" id="register-linkedin" formControlName="linkedin" placeholder="https://www.linkedin.com/in/seu-perfil" />
+              <label class="field-label" for="register-instagram">Instagram</label>
+              <input class="form-input" id="register-instagram" formControlName="instagram" placeholder="Seu usuário ou link do perfil" />
+            </details>
+          }
+          @if (!apiMode) {
           <label class="consent"
             ><input
               type="checkbox"
@@ -219,19 +169,22 @@
               Confirme que você compreendeu o modo de demonstração.
             </p>
           }
+          }
           <button
             class="button button-primary submit-button"
             type="submit"
-            [disabled]="loading()"
+            [disabled]="loading() || uncertain()"
           >
-            {{ loading() ? "Simulando cadastro…" : "Testar cadastro" }}
+            @if (loading()) { {{ apiMode ? 'Enviando cadastro…' : 'Preparando seu perfil…' }} }
+            @else { {{ apiMode ? 'Criar cadastro de mentor' : 'Continuar para meu perfil' }} }
             @if (!loading()) {
               <app-icon name="arrow" />
             }
           </button>
         </fieldset>
-        <p class="form-footnote">Demonstração local com dados temporários.</p>
+        <p class="form-footnote">{{ apiMode ? 'O cadastro cria uma conta. O login e as preferências de mentoria ainda estão em desenvolvimento.' : 'Demonstração local com dados temporários.' }}</p>
       </form>
-    }
-  </section>
-</div>
+
+    </section>
+  </div>
+}

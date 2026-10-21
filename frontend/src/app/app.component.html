@@ -1,5 +1,5 @@
 <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
-<div class="app-layout">
+<div class="app-layout" [class.motion-paused]="motionPaused()">
   <aside class="sidebar" aria-label="Navegação principal">
     <a class="brand" routerLink="/" aria-label="DaMatch, início"
       ><span class="brand-mark" aria-hidden="true"><i></i><i></i></span
@@ -26,13 +26,14 @@
         ariaCurrentWhenActive="page"
         ><app-icon name="network" />Como funciona</a
       >
+      @if (!apiMode) { <a routerLink="/meu-perfil" routerLinkActive="active" ariaCurrentWhenActive="page"><app-icon name="spark" />Meu perfil</a> }
     </nav>
     <div class="sidebar-invite">
       <span class="invite-symbol"><app-icon name="spark" /></span>
       <h2>Boas conexões.<br />Novos caminhos.</h2>
       <p>Ideias em formação encontram experiência para começar.</p>
-      <a class="button button-light" routerLink="/cadastro"
-        >Testar cadastro<app-icon name="arrow"
+      <a class="button button-light" [routerLink]="session.profile() ? '/meu-perfil' : '/cadastro'"
+        >{{ invitationLabel() }}<app-icon name="arrow"
       /></a>
     </div>
     <div class="sidebar-footer">
@@ -47,16 +48,23 @@
         >Ecossistema de inovação<span>Recife, Pernambuco</span></span
       >
       <div class="topbar-actions">
-        <span class="demo-pill"><span></span>Demonstração</span
-        ><a routerLink="/cadastro" class="button button-primary button-small"
-          >Cadastrar<app-icon name="arrow"
+        <button class="theme-toggle" type="button" [attr.aria-pressed]="theme.isDark()"
+          [attr.aria-label]="theme.isDark() ? 'Ativar modo claro' : 'Ativar modo escuro'"
+          (click)="theme.toggle()"><app-icon [name]="theme.isDark() ? 'sun' : 'moon'" />
+          <span>{{ theme.isDark() ? 'Modo claro' : 'Modo escuro' }}</span></button>
+        <span class="demo-pill"><span></span>{{ apiMode ? 'Integração de mentor' : 'Demonstração' }}</span
+        ><a [routerLink]="session.profile() ? '/meu-perfil' : '/cadastro'" class="button button-primary button-small"
+          >{{ accountLabel() }}<app-icon name="arrow"
         /></a>
       </div>
     </header>
     <main id="conteudo" tabindex="-1"><router-outlet /></main>
     <footer class="page-footer">
       <span>DaMatch · Conexões com propósito</span
-      ><span>Demonstração com perfis fictícios e cadastros simulados.</span>
+      ><span>{{ apiMode ? 'Cadastro de mentor conectado. Descoberta e compatibilidade demonstrativas.' : 'Demonstração com perfis fictícios e cadastros simulados.' }}</span>
+      <button class="motion-toggle" type="button" [attr.aria-pressed]="motionPaused()"
+        title="A preferência de redução de movimento do dispositivo é sempre respeitada."
+        (click)="motionPaused.set(!motionPaused())">{{ motionPaused() ? 'Retomar animações' : 'Pausar animações' }}</button>
     </footer>
   </div>
 </div>

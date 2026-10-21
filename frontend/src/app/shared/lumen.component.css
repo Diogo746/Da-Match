@@ -1,0 +1,12 @@
+:host { display: block; width: var(--lumen-size, 150px); flex-shrink: 0; }
+.lumen-art { display: block; position: relative; width: 100%; aspect-ratio: 1; isolation: isolate; animation: lumen-hover 8s ease-in-out infinite; }
+img { display: block; width: 100%; height: auto; position: relative; z-index: 1; animation: pose-enter 240ms ease-out both; }
+.lumen-art::before, .lumen-art::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; left: 50%; top: 77%; }
+.lumen-art::before { width: 43%; height: 33%; background: radial-gradient(ellipse, var(--lumen-halo-inner), var(--lumen-halo-outer) 48%, transparent 74%); filter: blur(8px); transform: translate(-50%,-50%); opacity: var(--lumen-halo-rest); z-index: 0; animation: lantern-breathe 8s ease-in-out infinite; }
+.lumen-art::after { width: 13%; height: 9%; transform: translate(-50%,-50%); background: var(--lumen-core); filter: blur(6px); box-shadow: 0 0 15px var(--lumen-core-shadow); opacity: var(--lumen-core-rest); z-index: 2; }
+.compact::before { filter: blur(5px); }
+@keyframes lantern-breathe { 0%,100% { transform: translate(-50%,-50%) scale(.88); opacity: var(--lumen-halo-rest); } 50% { transform: translate(-50%,-50%) scale(1.16); opacity: var(--lumen-halo-peak); } }
+@keyframes lumen-hover { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes pose-enter { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .lumen-art, img, .lumen-art::before { animation: none; } .lumen-art::before { transform: translate(-50%,-50%); opacity: var(--lumen-halo-rest); } }
+

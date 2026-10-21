@@ -29,8 +29,11 @@
 .profile-tabs {
   display: flex;
   gap: 18px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
   border-bottom: 1px solid var(--border);
-  margin-top: 24px;
+  margin: 24px 0 0;
   overflow-x: auto;
 }
 .profile-tabs button {
@@ -47,22 +50,22 @@
   padding: 0 0 13px;
   cursor: pointer;
 }
-.profile-tabs button span {
+.profile-tabs span {
   font-size: 9px;
   min-width: 18px;
   padding: 3px 5px;
-  background: #e8edeb;
+  background: var(--surface-alt);
   border-radius: 4px;
 }
-.profile-tabs button.selected {
+.profile-tabs .selected {
   color: var(--teal);
   border-bottom-color: var(--teal);
 }
-.profile-tabs button.selected span {
-  background: #d9ebe4;
+.profile-tabs .selected span {
+  background: var(--selected-bg);
 }
 .filter-panel {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 11px;
   margin-top: 21px;
@@ -80,7 +83,7 @@
   border: 0;
   background: transparent;
   font-size: 12px;
-  color: var(--navy);
+  color:var(--text-primary);
   outline: none;
   min-width: 0;
 }
@@ -104,9 +107,9 @@
   display: block;
   width: 100%;
   font-size: 11px;
-  color: var(--navy);
+  color:var(--text-primary);
   border: 0;
-  background: #fff;
+  background: var(--surface);
   margin-top: 5px;
   padding: 2px 0;
   min-width: 0;
@@ -118,13 +121,10 @@
   align-items: center;
   margin: 16px 0;
 }
-.results-heading > p {
+.results-heading > output {
   font-size: 11px;
   color: var(--muted);
   margin: 0;
-}
-.results-heading .text-button {
-  font-size: 10px;
 }
 .profiles-grid {
   display: grid;
@@ -135,9 +135,9 @@
   grid-column: 1/-1;
   text-align: center;
   padding: 55px 25px;
-  border: 1px dashed #c9dad2;
+  border: 1px dashed var(--field-border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
 }
 .empty-state > app-icon {
   width: 30px;
@@ -215,3 +215,5 @@
     font-size: 9px;
   }
 }
+
+.personal-context{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-top:21px;padding:15px 17px;border:1px solid var(--border);border-radius:10px;background:var(--surface-tint)}.personal-context strong{font-size:12px}.personal-context p{font-size:10px;line-height:1.8;color:var(--text-soft);margin:4px 0 0}.personal-context a{display:flex;align-items:center;gap:5px;font-size:10px;white-space:nowrap;text-decoration:none;color:var(--teal);font-weight:650}.personal-context a app-icon,.profile-tabs app-icon{width:13px;height:13px}.matching-note{font-size:10px;color:var(--muted);line-height:1.8;margin:16px 0 0}.empty-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}@media(max-width:500px){.personal-context{align-items:flex-start;flex-direction:column}}
