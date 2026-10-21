@@ -76,7 +76,7 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
-          cache-dependency-path: 'frontend/package.json'
+          cache-dependency-path: 'frontend/package-lock.json'
 
       - name: 🔍 Backend - Lint (Checkstyle) & Validation
         if: github.event_name != 'pull_request' || needs.changes.outputs.backend == 'true'
@@ -94,16 +94,32 @@ jobs:
         if: github.event_name != 'pull_request' || needs.changes.outputs.frontend == 'true'
         working-directory: ./frontend
         run: |
-          npm ci || npm install
+          npm ci
           echo "Executando linting no Angular 22 com ESLint..."
-          npm run lint --if-present
+          npm run lint
 
       - name: 🎨 Frontend - Run Unit Tests (Vitest)
         if: github.event_name != 'pull_request' || needs.changes.outputs.frontend == 'true'
         working-directory: ./frontend
         run: |
           echo "Executando testes unitários do Angular 22 com Vitest..."
-          npm run test:coverage --if-present || npm run test --if-present
+          npm run test:coverage
+
+      - name: 📤 Upload Frontend LCOV Coverage Report
+        if: github.event_name != 'pull_request' || needs.changes.outputs.frontend == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-coverage-report
+          path: frontend/coverage/frontend/lcov.info
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: 🏗️ Frontend - Production Build
+        if: github.event_name != 'pull_request' || needs.changes.outputs.frontend == 'true'
+        working-directory: ./frontend
+        run: |
+          npm run build
+          npm run build:api
 
       - name: 📤 Upload JaCoCo Coverage Report
         if: github.event_name != 'pull_request' || needs.changes.outputs.backend == 'true'
@@ -273,11 +289,21 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
-          cache-dependency-path: 'frontend/package.json'
+          cache-dependency-path: 'frontend/package-lock.json'
 
       - name: 🔍 Install Frontend Dependencies
         working-directory: ./frontend
-        run: npm ci || npm install
+        run: npm ci
+
+      - name: 📥 Download Frontend LCOV Coverage Report
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-coverage-report
+          path: frontend/coverage/frontend
+
+      - name: 🔎 Verify Frontend Coverage Report
+        working-directory: ./frontend
+        run: test -s coverage/frontend/lcov.info
 
       - name: 🔍 Run SonarQube Scanner (damatch-frontend) & Wait for Quality Gate
         uses: SonarSource/sonarqube-scan-action@v5 # v5 é a versão estável atual mais recomendada
@@ -288,8 +314,6 @@ jobs:
           projectBaseDir: frontend
           args: >
             -Dsonar.projectKey=damatch-frontend
-            -Dsonar.sources=.
-            -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts,**/*.test.ts
             -Dsonar.qualitygate.wait=true
 
   # =========================================================================
