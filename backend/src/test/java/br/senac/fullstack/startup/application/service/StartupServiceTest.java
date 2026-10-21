@@ -12,6 +12,7 @@ import br.senac.fullstack.startup.domain.enums.StatusValidacao;
 import br.senac.fullstack.startup.infrastructure.persistence.repository.MembroStartupRepository;
 import br.senac.fullstack.startup.infrastructure.persistence.repository.StartupRepository;
 import br.senac.fullstack.shared.enums.TipoUsuario;
+import br.senac.fullstack.shared.security.ResourceAccess;
 import br.senac.fullstack.usuario.api.dto.CadastrarUsuarioRequest;
 import br.senac.fullstack.usuario.application.service.UsuarioService;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
@@ -58,6 +59,9 @@ class StartupServiceTest {
 
     @Mock
     private StartupMapper startupMapper;
+
+    @Mock
+    private ResourceAccess resourceAccess;
 
     @InjectMocks
     private StartupService startupService;

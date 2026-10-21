@@ -5,12 +5,11 @@ import br.senac.fullstack.startup.api.dto.CriarStartupRequest;
 import br.senac.fullstack.startup.api.dto.MembroStartupResponse;
 import br.senac.fullstack.startup.api.dto.StartupResponse;
 import br.senac.fullstack.startup.application.service.StartupService;
-import br.senac.fullstack.usuario.application.exception.EmailExistenteException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
@@ -32,7 +30,7 @@ public class StartupController {
         this.startupService = startupService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StartupResponse> criarStartup(
             @RequestBody @Valid CriarStartupRequest request
     ) {
@@ -52,7 +50,7 @@ public class StartupController {
         return ResponseEntity.ok(startupService.buscarStartupPorId(startupId));
     }
 
-    @PostMapping("/{startupId}/membros")
+    @PostMapping(value = "/{startupId}/membros", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MembroStartupResponse> adicionarMembro(
             @PathVariable("startupId") UUID startupId,
             @RequestBody @Valid AdicionarMembroStartupRequest request
@@ -77,18 +75,4 @@ public class StartupController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Void> tratarRecursoNaoEncontrado() {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Void> tratarArgumentoInvalido() {
-        return ResponseEntity.badRequest().build();
-    }
-
-    @ExceptionHandler({IllegalStateException.class, EmailExistenteException.class})
-    public ResponseEntity<Void> tratarConflito() {
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    }
 }

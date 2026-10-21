@@ -11,6 +11,7 @@ import br.senac.fullstack.startup.domain.enums.PapelMembroStartup;
 import br.senac.fullstack.startup.infrastructure.persistence.repository.MembroStartupRepository;
 import br.senac.fullstack.startup.infrastructure.persistence.repository.StartupRepository;
 import br.senac.fullstack.shared.enums.TipoUsuario;
+import br.senac.fullstack.shared.security.ResourceAccess;
 import br.senac.fullstack.usuario.application.service.UsuarioService;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
 import br.senac.fullstack.usuario.infrastructure.persistence.repository.UsuarioRepository;
@@ -36,19 +37,22 @@ public class StartupService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
     private final StartupMapper startupMapper;
+    private final ResourceAccess resourceAccess;
 
     public StartupService(
             StartupRepository startupRepository,
             MembroStartupRepository membroRepository,
             UsuarioRepository usuarioRepository,
             UsuarioService usuarioService,
-            StartupMapper startupMapper
+            StartupMapper startupMapper,
+            ResourceAccess resourceAccess
     ) {
         this.startupRepository = startupRepository;
         this.membroRepository = membroRepository;
         this.usuarioRepository = usuarioRepository;
         this.usuarioService = usuarioService;
         this.startupMapper = startupMapper;
+        this.resourceAccess = resourceAccess;
     }
 
     @Transactional
@@ -99,6 +103,7 @@ public class StartupService {
         }
 
         Startup startup = buscarStartup(startupId);
+        resourceAccess.requireStartupManager(startup);
         Usuario usuario = buscarUsuario(request.usuarioId());
 
         if (possuiMembro(startup, usuario.getId())) {
@@ -119,6 +124,7 @@ public class StartupService {
     @Transactional
     public void removerMembro(UUID startupId, UUID usuarioId) {
         Startup startup = buscarStartup(startupId);
+        resourceAccess.requireStartupManager(startup);
         MembroStartup membro = startup.getMembros().stream()
                 .filter(item -> item.getUsuario().getId().equals(usuarioId))
                 .findFirst()

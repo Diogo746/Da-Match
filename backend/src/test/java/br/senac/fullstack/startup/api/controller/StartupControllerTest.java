@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -77,6 +78,7 @@ class StartupControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "STARTUP")
     void deveListarEBuscarStartups() throws Exception {
         UUID startupId = UUID.randomUUID();
         StartupResponse response = startupResponse(startupId);
@@ -93,6 +95,7 @@ class StartupControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "STARTUP")
     void deveAdicionarEListarMembros() throws Exception {
         UUID startupId = UUID.randomUUID();
         UUID usuarioId = UUID.randomUUID();
@@ -123,6 +126,7 @@ class StartupControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "STARTUP")
     void deveRemoverMembroComCsrf() throws Exception {
         UUID startupId = UUID.randomUUID();
         UUID usuarioId = UUID.randomUUID();
@@ -154,6 +158,7 @@ class StartupControllerTest {
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(post("/api/v1/startups/{startupId}/membros", startupId)
+                        .with(SecurityMockMvcRequestPostProcessors.user("test").roles("STARTUP"))
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
@@ -167,7 +172,8 @@ class StartupControllerTest {
         when(startupService.buscarStartupPorId(startupId))
                 .thenThrow(new NoSuchElementException("Startup não encontrada."));
 
-        mockMvc.perform(get("/api/v1/startups/{startupId}", startupId))
+        mockMvc.perform(get("/api/v1/startups/{startupId}", startupId)
+                        .with(SecurityMockMvcRequestPostProcessors.user("test").roles("STARTUP")))
                 .andExpect(status().isNotFound());
 
         when(startupService.criarStartup(any()))
@@ -183,6 +189,7 @@ class StartupControllerTest {
                 .thenThrow(new IllegalStateException("Membro duplicado."));
 
         mockMvc.perform(post("/api/v1/startups/{startupId}/membros", startupId)
+                        .with(SecurityMockMvcRequestPostProcessors.user("test").roles("STARTUP"))
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(adicionarMembroJson(usuarioId)))

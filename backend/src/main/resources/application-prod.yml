@@ -1,16 +1,38 @@
 spring:
   application:
     name: fullstack-api-damatch
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
 
 server:
   # Render injects PORT for web services. The default preserves local execution.
   port: ${PORT:8080}
+  servlet:
+    session:
+      cookie:
+        secure: ${APP_SECURITY_COOKIES_SECURE:true}
 
 app:
   environment: production
+  security:
+    cors:
+      allowed-origins: ${APP_SECURITY_CORS_ALLOWED_ORIGINS:}
+    cookies:
+      secure: ${APP_SECURITY_COOKIES_SECURE:true}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health
+
+logging:
+  level:
+    org.hibernate.SQL: "OFF"
+    org.hibernate.orm.jdbc.bind: "OFF"
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: "OFF"

@@ -8,23 +8,52 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
+    open-in-view: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+  flyway:
+    enabled: false
 
 server:
   port: 8080
+  forward-headers-strategy: none
+  compression:
+    enabled: false
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+  servlet:
+    session:
+      timeout: ${APP_SECURITY_SESSION_TIMEOUT:30m}
+      tracking-modes: cookie
+      cookie:
+        name: JSESSIONID
+        http-only: true
+        path: /
+        secure: ${APP_SECURITY_COOKIES_SECURE:false}
+        same-site: ${APP_SECURITY_COOKIES_SAME_SITE:Lax}
 
 
 app:
   environment: development
+  security:
+    cors:
+      allowed-origins: ${APP_SECURITY_CORS_ALLOWED_ORIGINS:http://localhost:4200}
+    cookies:
+      secure: ${APP_SECURITY_COOKIES_SECURE:false}
+      same-site: ${APP_SECURITY_COOKIES_SAME_SITE:Lax}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health
+  endpoint:
+    health:
+      show-details: never
