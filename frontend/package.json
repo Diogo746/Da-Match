@@ -9,7 +9,8 @@
     "lint": "eslint src",
     "test": "ng test --watch=false",
     "test:watch": "ng test --watch",
-    "test:coverage": "ng test --watch=false --coverage",
+    "test:coverage": "npm run test:config && ng test --watch=false --coverage",
+    "test:config": "tsc -p tsconfig.vercel.json && node --test scripts/vercel-config.test.mjs",
     "start:api": "ng serve --configuration api",
     "build:api": "ng build --configuration production,api"
   },
@@ -31,6 +32,7 @@
     "@types/node": "^22.10.0",
     "@typescript-eslint/eslint-plugin": "^8.24.0",
     "@typescript-eslint/parser": "^8.24.0",
+    "@vercel/config": "^0.13.0",
     "@vitest/coverage-v8": "^4.0.8",
     "angular-eslint": "^22.2.0",
     "eslint": "^10.0.0",
