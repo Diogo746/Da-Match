@@ -1,1 +1,1 @@
-export const environment = { registrationMode: "DEMO" as const };
+export const environment = { registrationMode: "DEMO" as const, apiBaseUrl: "" };

@@ -51,7 +51,7 @@ A experiência prática declarada explica o apoio e desempata notas iguais. O se
 
 ## Cadastro conectado de mentor
 
-O backend incluído corresponde à main enviada em 17/10/2026. Os arquivos Java, o banco e as configurações do servidor foram preservados.
+O backend agora oferece autenticação por sessão. Consulte a [matriz de acesso e configuração de segurança](../docs/backend-security.md). O formulário de cadastro ainda precisa enviar `disponibilidades`, obrigatórias no backend; enquanto essa pendência anterior não for resolvida, crie contas fictícias completas pelo Postman para testar o login.
 
 1. Com **Java 21 e Maven**, configure `SUPABASE_DB_URL` apenas no ambiente do backend, com o responsável pelo banco.
 2. Em um terminal **na raiz do repositório**, execute:
@@ -77,9 +77,11 @@ O envio consulta `GET /csrf` e realiza `POST /api/v1/mentores` com `usuario: { n
 | Cadastro de startup | Simulado | Ainda indisponível |
 | Questionário, Meu perfil e compatibilidade | Temporários | Ainda sem persistência/API |
 | Catálogo e salvos | Fictícios | Fictícios, identificados como demonstração |
-| Login autenticado | Ainda indisponível | Ainda indisponível |
+| Login autenticado | Não autentica contas reais | `/entrar` e `/conta`, com sessão HttpOnly e CSRF |
 
 O cadastro conectado não cria uma sessão autenticada. As respostas novas não são acrescentadas ao JSON atual do mentor. A integração completa depende de novos endpoints de perfil, startups e recomendações.
+
+Para testar uma conta existente, abra `/entrar`. A página `/conta` consulta a sessão do servidor e permite logout; senhas e identificadores de sessão não são persistidos pelo JavaScript. No modo API, `/meu-perfil` encaminha para essa página, preservando a edição demonstrativa no modo DEMO. Com proxy, mantenha `apiBaseUrl` vazio. Em deploy cross-origin, injete a origem exata da API no build e configure CORS/cookies no backend conforme o guia de segurança.
 
 O cliente não repete POST automaticamente. Se o resultado ficar sem confirmação depois do envio, a conta pode ter sido criada. Confira com o responsável pelo backend antes de tentar novamente. Os detalhes de contrato, tratamento de falhas, biografia e e-mail duplicado estão no [guia da integração](../docs/17-mentor-api-integration.md).
 
@@ -117,4 +119,3 @@ O CI mantém lint, cobertura, ambos os builds e transferência do LCOV ao Sonar.
 ## Hospedagem
 
 Use um servidor HTTP; não abra o build por `file://`. As rotas precisam de fallback para `index.html`. No modo API, o servidor de hospedagem também deve encaminhar `/api/**` e `/csrf` ao backend antes desse fallback, preservando cookies e headers. O proxy de `ng serve` atende apenas ao desenvolvimento.
-
