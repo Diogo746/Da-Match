@@ -49,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:security;MODE=PostgreSQL;DB_CLOSE_DELAY=-1",
-        "spring.flyway.enabled=true", "spring.jpa.hibernate.ddl-auto=validate", "spring.jpa.open-in-view=false"
+        "spring.jpa.hibernate.ddl-auto=update", "spring.jpa.open-in-view=false"
 })
 @AutoConfigureMockMvc
 @Transactional

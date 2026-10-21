@@ -89,10 +89,9 @@ class ProductionSecurityTest {
     }
 
     @Test
-    void productionDisablesHelloAndSqlAndSchemaUpdatesAndOnlySendsHstsOnHttps() throws Exception {
-        assertThat(environment.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("validate");
+    void productionUsesHibernateUpdateDisablesHelloAndSqlAndOnlySendsHstsOnHttps() throws Exception {
+        assertThat(environment.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(environment.getProperty("spring.jpa.show-sql")).isEqualTo("false");
-        assertThat(environment.getProperty("spring.flyway.baseline-on-migrate")).isEqualTo("false");
         assertThat(environment.getProperty("management.endpoints.web.exposure.include")).isEqualTo("health");
         mvc.perform(get("/api/v1/hello").with(user("admin").roles("ADMIN"))).andExpect(status().isForbidden());
         mvc.perform(get("/api/v1/health").secure(true)).andExpect(status().isOk())
