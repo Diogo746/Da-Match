@@ -35,3 +35,8 @@ Project Charter (Visão & Dores)
 - [Contrato do cadastro conectado de mentor](17-mentor-api-integration.md).
 - [Questionário, compatibilidade e validação v0.5.0](18-frontend-v0.5.0.md).
 - [Paleta e poses do Lumen](19-visual-identity.md).
+
+## Backend atual
+
+- [Segurança, sessões e configuração de produção](backend-security.md).
+- [Correções SonarQube e prevenção de regressões](backend-quality.md).

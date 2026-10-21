@@ -35,7 +35,7 @@ A autorização por recurso é verificada dentro dos serviços, usando `UsuarioP
 5. Enviar cookies e header CSRF em toda escrita. `GET /api/v1/auth/me` restaura os dados da conta no frontend após recarga.
 6. Enviar `POST /api/v1/auth/logout` com sessão e CSRF. O servidor invalida a sessão, limpa o contexto e remove os dois cookies. Consultar `/csrf` antes de novas escritas.
 
-Sessão: `HttpOnly=true`, `Path=/`, apenas transporte por cookie, sem reescrita de sessão na URL. `XSRF-TOKEN` é o único cookie acessível a JavaScript. Nunca copiar credenciais ou identificadores de sessão para LocalStorage/SessionStorage, DTOs ou logs.
+Sessão: `HttpOnly=true`, `Path=/`, apenas transporte por cookie, sem reescrita de sessão na URL. `XSRF-TOKEN` também usa `HttpOnly=true`: os clientes obtêm o token no JSON de `GET /csrf`, sem ler `document.cookie`. O navegador/Postman preserva o cookie e o cliente envia o token no header indicado. Nunca copiar credenciais ou identificadores de sessão para LocalStorage/SessionStorage, DTOs ou logs.
 
 `/csrf` retorna o valor bruto compatível com Angular e Postman. Compressão HTTP está desligada; preserve isso para respostas com CSRF também no proxy/CDN para evitar exposição por compressão. O token de cookie não substitui autenticação. Um header sem cookie, token incorreto ou ausência de token resulta em 403.
 
