@@ -39,4 +39,3 @@ Project Charter (Visão & Dores)
 ## Backend atual
 
 - [Segurança, sessões e configuração de produção](backend-security.md).
-- [Correções SonarQube e prevenção de regressões](backend-quality.md).
