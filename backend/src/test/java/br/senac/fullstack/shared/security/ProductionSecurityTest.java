@@ -58,7 +58,7 @@ class ProductionSecurityTest {
                     HttpResponse.BodyHandlers.ofString());
             assertThat(token.statusCode()).isEqualTo(200);
             String csrfCookie = token.headers().allValues("set-cookie").getFirst();
-            assertThat(csrfCookie).contains("Secure", "Path=/", "SameSite=None").doesNotContain("HttpOnly");
+            assertThat(csrfCookie).contains("Secure", "HttpOnly", "Path=/", "SameSite=None");
             String body = mapper.writeValueAsString(Map.of("email", "cookie@example.test", "senha", "senha-ficticia-123"));
             var login = client.send(HttpRequest.newBuilder(URI.create(base + "/api/v1/auth/login"))
                             .header("Cookie", csrfCookie.split(";")[0])
@@ -80,6 +80,8 @@ class ProductionSecurityTest {
             assertThat(logout.statusCode()).isEqualTo(204);
             assertThat(logout.headers().allValues("set-cookie")).anySatisfy(value ->
                     assertThat(value).contains("JSESSIONID=", "Max-Age=0", "HttpOnly", "Secure", "SameSite=None"));
+            assertThat(logout.headers().allValues("set-cookie")).anySatisfy(value ->
+                    assertThat(value).contains("XSRF-TOKEN=", "Max-Age=0", "HttpOnly", "Secure", "SameSite=None"));
             var after = client.send(HttpRequest.newBuilder(URI.create(base + "/api/v1/auth/me"))
                     .header("Cookie", sessionPair).GET().build(), HttpResponse.BodyHandlers.ofString());
             assertThat(after.statusCode()).isEqualTo(401);

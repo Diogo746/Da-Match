@@ -152,6 +152,9 @@ class SecurityIntegrationTest {
         mvc.perform(post("/api/v1/auth/logout").with(csrf())).andExpect(status().isUnauthorized());
         MvcResult token = mvc.perform(get("/csrf")).andReturn();
         mvc.perform(post("/api/v1/auth/login").cookie(token.getResponse().getCookie("XSRF-TOKEN"))
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isForbidden());
+        mvc.perform(post("/api/v1/auth/login").cookie(token.getResponse().getCookie("XSRF-TOKEN"))
                         .header("X-XSRF-TOKEN", "invalid").contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isForbidden());
         mvc.perform(post("/api/v1/auth/login").header("X-XSRF-TOKEN", "without-cookie")

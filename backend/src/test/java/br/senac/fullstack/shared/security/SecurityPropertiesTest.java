@@ -35,8 +35,10 @@ class SecurityPropertiesTest {
     void productionRejectsInsecureCookiesBeforeBuildingTheFilterChain() {
         MockEnvironment environment = new MockEnvironment();
         environment.setActiveProfiles("prod");
-        assertThatThrownBy(() -> new SecurityConfig().securityFilterChain(
-                null, null, null, new SecurityProperties(), environment, null))
+        SecurityConfig configuration = new SecurityConfig();
+        SecurityProperties properties = new SecurityProperties();
+        assertThatThrownBy(() -> configuration.securityFilterChain(
+                null, null, null, properties, environment, null))
                 .isInstanceOf(IllegalStateException.class).hasMessage("Produção exige cookies Secure.");
     }
 

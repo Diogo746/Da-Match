@@ -32,6 +32,18 @@ public final class UsuarioPrincipal extends User {
     }
 
     @Override
+    public boolean equals(Object other) {
+        // Preserve Spring User identity (the exact email); profile fields are session metadata.
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        // Match the same username-based identity used by equals, even after credentials are erased.
+        return super.hashCode();
+    }
+
+    @Override
     public String toString() {
         return "UsuarioPrincipal[redacted]";
     }

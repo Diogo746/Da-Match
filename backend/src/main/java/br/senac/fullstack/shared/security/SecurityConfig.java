@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.HstsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -65,7 +66,7 @@ public class SecurityConfig {
                             .referrerPolicy(referrer ->
                                     referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER));
                     if (!production) {
-                        headers.httpStrictTransportSecurity(hsts -> hsts.disable());
+                        headers.httpStrictTransportSecurity(HstsConfig::disable);
                     }
                 })
                 .authorizeHttpRequests(auth -> {
@@ -94,8 +95,10 @@ public class SecurityConfig {
 
     @Bean
     public CookieCsrfTokenRepository csrfTokenRepository(SecurityProperties properties) {
-        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        // Clients obtain the header token from GET /csrf, without reading document.cookie.
+        CookieCsrfTokenRepository repository = new CookieCsrfTokenRepository();
         repository.setCookieCustomizer(cookie -> cookie.path("/")
+                .httpOnly(true)
                 .secure(properties.getCookies().isSecure()).sameSite(properties.getCookies().getSameSite()));
         return repository;
     }
