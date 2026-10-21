@@ -26,7 +26,8 @@ class CsrfControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.headerName").value("X-XSRF-TOKEN"))
                 .andExpect(jsonPath("$.token").isNotEmpty())
-                .andExpect(cookie().exists("XSRF-TOKEN"));
+                .andExpect(cookie().exists("XSRF-TOKEN"))
+                .andExpect(cookie().httpOnly("XSRF-TOKEN", true));
     }
 
     @Test

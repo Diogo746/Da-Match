@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "89f937f0-df1e-43b4-92d1-19b7680021bb",
     "name": "Da-Match API",
-    "description": "Coleção baseada no backend atual. As requisições na pasta PENDENTE representam contratos propostos que ainda não possuem endpoint implementado.",
+    "description": "API com autenticação por sessão. Preserve os cookies no Postman e obtenha CSRF antes de escritas, inclusive login/logout. Após login/logout, obtenha um novo CSRF. Cadastro exige visitante sem sessão; leitura de startups exige sessão; edição de mentor exige titular e gestão de membros exige fundador/representante. PENDENTE contém somente propostas.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -33,6 +33,48 @@
     }
   ],
   "item": [
+    {
+      "name": "Autenticação",
+      "description": "Use authEmail e authPassword apenas localmente com conta fictícia existente. Não exporte credenciais. Execute Obter token CSRF antes do login e novamente após login/logout. O cookie JSESSIONID é mantido pelo Postman.",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+              { "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{authEmail}}\",\n  \"senha\": \"{{authPassword}}\"\n}", "options": { "raw": { "language": "json" } } }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Login confirmado', () => pm.response.to.have.status(200));",
+            "pm.test('Resposta sem credenciais', () => { const body = pm.response.json(); pm.expect(body).not.to.have.property('senha'); pm.expect(body).not.to.have.property('sessionId'); });",
+            "if (pm.response.code === 200) pm.collectionVariables.unset('csrfToken');"
+          ] } }],
+          "response": []
+        },
+        {
+          "name": "Conta atual",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/v1/auth/me" },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }],
+            "url": "{{baseUrl}}/api/v1/auth/logout"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Sessão encerrada', () => pm.response.to.have.status(204));",
+            "if (pm.response.code === 204) pm.collectionVariables.unset('csrfToken');"
+          ] } }],
+          "response": []
+        }
+      ]
+    },
     {
       "name": "Disponíveis agora",
       "description": "Endpoints que possuem controller no backend atual.",
@@ -81,7 +123,7 @@
                 }
               ]
             },
-            "description": "HelloWorldController#sayHello. O parâmetro name é opcional."
+            "description": "Disponível somente fora do perfil prod. O parâmetro name é opcional."
           },
           "event": [
             {
@@ -134,7 +176,7 @@
     },
     {
       "name": "Mentor",
-      "description": "Execute primeiro a requisição 'Obter token CSRF'. O Postman preserva o cookie XSRF-TOKEN e o teste armazena o token para a requisição de cadastro.",
+      "description": "Cadastro público exige visitante e CSRF. PATCH exige login de MENTOR titular do mentorId e novo CSRF após login. O Postman preserva os cookies.",
       "item": [
         {
           "name": "Registrar mentor",

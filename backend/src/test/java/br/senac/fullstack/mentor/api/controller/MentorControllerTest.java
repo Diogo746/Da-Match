@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -41,6 +42,19 @@ class MentorControllerTest {
 
     @MockBean
     private MentorService mentorService;
+
+    @Test
+    @WithMockUser(roles = "MENTOR")
+    void shouldHideUnexpectedInternalFailureDetails() throws Exception {
+        when(mentorService.atualizarPerfil(any(), any())).thenThrow(new RuntimeException("SQL secret internals"));
+        mockMvc.perform(patch("/api/v1/mentores/{mentorId}", UUID.randomUUID())
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.detail").value("Não foi possível processar a solicitação."))
+                .andExpect(jsonPath("$.exception").doesNotExist())
+                .andExpect(jsonPath("$.trace").doesNotExist());
+    }
 
     @Test
     void shouldCreateMentorWhenRequestIsValidAndHasCsrfToken() throws Exception {
@@ -131,6 +145,7 @@ class MentorControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "MENTOR")
     void shouldUpdateMentorStatusWhenRequestIsValid() throws Exception {
         UUID mentorId = UUID.randomUUID();
         MentorResponse response = new MentorResponse(
@@ -159,6 +174,7 @@ class MentorControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "MENTOR")
     void shouldRejectStatusUpdateWhenStatusIsMissing() throws Exception {
         mockMvc.perform(patch("/api/v1/mentores/{mentorId}/status", UUID.randomUUID())
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -168,6 +184,7 @@ class MentorControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "MENTOR")
     void shouldReturnNotFoundWhenUpdatingUnknownMentorStatus() throws Exception {
         UUID mentorId = UUID.randomUUID();
         when(mentorService.atualizarStatus(any(UUID.class), any()))
@@ -183,6 +200,7 @@ class MentorControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "MENTOR")
     void shouldUpdateMentorProfileWhenRequestIsValid() throws Exception {
         UUID mentorId = UUID.randomUUID();
         MentorResponse response = new MentorResponse(
@@ -219,6 +237,7 @@ class MentorControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "MENTOR")
     void shouldRejectProfileUpdateWithEmptyAvailability() throws Exception {
         mockMvc.perform(patch("/api/v1/mentores/{mentorId}", UUID.randomUUID())
                         .with(SecurityMockMvcRequestPostProcessors.csrf())

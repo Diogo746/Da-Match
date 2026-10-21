@@ -13,6 +13,7 @@ import br.senac.fullstack.mentor.domain.enums.PeriodoDisponibilidade;
 import br.senac.fullstack.mentor.domain.enums.StatusPerfilMentor;
 import br.senac.fullstack.mentor.infrastructure.persistence.repository.MentorRepository;
 import br.senac.fullstack.shared.enums.TipoUsuario;
+import br.senac.fullstack.shared.security.ResourceAccess;
 import br.senac.fullstack.usuario.api.dto.CadastrarUsuarioRequest;
 import br.senac.fullstack.usuario.application.service.UsuarioService;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
@@ -47,6 +48,9 @@ class MentorServiceTest {
 
     @Mock
     private MentorMapper mentorMapper;
+
+    @Mock
+    private ResourceAccess resourceAccess;
 
     @InjectMocks
     private MentorService mentorService;

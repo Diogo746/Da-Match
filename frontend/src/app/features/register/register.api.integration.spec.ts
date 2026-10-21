@@ -77,7 +77,7 @@ it("confirma somente depois de 201, limpa a senha e termina sem inventar login o
   expect(page.querySelector(".account-card")?.textContent).toContain(mentorResponse.linkedin);
   expect(page.querySelector(".account-card")?.textContent).toContain(mentorResponse.instagram);
   expect(page.querySelector("app-profile-setup")).toBeNull();
-  expect(page.textContent).toContain("login, a edição online");
+  expect(page.textContent).toContain("Você já pode entrar");
   expect(page.innerHTML).not.toContain("senha-ficticia");
   expect(TestBed.inject(ProfileSessionStore).profile()).toBeNull();
   expect(document.activeElement?.id).toBe("mentor-created-title");

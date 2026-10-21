@@ -11,12 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -30,6 +32,19 @@ class StartupRepositoryTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Test
+    void deveImpedirMembroDuplicadoNoBancoMesmoSemPassarPeloServico() {
+        Usuario usuario = usuarioRepository.saveAndFlush(new Usuario(
+                "Pessoa Ficticia", "duplicado@example.test", "hash-ficticio", TipoUsuario.STARTUP));
+        Startup startup = startupRepository.saveAndFlush(startup());
+        MembroStartup first = new MembroStartup(null, startup, usuario,
+                PapelMembroStartup.FUNDADOR, LocalDate.of(2026, 10, 20));
+        membroStartupRepository.saveAndFlush(first);
+        MembroStartup duplicate = new MembroStartup(null, startup, usuario,
+                PapelMembroStartup.MEMBRO, LocalDate.of(2026, 10, 20));
+        assertThrows(DataIntegrityViolationException.class, () -> membroStartupRepository.saveAndFlush(duplicate));
+    }
 
     @Test
     void devePersistirStartupComMembro() {

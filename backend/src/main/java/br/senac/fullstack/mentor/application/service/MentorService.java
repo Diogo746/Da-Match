@@ -9,6 +9,7 @@ import br.senac.fullstack.mentor.application.exception.MentorNaoEncontradoExcept
 import br.senac.fullstack.mentor.domain.Mentor;
 import br.senac.fullstack.mentor.infrastructure.persistence.repository.MentorRepository;
 import br.senac.fullstack.shared.enums.TipoUsuario;
+import br.senac.fullstack.shared.security.ResourceAccess;
 import br.senac.fullstack.usuario.application.service.UsuarioService;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
 import jakarta.transaction.Transactional;
@@ -26,11 +27,14 @@ public class MentorService {
     private final MentorRepository mentorRepository;
     private final UsuarioService usuarioService;
     private final MentorMapper mentorMapper;
+    private final ResourceAccess resourceAccess;
 
-    public MentorService(MentorRepository mentorRepository, UsuarioService usuarioService, MentorMapper mentorMapper) {
+    public MentorService(MentorRepository mentorRepository, UsuarioService usuarioService,
+                         MentorMapper mentorMapper, ResourceAccess resourceAccess) {
         this.mentorRepository = mentorRepository;
         this.usuarioService = usuarioService;
         this.mentorMapper = mentorMapper;
+        this.resourceAccess = resourceAccess;
     }
 
     @Transactional
@@ -66,6 +70,7 @@ public class MentorService {
 
         Mentor mentor = mentorRepository.findById(mentorId)
                 .orElseThrow(() -> new MentorNaoEncontradoException(MENTOR_NAO_ENCONTRADO));
+        resourceAccess.requireMentorOwner(mentor);
         mentorMapper.atualizarPerfil(request, mentor);
 
         if (request.disponibilidades() != null) {
@@ -83,6 +88,7 @@ public class MentorService {
 
         Mentor mentor = mentorRepository.findById(mentorId)
                 .orElseThrow(() -> new MentorNaoEncontradoException(MENTOR_NAO_ENCONTRADO));
+        resourceAccess.requireMentorOwner(mentor);
         mentor.setStatus(request.status());
         return mentorMapper.toResponse(mentor);
     }

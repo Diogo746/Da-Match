@@ -2,7 +2,8 @@ import {
   ApplicationConfig,
   provideZonelessChangeDetection,
 } from "@angular/core";
-import { provideHttpClient } from "@angular/common/http";
+import { provideHttpClient, withInterceptors } from "@angular/common/http";
+import { authInterceptor } from "./core/auth.interceptor";
 import { provideRouter, withInMemoryScrolling } from "@angular/router";
 import { routes } from "./app.routes";
 import {
@@ -16,7 +17,7 @@ export const appConfig: ApplicationConfig = {
       routes,
       withInMemoryScrolling({ scrollPositionRestoration: "enabled" }),
     ),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     { provide: RegistrationGateway, useFactory: registrationGatewayFactory },
   ],
 };

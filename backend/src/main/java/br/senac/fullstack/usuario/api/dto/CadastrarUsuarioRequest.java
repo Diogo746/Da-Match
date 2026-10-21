@@ -6,15 +6,20 @@ import jakarta.validation.constraints.Size;
 
 public record CadastrarUsuarioRequest(
         @NotBlank(message = "Nome não pode estar vazio")
-        @Size(min = 4, message = "Nome deve conter no mínimo 4 caracteres")
+        @Size(min = 4, max = 255, message = "Nome deve conter de 4 a 255 caracteres")
         String nome,
 
         @NotBlank(message = "Email não pode estar vazio")
         @Email
+        @Size(max = 254)
         String email,
 
         @NotBlank(message = "Senha não pode estar vazia")
-        @Size(min = 6, message = "Senha deve conter no mínimo 6 caracteres")
+        @Size(min = 6, max = 72, message = "Senha deve conter de 6 a 72 caracteres")
         String senha
 ) {
+    @Override
+    public String toString() {
+        return "CadastrarUsuarioRequest[redacted]";
+    }
 }
