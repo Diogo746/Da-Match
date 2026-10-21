@@ -51,7 +51,7 @@ A experiência prática declarada explica o apoio e desempata notas iguais. O se
 
 ## Cadastro conectado de mentor
 
-O backend agora oferece autenticação por sessão. Consulte a [matriz de acesso e configuração de segurança](../docs/backend-security.md). O formulário de cadastro ainda precisa enviar `disponibilidades`, obrigatórias no backend; enquanto essa pendência anterior não for resolvida, crie contas fictícias completas pelo Postman para testar o login.
+O modo API integra cadastro, login, consulta privada, edição, agenda semanal e publicação de mentor. Consulte a [matriz de segurança](../docs/backend-security.md) e o [guia de integração e variáveis de deploy](../docs/20-mentor-integration.md).
 
 1. Com **Java 21 e Maven**, configure `SUPABASE_DB_URL` apenas no ambiente do backend, com o responsável pelo banco.
 2. Em um terminal **na raiz do repositório**, execute:
@@ -69,7 +69,7 @@ O backend agora oferece autenticação por sessão. Consulte a [matriz de acesso
 
 5. Abra **http://localhost:4200/cadastro**. O topo identifica a integração de mentor.
 
-O envio consulta `GET /csrf` e realiza `POST /api/v1/mentores` com `usuario: { nome, email, senha }`, biografia obrigatória e LinkedIn/Instagram opcionais. O token e o cookie de proteção são preservados pelo fluxo de mesma origem. A confirmação exige HTTP 201 e os campos previstos.
+O envio consulta `GET /csrf` e realiza `POST /api/v1/mentores` com `usuario: { nome, email, senha }`, biografia, pelo menos uma disponibilidade semanal e LinkedIn/Instagram opcionais. O token vem do JSON e o navegador mantém os cookies HttpOnly. A confirmação exige HTTP 201 e os campos previstos. O cadastro não cria sessão; entre em `/entrar` depois da confirmação.
 
 | Recurso | Demonstração | Modo API |
 | --- | --- | --- |
@@ -78,10 +78,11 @@ O envio consulta `GET /csrf` e realiza `POST /api/v1/mentores` com `usuario: { n
 | Questionário, Meu perfil e compatibilidade | Temporários | Ainda sem persistência/API |
 | Catálogo e salvos | Fictícios | Fictícios, identificados como demonstração |
 | Login autenticado | Não autentica contas reais | `/entrar` e `/conta`, com sessão HttpOnly e CSRF |
+| Perfil do mentor | Temporário | `/mentor/perfil`: consulta privada, edição, agenda e publicação |
 
-O cadastro conectado não cria uma sessão autenticada. As respostas novas não são acrescentadas ao JSON atual do mentor. A integração completa depende de novos endpoints de perfil, startups e recomendações.
+O cadastro conectado não acrescenta perfis reais ao catálogo fictício. Questionário, descoberta, startups e recomendações serão integrados em etapas posteriores.
 
-Para testar uma conta existente, abra `/entrar`. A página `/conta` consulta a sessão do servidor e permite logout; senhas e identificadores de sessão não são persistidos pelo JavaScript. No modo API, `/meu-perfil` encaminha para essa página, preservando a edição demonstrativa no modo DEMO. Com proxy, mantenha `apiBaseUrl` vazio. Em deploy cross-origin, injete a origem exata da API no build e configure CORS/cookies no backend conforme o guia de segurança.
+Para testar uma conta existente, abra `/entrar`. `/conta` consulta a sessão e permite acessar `/mentor/perfil` ou sair. Senhas e identificadores de sessão não são persistidos pelo JavaScript. O modo DEMO mantém seu perfil separado. Na Vercel, use Root Directory `frontend`, configure `BACKEND_ORIGIN` e mantenha `apiBaseUrl` vazio: `vercel.ts` encaminha `/api/v1/**` e `/csrf` ao Render antes do fallback das rotas Angular. Nenhuma credencial de banco pertence ao frontend.
 
 O cliente não repete POST automaticamente. Se o resultado ficar sem confirmação depois do envio, a conta pode ter sido criada. Confira com o responsável pelo backend antes de tentar novamente. Os detalhes de contrato, tratamento de falhas, biografia e e-mail duplicado estão no [guia da integração](../docs/17-mentor-api-integration.md).
 
