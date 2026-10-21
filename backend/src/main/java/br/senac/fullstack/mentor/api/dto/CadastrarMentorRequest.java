@@ -17,7 +17,9 @@ public record CadastrarMentorRequest(
         @NotBlank(message = "Biografia não pode ta vazia")
         @Size(max = 1000, message = "Biografia deve ter no máximo 1000 caracteres")
         String biografia,
+        @Size(max = 255)
         String linkedin,
+        @Size(max = 255)
         String instagram,
         @NotEmpty
         @Valid

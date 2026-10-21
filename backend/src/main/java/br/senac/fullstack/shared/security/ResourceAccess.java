@@ -9,8 +9,14 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class ResourceAccess {
+    public UUID currentMentorUserId() {
+        return requireRole(TipoUsuario.MENTOR).getId();
+    }
+
     public void requireMentorOwner(Mentor mentor) {
         UsuarioPrincipal principal = requireRole(TipoUsuario.MENTOR);
         if (!principal.getId().equals(mentor.getUsuario().getId())) {

@@ -62,7 +62,7 @@ class MentorMapperTest {
     }
 
     @Test
-    void shouldIgnoreBlankProfileFieldsWhenUpdatingMentor() {
+    void shouldPreserveOmittedFieldsAndAllowExplicitSocialClearing() {
         Mentor mentor = new Mentor(
                 new Usuario("Mentor de Teste", "mentor.teste@example.com", "senha-codificada", TipoUsuario.MENTOR),
                 LocalDate.of(2026, 10, 15),
@@ -77,14 +77,14 @@ class MentorMapperTest {
                 "  ",
                 null,
                 "novo.instagram",
-                "  ",
+                "",
                 null
         ), mentor);
 
         assertEquals("Biografia original", mentor.getBiografia());
         assertEquals("https://www.linkedin.com/in/original", mentor.getLinkedin());
         assertEquals("novo.instagram", mentor.getInstagram());
-        assertEquals("https://original.example.com", mentor.getSite());
+        assertEquals("", mentor.getSite());
     }
 
     @Test

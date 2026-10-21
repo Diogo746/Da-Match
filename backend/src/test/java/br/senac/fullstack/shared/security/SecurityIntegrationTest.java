@@ -69,6 +69,75 @@ class SecurityIntegrationTest {
     private PasswordEncoder encoder;
 
     @Test
+    void mentorCanRegisterLoadEditPublishAndLogoutUsingTheSession() throws Exception {
+        String email = UUID.randomUUID() + "@example.test";
+        String biography = "b".repeat(1000);
+        String registration = mapper.writeValueAsString(java.util.Map.of(
+                "usuario", java.util.Map.of("nome", "Mentora Ficticia", "email", email, "senha", PASSWORD),
+                "biografia", biography, "linkedin", "perfil.ficticio",
+                "disponibilidades", Set.of(java.util.Map.of("diaSemana", 1, "periodo", "MANHA"))));
+        MvcResult token = mvc.perform(get("/csrf")).andReturn();
+        MvcResult registered = mvc.perform(withToken(post("/api/v1/mentores"), token)
+                        .contentType(MediaType.APPLICATION_JSON).content(registration))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.biografia").value(biography))
+                .andExpect(jsonPath("$.status").value("RASCUNHO")).andReturn();
+        String mentorId = mapper.readTree(registered.getResponse().getContentAsString()).get("id").asText();
+        Usuario owner = users.findByEmail(email).orElseThrow();
+        MockHttpSession session = login(owner);
+        mvc.perform(get("/api/v1/mentores/me").session(session).param("usuarioId", UUID.randomUUID().toString()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(mentorId))
+                .andExpect(jsonPath("$.usuarioId").value(owner.getId().toString()))
+                .andExpect(jsonPath("$.senha").doesNotExist()).andExpect(jsonPath("$.usuario").doesNotExist());
+        MvcResult refreshed = mvc.perform(get("/csrf").session(session)).andReturn();
+        mvc.perform(withToken(patch("/api/v1/mentores/" + mentorId).session(session), refreshed)
+                        .contentType(MediaType.APPLICATION_JSON).content("""
+                        {"biografia":"Experiencia atualizada","linkedin":"","site":"",
+                         "disponibilidades":[{"diaSemana":7,"periodo":"NOITE"}]}
+                        """))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.biografia").value("Experiencia atualizada"))
+                .andExpect(jsonPath("$.linkedin").isEmpty())
+                .andExpect(jsonPath("$.disponibilidades[0].diaSemana").value(7));
+        mvc.perform(withToken(patch("/api/v1/mentores/" + mentorId + "/status").session(session), refreshed)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"PUBLICADO\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("PUBLICADO"));
+        mentors.flush();
+        mvc.perform(get("/api/v1/mentores/me").session(session))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("PUBLICADO"));
+        mvc.perform(withToken(post("/api/v1/auth/logout").session(session), refreshed))
+                .andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/mentores/me")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void mentorSelfProfileRequiresTheMentorRoleAndNeverUsesAnIdFromTheClient() throws Exception {
+        mvc.perform(get("/api/v1/mentores/me")).andExpect(status().isUnauthorized());
+        for (TipoUsuario role : Set.of(TipoUsuario.STARTUP, TipoUsuario.ADMIN)) {
+            mvc.perform(get("/api/v1/mentores/me").session(login(account(role))))
+                    .andExpect(status().isForbidden());
+        }
+        Usuario owner = account(TipoUsuario.MENTOR);
+        Mentor mentor = mentors.saveAndFlush(new Mentor(owner, LocalDate.of(2026, 10, 21), "Biografia",
+                null, null, Set.of(new DisponibilidadeMentor(1, PeriodoDisponibilidade.MANHA))));
+        mvc.perform(get("/api/v1/mentores/me").session(login(account(TipoUsuario.MENTOR)))
+                        .param("mentorId", mentor.getId().toString()).param("usuarioId", owner.getId().toString()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void mentorProfileRejectsBlankBiographyAndLinksLongerThanTheDatabaseLimit() throws Exception {
+        Usuario owner = account(TipoUsuario.MENTOR);
+        Mentor mentor = mentors.saveAndFlush(new Mentor(owner, LocalDate.of(2026, 10, 21), "Biografia",
+                null, null, Set.of(new DisponibilidadeMentor(1, PeriodoDisponibilidade.MANHA))));
+        MockHttpSession session = login(owner);
+        for (String body : Set.of("{\"biografia\":\"   \"}",
+                mapper.writeValueAsString(java.util.Map.of("linkedin", "x".repeat(256))))) {
+            mvc.perform(patch("/api/v1/mentores/" + mentor.getId()).session(session).with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON).content(body))
+                    .andExpect(status().isBadRequest());
+        }
+    }
+
+    @Test
     void publicRegistrationKeepsServerAssignedRolesAndRejectsDuplicateEmail() throws Exception {
         String email = UUID.randomUUID() + "@example.test";
         String body = """

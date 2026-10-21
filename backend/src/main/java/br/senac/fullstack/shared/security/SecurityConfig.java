@@ -75,6 +75,8 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/v1/mentores", "/api/v1/startups").anonymous()
                             .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
+                            .requestMatchers(HttpMethod.GET, "/api/v1/mentores/me")
+                            .hasRole(TipoUsuario.MENTOR.name())
                             .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                             .requestMatchers(HttpMethod.PATCH, "/api/v1/mentores/*", "/api/v1/mentores/*/status")
                             .hasRole(TipoUsuario.MENTOR.name())
