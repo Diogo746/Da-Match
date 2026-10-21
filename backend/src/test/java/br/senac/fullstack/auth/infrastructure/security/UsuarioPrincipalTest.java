@@ -47,7 +47,7 @@ class UsuarioPrincipalTest {
     void stringRepresentationDoesNotExposeAccountOrCredentials() {
         UsuarioPrincipal principal = principal("conta@example.test");
 
-        assertThat(principal.toString()).isEqualTo("UsuarioPrincipal[redacted]");
+        assertThat(principal).hasToString("UsuarioPrincipal[redacted]");
     }
 
     private UsuarioPrincipal principal(String email) {
