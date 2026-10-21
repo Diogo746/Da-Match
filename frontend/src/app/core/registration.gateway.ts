@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { FormControl, Validators } from "@angular/forms";
 import { Observable, defer, delay, of, throwError } from "rxjs";
 import { ProfileKind } from "./profiles.store";
+import { MentorAvailability, MentorProfile, validAvailability } from "./mentor.models";
 
 // Campos declarados em CadastrarUsuarioRequest no backend enviado pela equipe.
 export interface RegistrationRequest {
@@ -12,22 +13,13 @@ export interface RegistrationRequest {
 }
 
 export interface MentorRegistrationDetails {
+  disponibilidades?: MentorAvailability[];
   biografia: string;
   linkedin?: string;
   instagram?: string;
 }
 
-export interface MentorAccount {
-  id: string;
-  usuarioId: string;
-  nome: string;
-  email: string;
-  biografia: string;
-  linkedin: string | null;
-  instagram: string | null;
-  site: string | null;
-  dataEntradaPlataforma: string;
-}
+export type MentorAccount = MentorProfile;
 
 interface DemoRegistrationReceipt {
   nome: string;
@@ -77,20 +69,23 @@ export function validMentorBiography(value: string): boolean {
 export function normalizeRegistration(kind: ProfileKind, request: RegistrationRequest): RegistrationRequest {
   const nome = request.nome.trim();
   const email = request.email.trim().toLowerCase();
-  if (nome.length < 4 || !isValidEmail(email) || request.senha.length < 6 ||
+  if (nome.length < 4 || nome.length > 255 || !isValidEmail(email) || request.senha.length < 6 || request.senha.length > 72 ||
       request.senha.trim().length === 0 || !["STARTUP", "MENTOR"].includes(kind)) {
     throw new RegistrationError("INVALID_INPUT");
   }
   const account = { nome, email, senha: request.senha };
   if (kind !== "MENTOR") return account;
   const details = request.mentor;
-  if (!details || !validMentorBiography(details.biografia)) {
+  if (!details || !validMentorBiography(details.biografia) ||
+      (details.disponibilidades !== undefined && !validAvailability(details.disponibilidades)) ||
+      [details.linkedin, details.instagram].some(value => value !== undefined && value.length > 255)) {
     throw new RegistrationError("INVALID_INPUT");
   }
   return { ...account, mentor: {
     biografia: details.biografia.trim(),
     linkedin: details.linkedin?.trim() || undefined,
     instagram: details.instagram?.trim() || undefined,
+    ...(details.disponibilidades ? { disponibilidades: details.disponibilidades.map(item => ({ diaSemana: item.diaSemana, periodo: item.periodo })) } : {}),
   } };
 }
 

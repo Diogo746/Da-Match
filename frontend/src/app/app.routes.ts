@@ -1,11 +1,8 @@
 import { Routes } from "@angular/router";
 import { ExploreComponent } from "./features/explore/explore.component";
-import { RegisterComponent } from "./features/register/register.component";
 import { AboutComponent } from "./features/about/about.component";
 import { ProfileComponent } from "./features/profile/profile.component";
-import { authGuard, demoProfileGuard } from "./core/auth.guard";
-import { LoginComponent } from "./features/auth/login.component";
-import { AccountComponent } from "./features/auth/account.component";
+import { authGuard, demoProfileGuard, mentorGuard } from "./core/auth.guard";
 export const routes: Routes = [
   { path: "", component: ExploreComponent, title: "Descobrir | DaMatch" },
   {
@@ -16,13 +13,14 @@ export const routes: Routes = [
   },
   {
     path: "cadastro",
-    component: RegisterComponent,
+    loadComponent: () => import("./features/register/register.component").then(module => module.RegisterComponent),
     title: "Cadastro | DaMatch",
   },
   { path: "solicitar-acesso", redirectTo: "cadastro", pathMatch: "full" },
   { path: "meu-perfil", component: ProfileComponent, canActivate: [demoProfileGuard], title: "Meu perfil | DaMatch" },
-  { path: "entrar", component: LoginComponent, title: "Entrar | DaMatch" },
-  { path: "conta", component: AccountComponent, canActivate: [authGuard], title: "Minha conta | DaMatch" },
+  { path: "entrar", loadComponent: () => import("./features/auth/login.component").then(module => module.LoginComponent), title: "Entrar | DaMatch" },
+  { path: "conta", loadComponent: () => import("./features/auth/account.component").then(module => module.AccountComponent), canActivate: [authGuard], title: "Minha conta | DaMatch" },
+  { path: "mentor/perfil", loadComponent: () => import("./features/profile/mentor-profile.component").then(module => module.MentorProfileComponent), canActivate: [mentorGuard], title: "Perfil de mentor | DaMatch" },
   {
     path: "como-funciona",
     component: AboutComponent,

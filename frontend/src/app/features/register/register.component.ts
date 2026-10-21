@@ -31,6 +31,8 @@ import { ProfileSetupComponent } from "../profile/profile-setup.component";
 import { ProfileCompleteComponent } from "../profile/profile-complete.component";
 import { LumenGuideComponent } from "../../shared/lumen-guide.component";
 import { MentorRegistrationCompleteComponent } from "./mentor-registration-complete.component";
+import { MentorAvailability, validAvailability } from "../../core/mentor.models";
+import { MentorAvailabilityComponent } from "../../shared/mentor-availability.component";
 
 const API_ERRORS = {
   INVALID_INPUT: "Confira os dados do cadastro. O servidor não aceitou o preenchimento enviado.",
@@ -46,7 +48,7 @@ const API_ERRORS = {
 @Component({
   selector: "app-register",
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent, ProfileSetupComponent, ProfileCompleteComponent, LumenGuideComponent, MentorRegistrationCompleteComponent],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent, ProfileSetupComponent, ProfileCompleteComponent, LumenGuideComponent, MentorRegistrationCompleteComponent, MentorAvailabilityComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./register.component.html",
   styleUrl: "./register.component.css",
@@ -57,24 +59,28 @@ export class RegisterComponent {
   readonly apiMode = (inject(REGISTRATION_MODE, { optional: true }) ?? "DEMO") === "API";
   readonly session = inject(ProfileSessionStore);
   readonly profileReady = signal(false);
+  readonly availability = signal<MentorAvailability[]>([]);
+  readonly availabilityTouched = signal(false);
   readonly form = new FormGroup({
     nome: new FormControl("", {
       nonNullable: true,
       validators: [
         Validators.required,
         Validators.minLength(4),
+        Validators.maxLength(255),
         Validators.pattern(/\S/),
       ],
     }),
     email: new FormControl("", {
       nonNullable: true,
-      validators: [Validators.required, Validators.email],
+      validators: [Validators.required, Validators.email, Validators.maxLength(254)],
     }),
     senha: new FormControl("", {
       nonNullable: true,
       validators: [
         Validators.required,
         Validators.minLength(6),
+        Validators.maxLength(72),
         Validators.pattern(/\S/),
       ],
     }),
@@ -87,8 +93,8 @@ export class RegisterComponent {
       validators: this.apiMode ? [] : [Validators.requiredTrue],
     }),
     biografia: new FormControl("", { nonNullable: true }),
-    linkedin: new FormControl("", { nonNullable: true }),
-    instagram: new FormControl("", { nonNullable: true }),
+    linkedin: new FormControl("", { nonNullable: true, validators: [Validators.maxLength(255)] }),
+    instagram: new FormControl("", { nonNullable: true, validators: [Validators.maxLength(255)] }),
   }, { validators: (form) => {
     if (form.get("tipoUsuario")?.value !== "MENTOR") return null;
     return validMentorBiography(form.get("biografia")?.value ?? "") ? null : { mentorBiography: true };
@@ -138,7 +144,8 @@ export class RegisterComponent {
       this.form.controls.email.value.trim().toLowerCase(),
     );
     this.form.markAllAsTouched();
-    if (this.form.invalid) {
+    this.availabilityTouched.set(true);
+    if (this.form.invalid || (this.apiMode && !validAvailability(this.availability()))) {
       this.error.set("Confira os campos indicados antes de continuar.");
       setTimeout(() => this.errorSummary?.nativeElement.focus());
       return;
@@ -152,6 +159,7 @@ export class RegisterComponent {
           biografia: this.form.controls.biografia.value,
           linkedin: this.form.controls.linkedin.value,
           instagram: this.form.controls.instagram.value,
+          ...(this.apiMode ? { disponibilidades: this.availability() } : {}),
         } }
         : request;
       const result = await firstValueFrom(
@@ -188,6 +196,8 @@ export class RegisterComponent {
     this.receipt.set(null);
     this.error.set("");
     this.uncertain.set(false);
+    this.availability.set([]);
+    this.availabilityTouched.set(false);
     this.passwordVisible.set(false);
     this.form.reset({ tipoUsuario: this.apiMode ? "MENTOR" : "STARTUP", demoConsent: false });
   }

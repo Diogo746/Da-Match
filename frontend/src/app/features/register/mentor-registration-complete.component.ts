@@ -22,7 +22,7 @@ import { LumenGuideComponent } from "../../shared/lumen-guide.component";
         @if (mentor().linkedin) { <h3>LinkedIn</h3><p>{{ mentor().linkedin }}</p> }
         @if (mentor().instagram) { <h3>Instagram</h3><p>{{ mentor().instagram }}</p> }
       </div>
-      <p class="notice">Sua conta foi registrada. Você já pode entrar. A edição online e o salvamento das preferências de mentoria serão disponibilizados nas próximas etapas.</p>
+      <p class="notice">Sua conta foi registrada. Você já pode entrar para editar seu perfil, ajustar a agenda e publicar sua apresentação. O questionário e as recomendações serão integrados nas próximas etapas.</p>
       <a class="button button-primary" routerLink="/entrar">Entrar na minha conta</a>
       <a class="button button-primary" routerLink="/">Explorar a demonstração</a>
       <p class="field-help">Os perfis e as porcentagens da descoberta ainda são fictícios.</p>

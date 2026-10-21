@@ -101,6 +101,7 @@
               formControlName="senha"
               [placeholder]="apiMode ? 'Crie sua senha' : 'Crie uma senha fictícia'"
               minlength="6"
+              maxlength="72"
               autocomplete="new-password"
               required
               [attr.aria-invalid]="invalid('senha')"
@@ -143,10 +144,16 @@
             <details class="social-details">
               <summary>Adicionar redes sociais <span>Opcional</span></summary>
               <label class="field-label" for="register-linkedin">LinkedIn</label>
-              <input class="form-input" id="register-linkedin" formControlName="linkedin" placeholder="https://www.linkedin.com/in/seu-perfil" />
+              <input class="form-input" id="register-linkedin" formControlName="linkedin" maxlength="255" placeholder="https://www.linkedin.com/in/seu-perfil" />
               <label class="field-label" for="register-instagram">Instagram</label>
-              <input class="form-input" id="register-instagram" formControlName="instagram" placeholder="Seu usuário ou link do perfil" />
+              <input class="form-input" id="register-instagram" formControlName="instagram" maxlength="255" placeholder="Seu usuário ou link do perfil" />
             </details>
+            @if (apiMode) {
+              <app-mentor-availability [value]="availability()" (valueChange)="availability.set($event)" [disabled]="loading()" />
+              @if (availabilityTouched() && availability().length === 0) {
+                <p class="field-error" role="alert">Selecione pelo menos um período de disponibilidade.</p>
+              }
+            }
           }
           @if (!apiMode) {
           <label class="consent"
