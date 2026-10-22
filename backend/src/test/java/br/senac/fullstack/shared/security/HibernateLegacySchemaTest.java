@@ -22,6 +22,7 @@ class HibernateLegacySchemaTest {
         assertThat(jdbc.queryForObject("SELECT biografia FROM mentor", String.class))
                 .isEqualTo("Biografia ficticia preservada");
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM usuario", Integer.class)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT status FROM mentor", String.class)).isEqualTo("RASCUNHO");
         assertThat(jdbc.queryForObject("""
                 SELECT character_maximum_length FROM information_schema.columns
                 WHERE table_name = 'MENTOR' AND column_name = 'BIOGRAFIA'
