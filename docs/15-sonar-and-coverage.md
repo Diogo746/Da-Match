@@ -83,3 +83,16 @@ A revisão v0.4.3 preserva as correções de cobertura e acrescenta o checkout d
 ## Frontend v0.5.0
 
 O pipeline e os limites foram preservados. A v0.5.0 acrescenta testes do questionário e das regras v2. Os resultados locais atuais e as limitações estão no [documento 18](18-frontend-v0.5.0.md). A aprovação remota depende de novo push e execução no SonarQube.
+
+## Prevenção de reincidência: Web:S6819
+
+Em 22/10/2026, os dois apontamentos do perfil de mentor tinham a mesma causa: mensagens de confirmação e carregamento em `p` com `role="status"`. Ambas passaram a usar `output`, com CSS para manter o comportamento de bloco, as margens e a altura de linha dos parágrafos.
+
+- Prefira o elemento HTML nativo quando existir equivalente ao papel ARIA. Para esses avisos, use `<output>{{ message() }}</output>` e `<output>Carregando…</output>`.
+- `output` já possui o papel implícito `status`; não repita `role="status"`. Alertas de erro com `role="alert"` têm outra finalidade e devem ser avaliados separadamente.
+- Ao revisar templates, procure `role="status"` em `frontend/src`, inclusive em templates inline, e confira o CSS após a troca de tag.
+- Execute lint, testes com cobertura e builds DEMO/API. O lint atual não detectou esses dois usos; sua aprovação não substitui a nova análise do SonarQube. Preserve as regras e o Quality Gate.
+
+Validação local desta correção: lint aprovado; 231 testes Angular/Vitest e 8 testes da configuração Vercel aprovados; cobertura de linhas de 98,10%; builds DEMO e API aprovados. A busca em templates HTML e TypeScript não encontrou outros usos de `role="status"`. Não foi executada nova análise remota do SonarQube nem validação com leitor de tela.
+
+Referência: [W3C — ARIA in HTML, semântica implícita de output](https://www.w3.org/TR/html-aria/#el-output).

@@ -2,11 +2,11 @@
 <section aria-labelledby="mentor-profile-title" [attr.aria-busy]="loading() || busy()">
   <h1 id="mentor-profile-title">Meu perfil de mentor</h1>
   @if (error()) { <p class="notice" role="alert">{{ error() }}</p> }
-  @if (message()) { <p class="notice" role="status">{{ message() }}</p> }
+  @if (message()) { <output class="notice">{{ message() }}</output> }
   @if (!state.user()) {
     <a class="button button-primary" routerLink="/entrar">Entrar novamente</a>
   } @else if (state.user()?.tipoUsuario === 'MENTOR') {
-    @if (loading()) { <p role="status">Carregando seu perfil…</p> }
+    @if (loading()) { <output>Carregando seu perfil…</output> }
     @if (profile(); as mentor) {
       <p>{{ mentor.nome }} · {{ mentor.email }}</p>
       <p>Estado: <strong>{{ statusLabels[mentor.status] }}</strong></p>
