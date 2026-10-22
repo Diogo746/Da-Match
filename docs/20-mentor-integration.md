@@ -82,7 +82,20 @@ Depois faça novo deploy. Não é necessário criar histórico, executar baselin
 
 Mantenha backup e confira a atualização numa cópia PostgreSQL antes de produção. Hibernate `update` não fornece histórico versionado nem rollback e não resolve qualquer transformação de dados automaticamente. Duplicatas ou valores incompatíveis com constraints exigem análise própria; nunca remova registros silenciosamente. Não configure `create` ou `create-drop` no Render.
 
-O teste local `HibernateLegacySchemaTest` usa schema fictício populado, confirma preservação dos dados, ampliação da biografia e criação de tabelas ausentes sem histórico de migrations. Os testes usam H2 em modo PostgreSQL; o Supabase real não foi acessado nem modificado nesta sessão.
+O teste local `HibernateLegacySchemaTest` usa schema fictício populado, confirma preservação dos dados, ampliação da biografia e criação de tabelas ausentes sem histórico de migrations. Os testes automatizados usam H2 em modo PostgreSQL. O reparo posterior no Supabase está descrito abaixo.
+
+## Schema legado com dados: correção de 22/10/2026
+
+O PostgreSQL legado tinha registros em `mentor`, mas não tinha a coluna `status`. O Hibernate tentou adicioná-la com `NOT NULL` e sem default; a instrução falhou com `column "status" of relation "mentor" contains null values`, embora a aplicação tenha iniciado. O teste anterior de schema legado já incluía essa coluna e não cobria esse caso.
+
+- `Mentor.status` agora declara `@ColumnDefault("'RASCUNHO'")`, além da inicialização Java e de `@Enumerated(EnumType.STRING)`. O default permite adicionar a coluna obrigatória numa tabela populada e mantém perfis antigos como rascunhos.
+- A fixture de regressão não contém mais `mentor.status`; o teste exige preservação do registro e preenchimento com `RASCUNHO`. A falha foi reproduzida antes da correção; os 88 testes backend passaram após o ajuste.
+- O schema legado de `startup.status_validacao` ainda era `smallint`, com uma constraint numérica de 0 a 1. Alterar somente o tipo para texto falha. A correção precisa validar os valores, substituir a constraint e converter explicitamente `0 → APENAS_IDEIA` e `1 → PESQUISA_MERCADO`; converter números diretamente em strings não atende ao contrato JPA.
+- Antes de qualquer correção operacional, inspecione tipos, defaults, constraints e contagens; ensaie em cópias PostgreSQL, preserve uma cópia das tabelas afetadas e aplique a alteração em transação com verificações de preservação. Não apague registros nem reintroduza Flyway para esse reparo.
+
+Com autorização do usuário, o reparo foi ensaiado em tabelas temporárias no próprio PostgreSQL, com rollback, e aplicado no Supabase em transação. Foram preservados o mentor e a startup originais, com cópias das tabelas e das definições de constraints em schema separado, RLS habilitado e sem acesso para `PUBLIC`, `anon` e `authenticated`. Essas cópias no mesmo banco não substituem um backup externo.
+
+Validação HTTP pela origem do frontend publicado, usando conta fictícia nova: cadastro `201`, login `200`, consulta própria `200` e logout `204`, com CSRF e cookies de sessão. A disponibilidade foi persistida e o perfil permaneceu em `RASCUNHO`. A conta de teste foi mantida sem publicação. A correção de schema já atende à versão publicada; a anotação preventiva e a regressão foram validadas localmente e dependem de integração à `main`.
 
 ## Sequência de configuração e conferência
 

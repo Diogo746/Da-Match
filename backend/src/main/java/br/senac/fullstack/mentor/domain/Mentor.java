@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -51,6 +52,7 @@ public class Mentor {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @ColumnDefault("'RASCUNHO'")
     private StatusPerfilMentor status = StatusPerfilMentor.RASCUNHO;
 
     @Column(nullable = false)
