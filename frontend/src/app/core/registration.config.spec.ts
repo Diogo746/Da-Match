@@ -2,7 +2,7 @@ import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting, HttpTestingController } from "@angular/common/http/testing";
 import { TestBed } from "@angular/core/testing";
 import { expect, it } from "vitest";
-import { HttpMentorRegistrationGateway } from "./http-mentor-registration.gateway";
+import { HttpRegistrationGateway } from "./http-registration.gateway";
 import { RegistrationGateway } from "./registration.gateway";
 import { REGISTRATION_MODE, registrationGatewayFactory } from "./registration.config";
 
@@ -16,6 +16,6 @@ it.each(["DEMO", "API"] as const)("seleciona %s sem fazer chamadas antecipadas",
     { provide: REGISTRATION_MODE, useValue: mode },
     { provide: RegistrationGateway, useFactory: registrationGatewayFactory },
   ] });
-  expect(TestBed.inject(RegistrationGateway) instanceof HttpMentorRegistrationGateway).toBe(mode === "API");
+  expect(TestBed.inject(RegistrationGateway) instanceof HttpRegistrationGateway).toBe(mode === "API");
   TestBed.inject(HttpTestingController).verify();
 });

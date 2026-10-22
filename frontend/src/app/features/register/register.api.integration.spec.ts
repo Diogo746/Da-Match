@@ -12,6 +12,7 @@ import { ProfileSessionStore } from "../../core/profile-session.store";
 import { THEME_STORAGE_KEY } from "../../core/theme.store";
 import { RegisterComponent } from "./register.component";
 import { emptyProfile } from "../../core/profile.models";
+import { AuthStateStore } from "../../core/auth-state.store";
 
 let fixture: ComponentFixture<AppComponent>;
 let page: HTMLElement;
@@ -53,12 +54,12 @@ beforeEach(async () => {
 });
 afterEach(() => { http.verify(); localStorage.removeItem(THEME_STORAGE_KEY); });
 
-it("apresenta apenas mentor no modo conectado e exige a biografia antes da rede", async () => {
-  expect(page.querySelectorAll(".role-option")).toHaveLength(1);
+it("oferece startup e mentor no modo conectado e exige a biografia do mentor antes da rede", async () => {
+  expect(page.querySelectorAll(".role-option")).toHaveLength(2);
   expect(page.querySelector('.main-nav a[href="/meu-perfil"]')).toBeNull();
-  expect(page.querySelector(".topbar-actions a")?.textContent).toContain("Cadastro de mentor");
-  expect(page.querySelector(".sidebar-invite a")?.textContent).toContain("Cadastrar mentor");
-  expect(page.querySelector(".demo-pill")?.textContent).toContain("Integração de mentor");
+  expect(page.querySelector(".topbar-actions a")?.textContent).toContain("Criar conta");
+  expect(page.querySelector(".sidebar-invite a")?.textContent).toContain("Cadastrar startup ou mentor");
+  expect(page.querySelector(".demo-pill")?.textContent).toContain("Cadastros conectados");
   expect(page.querySelector('input[formControlName="demoConsent"]')).toBeNull();
   enter("register-name", "Ana Mentora"); enter("register-email", "ana@example.test"); enter("register-password", "senha-ficticia");
   submit(); await refresh();
@@ -128,4 +129,78 @@ it("não transforma a confirmação de API em perfil demonstrativo", async () =>
   registration.restart(); await refresh();
   expect(registration.form.controls.tipoUsuario.value).toBe("MENTOR");
   expect(registration.form.controls.biografia.value).toBe("");
+});
+
+const startupDetails = { nomeProvisorio: "Ideia Fictícia", pitchCurto: "Uma rede para ideias.",
+  problemaCentral: "Pouco acesso a orientação.", solucaoProposta: "Conectar pessoas e experiência.",
+  publicoAlvo: "Projetos em ideação", modeloDeNegocio: "Assinatura", statusValidacao: "APENAS_IDEIA" };
+const startupResponse = { ...startupDetails, id: "startup-confirmada", dataCriacao: "2026-10-22T12:00:00Z",
+  membros: [{ id: "vinculo-confirmado", usuarioId: "fundador-confirmado", nomeUsuario: "Pessoa Fundadora", papelMembro: "FUNDADOR", dataEntrada: "2026-10-22" }] };
+function selectStartup() {
+  page.querySelector<HTMLInputElement>("#register-kind-STARTUP")!.click(); fixture.detectChanges();
+}
+function fillStartup() {
+  selectStartup();
+  enter("register-name", "Pessoa Fundadora"); enter("register-email", "fundador@example.test"); enter("register-password", "senha-ficticia");
+  for (const [key, value] of Object.entries(startupDetails)) {
+    if (key !== "statusValidacao") enter(`startup-${key}`, value);
+  }
+}
+function receiveStartupCsrf() {
+  http.expectOne("/csrf").flush({ headerName: "X-XSRF-TOKEN", token: "startup-csrf" });
+  return http.expectOne("/api/v1/startups");
+}
+
+it("valida o projeto e não exige agenda ou biografia de mentor para cadastrar startup", async () => {
+  selectStartup();
+  expect(page.querySelector("#register-biography")).toBeNull();
+  expect(page.querySelectorAll('input[type="checkbox"]')).toHaveLength(0);
+  submit(); await refresh();
+  expect(page.querySelector("#startup-nomeProvisorio-error")?.textContent).toContain("Preencha");
+  http.expectNone(() => true);
+  fillStartup(); submit();
+  const post = receiveStartupCsrf();
+  expect(post.request.body).toEqual({ fundador: { nome: "Pessoa Fundadora", email: "fundador@example.test", senha: "senha-ficticia" }, ...startupDetails });
+  post.flush(startupResponse, { status: 201, statusText: "Created" }); await refresh();
+  expect(page.querySelector("h1")?.textContent).toContain("Sua startup foi cadastrada");
+  expect(page.querySelector(".startup-card")?.textContent).toContain(startupResponse.nomeProvisorio);
+  expect(page.textContent).toContain("Pessoa Fundadora");
+  expect(document.activeElement?.id).toBe("startup-created-title");
+  expect(page.innerHTML).not.toContain("senha-ficticia");
+  expect(TestBed.inject(ProfileSessionStore).profile()).toBeNull();
+  expect(TestBed.inject(AuthStateStore).user()).toBeNull();
+  expect(page.querySelector("app-profile-setup")).toBeNull();
+});
+
+it("exige campos de startup somente para startup e não envia valores do outro perfil", async () => {
+  fillStartup(); enter("startup-pitchCurto", " "); submit(); await refresh();
+  http.expectNone(() => true);
+  page.querySelector<HTMLInputElement>("#register-kind-MENTOR")!.click(); fixture.detectChanges();
+  fill(); submit();
+  const post = receiveCsrf();
+  expect(post.request.body).not.toHaveProperty("startup");
+  expect(post.request.body).not.toHaveProperty("fundador");
+  post.flush(mentorResponse, { status: 201, statusText: "Created" }); await refresh();
+});
+
+it.each([[400, "não aceitou"], [403, "proteção"], [409, "já está cadastrado"], [500, "pode ter sido criada"]])("trata falha %s de startup sem inventar confirmação nem repetir POST", async (status, message) => {
+  fillStartup(); submit(); submit();
+  receiveStartupCsrf().flush({ debug: "never-display" }, { status: Number(status), statusText: "Error" }); await refresh();
+  expect(page.querySelector('[role="alert"]')?.textContent).toContain(message);
+  expect(page.textContent).not.toContain("never-display");
+  expect(page.querySelector("app-startup-registration-complete")).toBeNull();
+  if (status === 500) {
+    expect(page.querySelector<HTMLInputElement>("#register-password")?.value).toBe("");
+    submit(); http.expectNone(() => true);
+  }
+});
+
+it("orienta uma sessão já autenticada sem exibir ou enviar onboarding público", async () => {
+  TestBed.inject(AuthStateStore).setUser({ id: "user-test", nome: "Pessoa Teste", email: "user@example.test", tipoUsuario: "STARTUP" });
+  await refresh();
+  expect(page.textContent).toContain("Você já está em uma conta");
+  expect(page.querySelector("form")).toBeNull();
+  const component = fixture.debugElement.query(node => node.componentInstance instanceof RegisterComponent).componentInstance as RegisterComponent;
+  await component.submit();
+  http.expectNone(() => true);
 });

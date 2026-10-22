@@ -53,7 +53,7 @@
           [attr.aria-label]="theme.isDark() ? 'Ativar modo claro' : 'Ativar modo escuro'"
           (click)="theme.toggle()"><app-icon [name]="theme.isDark() ? 'sun' : 'moon'" />
           <span>{{ theme.isDark() ? 'Modo claro' : 'Modo escuro' }}</span></button>
-        <span class="demo-pill"><span></span>{{ apiMode ? 'Integração de mentor' : 'Demonstração' }}</span
+        <span class="demo-pill"><span></span>{{ apiMode ? 'Cadastros conectados' : 'Demonstração' }}</span
         ><a [routerLink]="session.profile() ? '/meu-perfil' : '/cadastro'" class="button button-primary button-small"
           >{{ accountLabel() }}<app-icon name="arrow"
         /></a>
@@ -62,7 +62,7 @@
     <main id="conteudo" tabindex="-1"><router-outlet /></main>
     <footer class="page-footer">
       <span>DaMatch · Conexões com propósito</span
-      ><span>{{ apiMode ? 'Cadastro de mentor conectado. Descoberta e compatibilidade demonstrativas.' : 'Demonstração com perfis fictícios e cadastros simulados.' }}</span>
+      ><span>{{ apiMode ? 'Cadastros de startup e mentor conectados. Descoberta e compatibilidade demonstrativas.' : 'Demonstração com perfis fictícios e cadastros simulados.' }}</span>
       <button class="motion-toggle" type="button" [attr.aria-pressed]="motionPaused()"
         title="A preferência de redução de movimento do dispositivo é sempre respeitada."
         (click)="motionPaused.set(!motionPaused())">{{ motionPaused() ? 'Retomar animações' : 'Pausar animações' }}</button>
