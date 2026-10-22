@@ -38,7 +38,7 @@ public class Mentor {
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
     private Usuario usuario;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String biografia;
 
     private String linkedin;

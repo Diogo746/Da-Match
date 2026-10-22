@@ -179,6 +179,16 @@
       "description": "Cadastro público exige visitante e CSRF. PATCH exige login de MENTOR titular do mentorId e novo CSRF após login. O Postman preserva os cookies.",
       "item": [
         {
+          "name": "Meu perfil de mentor",
+          "description": "Exige sessão de MENTOR. O usuário é obtido da sessão; não envie usuarioId. Salva mentorId para os PATCH existentes.",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/v1/mentores/me" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Perfil privado do mentor', () => pm.response.to.have.status(200));",
+            "if (pm.response.code === 200) { const body = pm.response.json(); pm.collectionVariables.set('mentorId', body.id); pm.test('Sem senha na resposta', () => pm.expect(body).not.to.have.property('senha')); }"
+          ] } }],
+          "response": []
+        },
+        {
           "name": "Registrar mentor",
           "request": {
             "method": "POST",

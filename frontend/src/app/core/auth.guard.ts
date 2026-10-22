@@ -19,3 +19,12 @@ export const authGuard: CanActivateFn = () => {
 // The existing profile editor is a demo; API mode has a separate authenticated account page.
 export const demoProfileGuard: CanActivateFn = () =>
   inject(REGISTRATION_MODE) === "DEMO" ? true : inject(Router).createUrlTree(["/conta"]);
+
+export const mentorGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  if (inject(REGISTRATION_MODE) !== "API") return router.createUrlTree(["/"]);
+  return inject(AuthService).me().pipe(
+    map(user => user.tipoUsuario === "MENTOR" ? true : router.createUrlTree(["/conta"])),
+    catchError(() => of(router.createUrlTree(["/entrar"]))),
+  );
+};

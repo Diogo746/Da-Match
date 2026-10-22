@@ -59,6 +59,8 @@ Não há retry automático de POST. No resultado incerto, a senha é limpa. Não
 
 ## Pontos de alinhamento com o backend
 
+Registro histórico desta primeira integração. A entrega posterior descrita em [Integração de mentor](20-mentor-integration.md) conecta sessão, consulta própria, edição e publicação, envia a agenda obrigatória, trata conflito de cadastro e declara `length = 1000` na biografia. O banco continua gerenciado pelo Hibernate `update`, sem migrations, por decisão do responsável. As pendências abaixo refletem o diagnóstico anterior.
+
 ### Biografia e coluna do banco
 
 `CadastrarMentorRequest` declara `@Size(max = 1000)`, que é o limite usado no formulário. A entidade `Mentor` usa `@Column(nullable = false)` em `biografia`, sem declarar `length`. O padrão de length no JPA é 255.

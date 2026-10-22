@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
-import { Router } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { AuthService } from "../../core/auth.service";
 import { AuthStateStore } from "../../core/auth-state.store";
@@ -7,12 +7,16 @@ import { AuthStateStore } from "../../core/auth-state.store";
 @Component({
   selector: "app-account",
   standalone: true,
+  imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <h1>Minha conta</h1>
     @if (state.user(); as user) {
       <p>{{ user.nome }}</p><p>{{ user.email }}</p>
-      <p>Sua sessão está ativa. A edição online do perfil estará disponível em uma próxima etapa.</p>
+      <p>Sua sessão está ativa.</p>
+      @if (user.tipoUsuario === 'MENTOR') {
+        <a class="button button-primary" routerLink="/mentor/perfil">Abrir meu perfil de mentor</a>
+      }
     }
     @if (state.notice()) { <p role="alert">{{ state.notice() }}</p> }
     <button class="button button-primary" type="button" [disabled]="loading()" (click)="logout()">Sair da conta</button>`,

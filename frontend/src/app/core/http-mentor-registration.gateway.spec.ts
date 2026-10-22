@@ -9,13 +9,14 @@ import { RegistrationRequest } from "./registration.gateway";
 
 const input: RegistrationRequest = {
   nome: " Maria Teste ", email: " MARIA@example.test ", senha: " senha-inventada ",
-  mentor: { biografia: " Mentora em produtos digitais. ", linkedin: " https://www.linkedin.com/in/maria-teste ", instagram: " maria.teste " },
+  mentor: { biografia: " Mentora em produtos digitais. ", linkedin: " https://www.linkedin.com/in/maria-teste ", instagram: " maria.teste ", disponibilidades: [{ diaSemana: 1, periodo: "MANHA" }] },
 };
 const response = {
   id: "c7566087-4531-40fc-8af6-c94b36b7f951", usuarioId: "533294b1-e49e-49d3-8943-37258f07cb88",
   nome: "Maria Teste", email: "maria@example.test", biografia: "Mentora em produtos digitais.",
   linkedin: "https://www.linkedin.com/in/maria-teste", instagram: "maria.teste", site: null,
   dataEntradaPlataforma: "2026-10-17",
+  disponibilidades: [{ diaSemana: 1, periodo: "MANHA" }], status: "RASCUNHO",
 };
 let http: HttpTestingController;
 let gateway: HttpMentorRegistrationGateway;
@@ -45,6 +46,7 @@ describe("Contrato HTTP do cadastro de mentor", () => {
     expect(post.request.body).toEqual({
       usuario: { nome: "Maria Teste", email: "maria@example.test", senha: " senha-inventada " },
       biografia: "Mentora em produtos digitais.", linkedin: "https://www.linkedin.com/in/maria-teste", instagram: "maria.teste",
+      disponibilidades: [{ diaSemana: 1, periodo: "MANHA" }],
     });
     expect(post.request.body).not.toHaveProperty("tipoUsuario");
     expect(post.request.body).not.toHaveProperty("site");
@@ -57,10 +59,11 @@ describe("Contrato HTTP do cadastro de mentor", () => {
   });
 
   it("aceita a biografia no limite e omite links vazios", async () => {
-    const result = start({ ...input, mentor: { biografia: "a".repeat(1000), linkedin: " ", instagram: "" } });
+    const result = start({ ...input, mentor: { ...input.mentor, biografia: "a".repeat(1000), linkedin: " ", instagram: "", disponibilidades: [{ diaSemana: 1, periodo: "MANHA" }] } });
     const post = csrf();
     expect(JSON.parse(JSON.stringify(post.request.body))).toEqual({
       usuario: { nome: "Maria Teste", email: "maria@example.test", senha: input.senha }, biografia: "a".repeat(1000),
+      disponibilidades: [{ diaSemana: 1, periodo: "MANHA" }],
     });
     post.flush({ ...response, linkedin: null, instagram: null }, { status: 201, statusText: "Created" });
     expect((await result).value?.mode).toBe("API");
@@ -71,7 +74,11 @@ describe("Contrato HTTP do cadastro de mentor", () => {
     http.expectNone(() => true);
   });
 
-  it.each([{ ...input, senha: "curta" }, { ...input, mentor: undefined }])("valida os dados antes de obter CSRF: caso %#", async (request) => {
+  it.each([{ ...input, senha: "curta" }, { ...input, mentor: undefined },
+    { ...input, mentor: { biografia: "Mentora" } },
+    { ...input, mentor: { biografia: "Mentora", disponibilidades: [] } },
+    { ...input, mentor: { biografia: "Mentora", disponibilidades: [{ diaSemana: 8, periodo: "MANHA" as const }] } },
+  ])("valida os dados antes de obter CSRF: caso %#", async (request) => {
     await expect(firstValueFrom(gateway.register("MENTOR", request))).rejects.toMatchObject({ code: "INVALID_INPUT" });
     http.expectNone(() => true);
   });

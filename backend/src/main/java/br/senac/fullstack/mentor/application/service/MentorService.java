@@ -94,8 +94,10 @@ public class MentorService {
     }
 
 
-    public MentorResponse buscarMentor(Usuario usuario) {
-        Mentor mentor = mentorRepository.findByUsuario(usuario)
+    @Transactional
+    public MentorResponse consultarMeuPerfil() {
+        UUID usuarioId = resourceAccess.currentMentorUserId();
+        Mentor mentor = mentorRepository.findByUsuarioId(usuarioId)
                 .orElseThrow(() -> new MentorNaoEncontradoException(MENTOR_NAO_ENCONTRADO));
         return mentorMapper.toResponse(mentor);
     }

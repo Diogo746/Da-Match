@@ -20,6 +20,7 @@ const mentorResponse = {
   id: "mentor-confirmado", usuarioId: "usuario-confirmado", nome: "Ana Mentora", email: "ana@example.test",
   biografia: "Experiência em educação e validação de ideias.", dataEntradaPlataforma: "2026-10-17",
   linkedin: "https://www.linkedin.com/in/ana-teste", instagram: "ana.teste", site: null,
+  disponibilidades: [{ diaSemana: 1, periodo: "MANHA" }], status: "RASCUNHO",
 };
 async function refresh() { await fixture.whenStable(); fixture.detectChanges(); }
 function enter(id: string, value: string) {
@@ -33,6 +34,8 @@ function submit() {
 function fill() {
   enter("register-name", "Ana Mentora"); enter("register-email", "ana@example.test");
   enter("register-password", "senha-ficticia"); enter("register-biography", mentorResponse.biografia);
+  page.querySelector<HTMLInputElement>('input[aria-label="Segunda-feira, Manhã"]')!.click();
+  fixture.detectChanges();
 }
 function receiveCsrf() {
   http.expectOne("/csrf").flush({ headerName: "X-XSRF-TOKEN", token: "protecao-ficticia" });
@@ -81,6 +84,14 @@ it("confirma somente depois de 201, limpa a senha e termina sem inventar login o
   expect(page.innerHTML).not.toContain("senha-ficticia");
   expect(TestBed.inject(ProfileSessionStore).profile()).toBeNull();
   expect(document.activeElement?.id).toBe("mentor-created-title");
+});
+
+it("exige ao menos um período de disponibilidade antes de enviar o cadastro", async () => {
+  fill();
+  page.querySelector<HTMLInputElement>('input[aria-label="Segunda-feira, Manhã"]')!.click();
+  submit(); await refresh();
+  expect(page.textContent).toContain("Selecione pelo menos um período");
+  http.expectNone(() => true);
 });
 
 it.each([[400, "não aceitou"], [403, "proteção do envio"], [409, "e-mail já está cadastrado"]])("explica HTTP %s sem abrir o questionário", async (status, message) => {

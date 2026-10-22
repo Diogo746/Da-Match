@@ -39,3 +39,4 @@ Project Charter (Visão & Dores)
 ## Backend atual
 
 - [Segurança, sessões e configuração de produção](backend-security.md).
+- [Integração de mentor e variáveis Render/Vercel](20-mentor-integration.md).

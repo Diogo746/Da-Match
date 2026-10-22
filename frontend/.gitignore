@@ -4,3 +4,4 @@ dist/
 coverage/
 .vercel
 .env*
+!.env.example

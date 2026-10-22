@@ -3,11 +3,8 @@ spring:
     name: fullstack-api-damatch
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: false
-  flyway:
-    enabled: true
-    baseline-on-migrate: false
 
 server:
   # Render injects PORT for web services. The default preserves local execution.

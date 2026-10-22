@@ -27,6 +27,9 @@ public interface MentorMapper {
     @Mapping(target = "dataEntradaPlataforma", ignore = true)
     @Mapping(target = "disponibilidades", ignore = true)
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "linkedin", conditionExpression = "java(request.linkedin() != null)")
+    @Mapping(target = "instagram", conditionExpression = "java(request.instagram() != null)")
+    @Mapping(target = "site", conditionExpression = "java(request.site() != null)")
     void atualizarPerfil(
             AtualizarPerfilMentorRequest request,
             @MappingTarget Mentor mentor

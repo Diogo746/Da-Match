@@ -54,6 +54,7 @@ class SecurityPropertiesTest {
             SecurityProperties properties = new SecurityProperties();
             assertThat(validator.validate(properties)).isEmpty();
             for (String invalid : List.of("*", "https://*.example.test", "https://example.test/path",
+                    "frontend.example.test", "https://frontend.example.test/", "[https://frontend.example.test]",
                     "https://user:password@example.test", "null", "https://example.test?query=value")) {
                 properties.getCors().setAllowedOrigins(List.of(invalid));
                 assertThat(validator.validate(properties)).isNotEmpty();

@@ -11,6 +11,7 @@ Implementação na branch `feature/security-configuration`. Autenticação por s
 | `POST /api/v1/auth/login` | Público, com CSRF |
 | `POST /api/v1/mentores` e `POST /api/v1/startups` | Visitante sem sessão autenticada, com CSRF |
 | `GET /api/v1/auth/me` | Autenticado |
+| `GET /api/v1/mentores/me` | MENTOR; consulta somente o perfil associado à sessão |
 | `POST /api/v1/auth/logout` | Autenticado, com CSRF; retorna 204 |
 | `GET /api/v1/startups`, `/{startupId}`, `/{startupId}/membros` | Autenticado |
 | `PATCH /api/v1/mentores/{mentorId}` e `/{mentorId}/status` | MENTOR titular do recurso, com CSRF |
@@ -49,6 +50,7 @@ Os arquivos de CI apontam para frontend no Vercel e backend no Render; o domíni
 | --- | --- | --- |
 | `SPRING_PROFILES_ACTIVE` | Perfil padrão | `prod` (também definido no Dockerfile) |
 | `SUPABASE_DB_URL` | Banco de desenvolvimento fornecido no ambiente | Secret manager/ambiente; nunca versionar |
+| `SPRING_JPA_HIBERNATE_DDL_AUTO` | `update` por padrão | `update`, conforme decisão do projeto; Hibernate gerencia o schema |
 | `APP_SECURITY_CORS_ALLOWED_ORIGINS` | Padrão `http://localhost:4200` | Obrigatória; origens exatas separadas por vírgula |
 | `APP_SECURITY_COOKIES_SECURE` | `false` para HTTP local | `true`; inicialização rejeita `false` |
 | `APP_SECURITY_COOKIES_SAME_SITE` | `Lax` | `Lax` para mesmo site; `None` para sites distintos |
@@ -64,23 +66,25 @@ O backend mantém `forward-headers-strategy: none`: não confia automaticamente 
 
 Outros headers incluem `nosniff`, `X-Frame-Options: DENY`, `frame-ancestors 'none'`, `Referrer-Policy: no-referrer` e controle de cache padrão do Spring Security. Actuator expõe somente health sem detalhes e exige ADMIN.
 
-## Migrações e baseline
+## Schema gerenciado pelo Hibernate
 
-Produção habilita Flyway e usa `ddl-auto: validate`, sem SQL verboso ou logs de parâmetros. Desenvolvimento preserva `update` para compatibilidade local; habilitar Flyway em um banco local novo permite ensaiar a migração. Nunca usar o perfil de desenvolvimento contra produção.
+Por decisão explícita do responsável em 21/10/2026, o banco Supabase existente continua gerenciado pelo Hibernate, sem migrations. Flyway e seus scripts foram removidos. Desenvolvimento e produção usam `ddl-auto: update`, configurável por `SPRING_JPA_HIBERNATE_DDL_AUTO`; produção mantém o perfil `prod`, SQL verboso desligado e as demais proteções de segurança.
 
-- `V1__initial_schema.sql` cria as cinco tabelas do modelo atual.
-- `V2__unique_startup_member.sql` adiciona a unicidade de startup/usuário e falha se encontrar duplicatas.
-- Banco vazio: Flyway executa V1 e V2 antes da validação Hibernate.
-- Banco existente criado por Hibernate: não habilitar `baseline-on-migrate` automaticamente. Fazer backup, restaurar uma cópia isolada e comparar tabelas, colunas, tipos, FKs e enums com V1 e entidades. Verificar duplicatas por `(startup_id, usuario_id)` e reconciliá-las com decisão de negócio. Confirmada a equivalência, executar o comando `baseline` do Flyway com versão **1** e credenciais fornecidas pelo ambiente, depois `migrate` para V2. Validar a aplicação e testar rollback operacional/restauração antes de repetir em produção.
-- Se houver divergência, preparar a migração específica antes do baseline. Não executar V1 sobre tabelas existentes, nem marcar V2 como aplicada sem verificar a constraint.
+Hibernate atualiza o schema pelas entidades: a biografia do mentor passa a comportar 1.000 caracteres e a unicidade `(startup_id, usuario_id)` permanece declarada em `MembroStartup`. `update` não oferece histórico versionado, rollback nem conversão arbitrária de dados legados. Antes de alterar entidades em produção, faça backup e ensaie a atualização numa cópia PostgreSQL. Dados existentes incompatíveis com novas constraints exigem análise; nunca remova registros silenciosamente para fazer o deploy passar. Não configure `create` ou `create-drop` no Render.
 
-As migrações e a validação Hibernate são executadas automaticamente nos testes de segurança com H2 em modo PostgreSQL. O Docker local estava desligado: não houve ensaio em PostgreSQL real ou acesso ao Supabase. A validação numa cópia PostgreSQL do ambiente é pré-requisito de deploy.
+Para um deploy antigo que ainda inclua Flyway, `SPRING_FLYWAY_ENABLED=false` e `SPRING_JPA_HIBERNATE_DDL_AUTO=update` desativam o inicializador e preservam o gerenciamento por Hibernate. Após publicar este código sem a dependência, a variável de Flyway é dispensável. Não é necessário criar histórico ou fazer baseline.
+
+O teste `HibernateLegacySchemaTest` inicia um schema fictício já populado, amplia a coluna de biografia, cria tabelas ausentes e confirma que os dados anteriores permanecem, sem histórico de migrations. Usa H2 em modo PostgreSQL; não houve acesso ao Supabase nem ensaio em PostgreSQL real nesta sessão.
 
 ## Frontend e Postman
 
 O modo API oferece `/entrar` e `/conta`. A guarda consulta `/auth/me`, o estado da conta fica em memória e a senha do formulário de login é limpa ao enviar. O interceptor trata 401/403 e invalida o CSRF em memória, sem repetir automaticamente operações de escrita. Login/logout renovam CSRF antes de concluir o fluxo. A página de perfil demonstrativo continua separada; `/meu-perfil` no modo API encaminha para a conta.
 
-Os arquivos existentes do frontend foram preservados. Há uma pendência anterior independente: o cadastro Angular de mentor ainda não envia `disponibilidades`, obrigatórias no backend; usar a coleção Postman para criar a conta fictícia completa enquanto esse formulário não for alinhado. Edição online, questionário persistido, descoberta e matching não fazem parte desta entrega.
+O cadastro Angular envia as disponibilidades obrigatórias. `/mentor/perfil` carrega o perfil por `GET /api/v1/mentores/me`, sem receber o identificador do ator do navegador, e usa os PATCH existentes para edição e publicação. Campos sociais omitidos são preservados; strings vazias permitem limpá-los. Questionário persistido, descoberta e matching continuam como próximas etapas.
+
+O deploy Angular possui `frontend/vercel.ts`: `BACKEND_ORIGIN`, configurada somente no ambiente Vercel, determina os rewrites HTTPS da API e do CSRF. As respostas dessas rotas não devem ser armazenadas em cache nem comprimidas pelo proxy. Com mesma origem, use cookies `Secure; SameSite=Lax` e configure no Render a origem exata do frontend em `APP_SECURITY_CORS_ALLOWED_ORIGINS`. Consulte `docs/20-mentor-integration.md`.
+
+Uma falha de inicialização com `SecurityProperties`, propriedade `app.security.cors.allowedOrigins`, valor `[]` e razão `must not be empty` indica que a lista de CORS está vazia. Foi o erro reportado no Render em 21/10/2026. Corrigir `APP_SECURITY_CORS_ALLOWED_ORIGINS` no ambiente e fazer novo deploy; não adicionar curinga, retirar a validação ou copiar a origem de produção para o código.
 
 Na coleção Postman, usar a pasta Autenticação e preencher `authEmail`/`authPassword` somente no ambiente local com dados fictícios. O Postman deve manter o cookie jar. Os scripts removem a variável CSRF após login/logout para exigir nova consulta. Não exportar variáveis preenchidas nem cookies.
 
@@ -94,10 +98,12 @@ Na coleção Postman, usar a pasta Autenticação e preencher `authEmail`/`authP
 
 ## Validação
 
-`mvn -pl backend test` executa testes unitários, de arquitetura, regressão HTTP, integração de autenticação/autorização, migrações e cookies reais no servidor de teste. No Windows desta sessão, Maven foi encontrado em `C:\Users\mario\AppData\Local\Temp\da-match-maven-3.9.9\apache-maven-3.9.9\bin\mvn.cmd`.
+`mvn -pl backend test` executa testes unitários, de arquitetura, regressão HTTP, integração de autenticação/autorização, atualização Hibernate de schema legado e cookies reais no servidor de teste. No Windows desta sessão, Maven foi encontrado em `C:\Users\mario\AppData\Local\Temp\da-match-maven-3.9.9\apache-maven-3.9.9\bin\mvn.cmd`.
 
 Frontend: `npm.cmd run lint`, `npm.cmd run test:coverage`, `npm.cmd run build` e `npm.cmd run build:api`. A configuração de cobertura e os testes existentes não foram desabilitados.
 
 Resultado local em 20/10/2026: **81 testes do backend**, sem falhas/erros/ignorados e `BUILD SUCCESS`; **192 testes do frontend**, lint e ambos os builds aprovados. Cobertura de linhas do frontend: **97,86%** (referência anterior: 97,60%). O log Maven desta validação fica em `backend/target/security-validation.log`; relatórios detalhados em `backend/target/surefire-reports`, `backend/target/site/jacoco` e `frontend/coverage/frontend`.
+
+Integração de mentor em 21/10/2026: **88 testes do backend**, incluindo schema legado com Hibernate `update`, aprovados após `clean test`; lint, testes com cobertura de **98,1% de linhas** e builds DEMO/API do frontend aprovados. Os testes da configuração Vercel também passaram. Conferência HTTP local pela aplicação Angular/proxy/API/H2 aprovou cadastro, login, consulta própria, edição persistida, publicação/pausa, logout e rejeições de CSRF, origem e acesso a perfil alheio. Não houve validação visual em navegador disponível, deploy remoto ou acesso ao banco Supabase.
 
 Referências de implementação: [CSRF e SPA](https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html), [persistência do contexto e sessões](https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html) e [integração CORS](https://docs.spring.io/spring-security/reference/servlet/integrations/cors.html). APIs utilizadas foram compiladas e testadas contra o Spring Security fornecido pelo Spring Boot 3.3.3 do projeto.

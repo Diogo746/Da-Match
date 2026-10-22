@@ -8,5 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MentorRepository extends JpaRepository<Mentor, UUID> {
+    Optional<Mentor> findByUsuarioId(UUID usuarioId);
+
     Optional<Mentor> findByUsuario(Usuario usuario);
 }
