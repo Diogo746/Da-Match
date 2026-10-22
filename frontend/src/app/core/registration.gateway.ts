@@ -3,6 +3,7 @@ import { FormControl, Validators } from "@angular/forms";
 import { Observable, defer, delay, of, throwError } from "rxjs";
 import { ProfileKind } from "./profiles.store";
 import { MentorAvailability, MentorProfile, validAvailability } from "./mentor.models";
+import { StartupProfile, StartupRegistrationDetails, normalizeStartupDetails, validStartupDetails } from "./startup.models";
 
 // Campos declarados em CadastrarUsuarioRequest no backend enviado pela equipe.
 export interface RegistrationRequest {
@@ -10,6 +11,7 @@ export interface RegistrationRequest {
   email: string;
   senha: string;
   mentor?: MentorRegistrationDetails;
+  startup?: StartupRegistrationDetails;
 }
 
 export interface MentorRegistrationDetails {
@@ -28,7 +30,7 @@ interface DemoRegistrationReceipt {
   mode: "DEMO";
 }
 
-interface ApiRegistrationReceipt {
+interface ApiMentorRegistrationReceipt {
   nome: string;
   email: string;
   tipoUsuario: "MENTOR";
@@ -36,7 +38,15 @@ interface ApiRegistrationReceipt {
   mentor: MentorAccount;
 }
 
-export type RegistrationReceipt = DemoRegistrationReceipt | ApiRegistrationReceipt;
+interface ApiStartupRegistrationReceipt {
+  nome: string;
+  email: string;
+  tipoUsuario: "STARTUP";
+  mode: "API";
+  startup: StartupProfile;
+}
+
+export type RegistrationReceipt = DemoRegistrationReceipt | ApiMentorRegistrationReceipt | ApiStartupRegistrationReceipt;
 
 export type RegistrationErrorCode = "INVALID_INPUT" | "DUPLICATE_EMAIL" |
   "UNSUPPORTED_PROFILE" | "CONNECTION_ERROR" | "CSRF_ERROR" |
@@ -74,7 +84,11 @@ export function normalizeRegistration(kind: ProfileKind, request: RegistrationRe
     throw new RegistrationError("INVALID_INPUT");
   }
   const account = { nome, email, senha: request.senha };
-  if (kind !== "MENTOR") return account;
+  if (kind === "STARTUP") {
+    if (request.startup === undefined) return account; // Demo only; HTTP registration requires project details.
+    if (!validStartupDetails(request.startup)) throw new RegistrationError("INVALID_INPUT");
+    return { ...account, startup: normalizeStartupDetails(request.startup) };
+  }
   const details = request.mentor;
   if (!details || !validMentorBiography(details.biografia) ||
       (details.disponibilidades !== undefined && !validAvailability(details.disponibilidades)) ||

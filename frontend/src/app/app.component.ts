@@ -19,11 +19,11 @@ export class AppComponent {
   readonly theme = inject(ThemeStore);
   readonly motionPaused = inject(MotionStore).paused;
   readonly accountLabel = computed(() => {
-    if (this.apiMode) return "Cadastro de mentor";
+    if (this.apiMode) return "Criar conta";
     return this.session.profile() ? "Meu perfil" : "Criar perfil";
   });
   readonly invitationLabel = computed(() => {
-    if (this.apiMode) return "Cadastrar mentor";
+    if (this.apiMode) return "Cadastrar startup ou mentor";
     return this.session.profile() ? "Meu próximo passo" : "Montar meu perfil";
   });
 }

@@ -1,27 +1,37 @@
 <a class="back-link" routerLink="/">← Voltar para descobrir</a>
-@if (profileReady()) {
+@if (apiMode && auth?.user()) {
+  <section aria-labelledby="registration-session-title">
+    <h1 id="registration-session-title">Você já está em uma conta.</h1>
+    <p>Para cadastrar outra pessoa fundadora ou um mentor, saia da conta atual primeiro.</p>
+    <a class="button button-primary" routerLink="/conta">Abrir minha conta</a>
+  </section>
+} @else if (profileReady()) {
   @if (session.profile(); as profile) { <app-profile-complete [profile]="profile" /> }
   <button class="text-button new-registration" type="button" (click)="restart()">Testar outro cadastro</button>
 } @else if (receipt(); as result) {
   @if (result.mode === 'API') {
-    <app-mentor-registration-complete [mentor]="result.mentor" />
+    @if (result.tipoUsuario === 'MENTOR') {
+      <app-mentor-registration-complete [mentor]="result.mentor" />
+    } @else {
+      <app-startup-registration-complete [startup]="result.startup" />
+    }
   } @else {
     <header class="setup-intro"><p class="eyebrow">PRAZER EM CONHECER VOCÊ, {{ result.nome.split(' ')[0] }}</p><h1 #receiptHeading tabindex="-1">Agora, um perfil com a sua cara.</h1><p>Suas respostas ajudam a personalizar as indicações. Você pode mudar tudo depois.</p></header>
     <app-profile-setup [kind]="result.tipoUsuario" [name]="result.nome" (finished)="completeProfile($event)" />
   }
 } @else {
   <div class="register-layout">
-    <section class="register-intro"><app-lumen-guide class="register-guide" [message]="apiMode ? 'Sua experiência pode abrir caminhos. Conte um pouco sobre como você pode ajudar.' : 'Vamos começar pelo básico. Depois, conto com você em cinco etapas rápidas.'" /><p class="eyebrow">IDEIAS ENCONTRAM EXPERIÊNCIA</p><h1>Uma boa conexão começa com você.</h1><p>Uma ideia para tirar do papel ou uma experiência para compartilhar. Conte um pouco sobre você e encontre novos caminhos.</p>
+    <section class="register-intro"><app-lumen-guide class="register-guide" [message]="apiMode ? 'Uma ideia ou uma experiência para compartilhar. Escolha como quer participar e vamos começar.' : 'Vamos começar pelo básico. Depois, conto com você em cinco etapas rápidas.'" /><p class="eyebrow">IDEIAS ENCONTRAM EXPERIÊNCIA</p><h1>Uma boa conexão começa com você.</h1><p>Uma ideia para tirar do papel ou uma experiência para compartilhar. Conte um pouco sobre você e encontre novos caminhos.</p>
       @if (!apiMode) {
       <ol class="register-steps"><li><span>01</span><div><h2>Seu lugar nessa história</h2><p>Startup em ideação ou mentor.</p></div></li><li><span>02</span><div><h2>Quatro pequenos passos</h2><p>Mais escolhas por toque, menos digitação.</p></div></li><li><span>03</span><div><h2>Indicações com contexto</h2><p>Conheça perfis e entenda o que aproxima vocês.</p></div></li></ol>
       }
-      <div class="privacy-note"><app-icon name="shield" /><p>{{ apiMode ? 'Ao confirmar, seus dados serão enviados ao servidor para criar uma conta de mentor. A senha não fica salva neste navegador pela aplicação.' : 'Demonstração: use nome, e-mail e senha inventados. O teste é temporário e a senha não é armazenada.' }}</p></div>
+      <div class="privacy-note"><app-icon name="shield" /><p>{{ apiMode ? 'Ao confirmar, seus dados serão enviados ao servidor para criar sua conta e o perfil escolhido. A aplicação não armazena sua senha neste navegador.' : 'Demonstração: use nome, e-mail e senha inventados. O teste é temporário e a senha não é armazenada.' }}</p></div>
     </section>
     <section class="register-card" aria-labelledby="register-title">
       <p class="eyebrow">{{ apiMode ? 'CADASTRO · CONECTADO' : 'CADASTRO · DEMONSTRAÇÃO' }}</p>
-      <h2 id="register-title">{{ apiMode ? 'Compartilhe sua experiência.' : 'Como você quer participar?' }}</h2>
+      <h2 id="register-title">Como você quer participar?</h2>
       <p class="form-intro">
-        {{ apiMode ? 'Crie seu cadastro de mentor. O cadastro de startups será disponibilizado em uma próxima etapa.' : 'Comece pelos dados da conta. Depois, cinco pequenas etapas para montar seu perfil.' }}
+        {{ apiMode ? 'Crie uma conta de mentor ou cadastre sua startup com a conta da pessoa fundadora.' : 'Comece pelos dados da conta. Depois, cinco pequenas etapas para montar seu perfil.' }}
       </p>
       <form
         [formGroup]="form"
@@ -34,7 +44,7 @@
             {{ error() }}
           </div>
         }
-        <fieldset [disabled]="loading()">
+        <fieldset [disabled]="loading() || uncertain()">
           <legend class="sr-only">
             Dados do cadastro e perfil de participação
           </legend>
@@ -43,6 +53,7 @@
               <label class="role-option"
                 ><input
                   type="radio"
+                  [id]="'register-kind-' + kind.value"
                   formControlName="tipoUsuario"
                   [value]="kind.value"
                 /><span
@@ -53,7 +64,7 @@
             }
           </div>
           <label class="field-label" for="register-name"
-            >Nome <span>Obrigatório</span></label
+            >{{ apiMode && !isMentor() ? 'Nome da pessoa fundadora' : 'Nome' }} <span>Obrigatório</span></label
           >
           <input
             class="form-input"
@@ -61,6 +72,7 @@
             formControlName="nome"
             placeholder="Ex.: Maria Teste"
             minlength="4"
+            maxlength="255"
             [attr.autocomplete]="apiMode ? 'name' : 'off'"
             required
             [attr.aria-invalid]="invalid('nome')"
@@ -78,6 +90,7 @@
             class="form-input"
             id="register-email"
             type="email"
+            maxlength="254"
             formControlName="email"
             placeholder="maria&#64;example.test"
             [attr.autocomplete]="apiMode ? 'email' : 'off'"
@@ -155,6 +168,33 @@
               }
             }
           }
+          @if (apiMode && !isMentor()) {
+            <fieldset class="startup-fields" [formGroup]="startupForm">
+              <legend>Conte sobre sua startup</legend>
+              @for (field of startupFields; track field.key) {
+                <label class="field-label" [for]="'startup-' + field.key">{{ field.label }} <span>Obrigatório</span></label>
+                @if (field.multiline) {
+                  <textarea class="form-input biography-input" [id]="'startup-' + field.key" [formControlName]="field.key"
+                    rows="3" [maxlength]="field.maxLength" required [attr.aria-invalid]="invalidStartup(field.key)"
+                    [attr.aria-describedby]="'startup-' + field.key + '-help' + (invalidStartup(field.key) ? ' startup-' + field.key + '-error' : '')"></textarea>
+                } @else {
+                  <input class="form-input" [id]="'startup-' + field.key" [formControlName]="field.key" [maxlength]="field.maxLength"
+                    required [attr.aria-invalid]="invalidStartup(field.key)"
+                    [attr.aria-describedby]="'startup-' + field.key + '-help' + (invalidStartup(field.key) ? ' startup-' + field.key + '-error' : '')" />
+                }
+                <p class="field-help" [id]="'startup-' + field.key + '-help'">{{ field.help }} Até {{ field.maxLength }} caracteres.</p>
+                @if (invalidStartup(field.key)) {
+                  <p class="field-error" [id]="'startup-' + field.key + '-error'">Preencha este campo com até {{ field.maxLength }} caracteres, sem usar apenas espaços.</p>
+                }
+              }
+              <label class="field-label" for="startup-status">Em que momento está a ideia? <span>Obrigatório</span></label>
+              <select id="startup-status" class="form-input" formControlName="statusValidacao" required
+                [attr.aria-invalid]="invalidStartup('statusValidacao')" [attr.aria-describedby]="invalidStartup('statusValidacao') ? 'startup-status-error' : null">
+                @for (status of startupStatuses; track status[0]) { <option [value]="status[0]">{{ status[1] }}</option> }
+              </select>
+              @if (invalidStartup('statusValidacao')) { <p class="field-error" id="startup-status-error">Escolha um momento válido para sua ideia.</p> }
+            </fieldset>
+          }
           @if (!apiMode) {
           <label class="consent"
             ><input
@@ -183,13 +223,15 @@
             [disabled]="loading() || uncertain()"
           >
             @if (loading()) { {{ apiMode ? 'Enviando cadastro…' : 'Preparando seu perfil…' }} }
-            @else { {{ apiMode ? 'Criar cadastro de mentor' : 'Continuar para meu perfil' }} }
+            @else if (!apiMode) { Continuar para meu perfil }
+            @else if (isMentor()) { Criar cadastro de mentor }
+            @else { Cadastrar startup e pessoa fundadora }
             @if (!loading()) {
               <app-icon name="arrow" />
             }
           </button>
         </fieldset>
-        <p class="form-footnote">{{ apiMode ? 'O cadastro cria uma conta. O login e as preferências de mentoria ainda estão em desenvolvimento.' : 'Demonstração local com dados temporários.' }}</p>
+        <p class="form-footnote">{{ apiMode ? 'Após a confirmação, entre com seu e-mail e senha. Questionário e recomendações continuam demonstrativos.' : 'Demonstração local com dados temporários.' }}</p>
       </form>
 
     </section>

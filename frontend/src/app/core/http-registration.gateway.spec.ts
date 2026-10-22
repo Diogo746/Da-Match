@@ -3,9 +3,10 @@ import { HttpTestingController, provideHttpClientTesting } from "@angular/common
 import { TestBed } from "@angular/core/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { firstValueFrom } from "rxjs";
-import { HttpMentorRegistrationGateway } from "./http-mentor-registration.gateway";
+import { HttpRegistrationGateway } from "./http-registration.gateway";
 import { ProfileKind } from "./profile.models";
 import { RegistrationRequest } from "./registration.gateway";
+import { StartupRegistrationDetails } from "./startup.models";
 
 const input: RegistrationRequest = {
   nome: " Maria Teste ", email: " MARIA@example.test ", senha: " senha-inventada ",
@@ -19,7 +20,7 @@ const response = {
   disponibilidades: [{ diaSemana: 1, periodo: "MANHA" }], status: "RASCUNHO",
 };
 let http: HttpTestingController;
-let gateway: HttpMentorRegistrationGateway;
+let gateway: HttpRegistrationGateway;
 function start(request = input) {
   const promise = firstValueFrom(gateway.register("MENTOR", request));
   // Instala o handler imediatamente, inclusive nos cenários de erro síncrono.
@@ -33,7 +34,67 @@ function csrf() {
 beforeEach(() => {
   TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
   http = TestBed.inject(HttpTestingController);
-  gateway = TestBed.inject(HttpMentorRegistrationGateway);
+  gateway = TestBed.inject(HttpRegistrationGateway);
+});
+
+describe("Contrato HTTP do onboarding de startup", () => {
+  const details: StartupRegistrationDetails = {
+    nomeProvisorio: " Ideia Fictícia ", pitchCurto: "Conectar ideias e experiência.",
+    problemaCentral: "Poucas conexões.", solucaoProposta: "Uma rede de apoio.",
+    publicoAlvo: "Projetos iniciantes", modeloDeNegocio: "Assinatura", statusValidacao: "PESQUISA_MERCADO",
+  };
+  const startup = { ...details, nomeProvisorio: "Ideia Fictícia", id: "startup-test", dataCriacao: "2026-10-22T12:00:00Z",
+    membros: [{ id: "member-test", usuarioId: "user-test", nomeUsuario: "Maria Teste", papelMembro: "FUNDADOR", dataEntrada: "2026-10-22" }] };
+  function startStartup(request: RegistrationRequest = { ...input, startup: details }) {
+    return firstValueFrom(gateway.register("STARTUP", request)).then(value => ({ value, error: undefined }),
+      (error: unknown) => ({ value: undefined, error }));
+  }
+  function startupPost() {
+    http.expectOne("/csrf").flush({ headerName: "X-XSRF-TOKEN", token: "startup-csrf" });
+    return http.expectOne({ method: "POST", url: "/api/v1/startups" });
+  }
+
+  it("posts a nested founder and sanitized project, requiring a confirmed founder relation", async () => {
+    const result = startStartup();
+    const post = startupPost();
+    expect(post.request.headers.get("X-XSRF-TOKEN")).toBe("startup-csrf");
+    expect(post.request.body).toEqual({ fundador: { nome: "Maria Teste", email: "maria@example.test", senha: input.senha },
+      ...details, nomeProvisorio: "Ideia Fictícia" });
+    expect(post.request.body).not.toHaveProperty("mentor");
+    expect(post.request.body).not.toHaveProperty("tipoUsuario");
+    expect(post.request.body.fundador).not.toHaveProperty("id");
+    post.flush({ ...startup, senha: "never-copy", membros: [{ ...startup.membros[0], token: "never-copy" }] },
+      { status: 201, statusText: "Created" });
+    expect((await result).value).toEqual({ nome: "Maria Teste", email: "maria@example.test", tipoUsuario: "STARTUP", mode: "API", startup });
+  });
+
+  it.each([undefined, { ...details, pitchCurto: "x".repeat(256) }, { ...details, problemaCentral: " " }])("rejects missing/invalid project details before the network: %#", async startup => {
+    expect((await startStartup({ ...input, startup })).error).toMatchObject({ code: "INVALID_INPUT" });
+    http.expectNone(() => true);
+  });
+
+  it.each([null, {}, { ...startup, membros: [] },
+    { ...startup, membros: [{ ...startup.membros[0], papelMembro: "MEMBRO" }] },
+    { ...startup, membros: [startup.membros[0], { ...startup.membros[0], id: "other-member" }] },
+  ])("does not confirm malformed or unexpected onboarding results: %#", async body => {
+    const result = startStartup();
+    startupPost().flush(body, { status: 201, statusText: "Created" });
+    expect((await result).error).toMatchObject({ code: "UNCONFIRMED" });
+  });
+
+  it.each([[400, "INVALID_INPUT"], [403, "CSRF_ERROR"], [409, "DUPLICATE_EMAIL"], [500, "UNCONFIRMED"]])("handles startup HTTP %s without replay", async (status, code) => {
+    const result = startStartup();
+    startupPost().flush({ internal: "never-display" }, { status: Number(status), statusText: "Error" });
+    expect((await result).error).toMatchObject({ code });
+    http.expectNone("/api/v1/startups");
+  });
+
+  it("never posts startup data when CSRF is unavailable or malformed", async () => {
+    const result = startStartup();
+    http.expectOne("/csrf").flush({ headerName: "unexpected", token: "csrf" });
+    expect((await result).error).toMatchObject({ code: "INVALID_RESPONSE" });
+    http.expectNone("/api/v1/startups");
+  });
 });
 afterEach(() => { http.verify(); vi.useRealTimers(); });
 
@@ -69,7 +130,7 @@ describe("Contrato HTTP do cadastro de mentor", () => {
     expect((await result).value?.mode).toBe("API");
   });
 
-  it.each(["STARTUP", "ADMIN"])("recusa %s antes de qualquer chamada de rede", async (kind) => {
+  it.each(["ADMIN"])("recusa %s antes de qualquer chamada de rede", async (kind) => {
     await expect(firstValueFrom(gateway.register(kind as ProfileKind, input))).rejects.toMatchObject({ code: "UNSUPPORTED_PROFILE" });
     http.expectNone(() => true);
   });
