@@ -67,20 +67,22 @@ O modo API integra cadastro, login, consulta privada, edição, agenda semanal e
    npm.cmd run start:api
    ```
 
-5. Abra **http://localhost:4200/cadastro**. O topo identifica a integração de mentor.
+5. Abra **http://localhost:4200/cadastro**. O topo identifica os cadastros conectados; escolha mentor ou startup.
 
 O envio consulta `GET /csrf` e realiza `POST /api/v1/mentores` com `usuario: { nome, email, senha }`, biografia, pelo menos uma disponibilidade semanal e LinkedIn/Instagram opcionais. O token vem do JSON e o navegador mantém os cookies HttpOnly. A confirmação exige HTTP 201 e os campos previstos. O cadastro não cria sessão; entre em `/entrar` depois da confirmação.
 
 | Recurso | Demonstração | Modo API |
 | --- | --- | --- |
 | Cadastro de mentor | Simulado | Enviado ao backend |
-| Cadastro de startup | Simulado | Ainda indisponível |
+| Cadastro de startup | Simulado | `POST /api/v1/startups`: startup e conta da pessoa fundadora |
 | Questionário, Meu perfil e compatibilidade | Temporários | Ainda sem persistência/API |
 | Catálogo e salvos | Fictícios | Fictícios, identificados como demonstração |
 | Login autenticado | Não autentica contas reais | `/entrar` e `/conta`, com sessão HttpOnly e CSRF |
 | Perfil do mentor | Temporário | `/mentor/perfil`: consulta privada, edição, agenda e publicação |
 
-O cadastro conectado não acrescenta perfis reais ao catálogo fictício. Questionário, descoberta, startups e recomendações serão integrados em etapas posteriores.
+Para startup, o formulário envia `fundador: { nome, email, senha }`, nome provisório, pitch, problema, solução, público-alvo, modelo de negócio e status de validação. A API cria o vínculo `FUNDADOR` e a tela confirma os dados antes de oferecer o login. Consulte o [guia da integração de startup](../docs/21-startup-integration.md).
+
+O cadastro conectado não acrescenta perfis reais ao catálogo fictício. Questionário, descoberta, edição da startup e recomendações serão integrados em etapas posteriores.
 
 Para testar uma conta existente, abra `/entrar`. `/conta` consulta a sessão e permite acessar `/mentor/perfil` ou sair. Senhas e identificadores de sessão não são persistidos pelo JavaScript. O modo DEMO mantém seu perfil separado. Na Vercel, use Root Directory `frontend`, configure `BACKEND_ORIGIN` e mantenha `apiBaseUrl` vazio: `vercel.ts` encaminha `/api/v1/**` e `/csrf` ao Render antes do fallback das rotas Angular. Nenhuma credencial de banco pertence ao frontend.
 

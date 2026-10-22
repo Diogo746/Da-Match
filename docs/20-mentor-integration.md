@@ -12,7 +12,7 @@ Este guia corresponde à branch `feature/mentor-integration`. Contém nomes de v
 6. `PATCH /api/v1/mentores/{mentorId}` edita biografia, redes, site e agenda. Uma agenda enviada substitui a anterior e não pode estar vazia. Biografia enviada não pode estar em branco e aceita até 1.000 caracteres; campos sociais aceitam até 255. Campos sociais omitidos são preservados; uma string vazia limpa o campo.
 7. `PATCH /api/v1/mentores/{mentorId}/status` altera `RASCUNHO`, `PUBLICADO` ou `PAUSADO`. Edição e publicação exigem mentor titular e CSRF. ADMIN não tem exceção automática. A interface exige salvar alterações pendentes antes de publicar/pausar.
 
-Catálogo, salvos, questionário e matching continuam demonstrativos. Publicar um perfil ainda não o inclui em um catálogo real. Cadastro de startup será conectado em etapa própria.
+Catálogo, salvos, questionário e matching continuam demonstrativos. Publicar um perfil ainda não o inclui em um catálogo real. A integração seguinte do cadastro de startup está no [guia 21](21-startup-integration.md).
 
 ## Topologia de deploy
 
