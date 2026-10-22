@@ -13,6 +13,7 @@ import br.senac.fullstack.startup.infrastructure.persistence.repository.StartupR
 import br.senac.fullstack.usuario.domain.entity.Usuario;
 import br.senac.fullstack.usuario.infrastructure.persistence.repository.UsuarioRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -341,6 +342,81 @@ class SecurityIntegrationTest {
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$.fields.email").exists());
         mvc.perform(post("/api/v1/auth/login").with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{bad"))
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$.detail").value("Dados da requisição inválidos."));
+    }
+
+    @Test
+    void startupOnboardingCreatesFounderAndSupportsSessionWithoutAcceptingClientRoles() throws Exception {
+        String email = UUID.randomUUID() + "@example.test";
+        String body = startupRegistrationBody(email);
+        MvcResult token = mvc.perform(get("/csrf")).andExpect(status().isOk()).andReturn();
+        mvc.perform(post("/api/v1/startups").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isForbidden());
+        mvc.perform(post("/api/v1/startups").cookie(token.getResponse().getCookie("XSRF-TOKEN"))
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isForbidden());
+        MvcResult registered = mvc.perform(withToken(post("/api/v1/startups"), token)
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.nomeProvisorio").value("Ideia Ficticia"))
+                .andExpect(jsonPath("$.statusValidacao").value("PESQUISA_MERCADO"))
+                .andExpect(jsonPath("$.membros.length()").value(1))
+                .andExpect(jsonPath("$.membros[0].papelMembro").value("FUNDADOR"))
+                .andExpect(jsonPath("$.senha").doesNotExist())
+                .andExpect(jsonPath("$.fundador").doesNotExist())
+                .andExpect(jsonPath("$.membros[0].senha").doesNotExist())
+                .andExpect(jsonPath("$.membros[0].usuario").doesNotExist()).andReturn();
+        Usuario founder = users.findByEmail(email).orElseThrow();
+        assertThat(founder.getTipoUsuario()).isEqualTo(TipoUsuario.STARTUP);
+        assertThat(encoder.matches(PASSWORD, founder.getSenha())).isTrue();
+        String startupId = mapper.readTree(registered.getResponse().getContentAsString()).get("id").asText();
+        assertThat(mapper.readTree(registered.getResponse().getContentAsString())
+                .get("membros").get(0).get("usuarioId").asText()).isEqualTo(founder.getId().toString());
+        mvc.perform(get("/api/v1/auth/me")).andExpect(status().isUnauthorized());
+        mvc.perform(post("/api/v1/startups").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isConflict());
+        mvc.perform(get("/api/v1/startups/" + startupId)).andExpect(status().isUnauthorized());
+        MockHttpSession session = login(founder);
+        mvc.perform(get("/api/v1/auth/me").session(session))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.tipoUsuario").value("STARTUP"));
+        mvc.perform(get("/api/v1/startups/" + startupId).session(session))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.membros[0].usuarioId").value(founder.getId().toString()));
+        mvc.perform(post("/api/v1/startups").session(session).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isForbidden());
+        MvcResult refreshed = mvc.perform(get("/csrf").session(session)).andReturn();
+        mvc.perform(withToken(post("/api/v1/auth/logout").session(session), refreshed))
+                .andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/startups/" + startupId)).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void startupRegistrationRejectsTextBeyondDatabaseLimitsBeforeCreatingAnAccount() throws Exception {
+        String email = UUID.randomUUID() + "@example.test";
+        long previousUsers = users.count();
+        for (String field : Set.of("nomeProvisorio", "pitchCurto", "publicoAlvo", "modeloDeNegocio",
+                "problemaCentral", "solucaoProposta")) {
+            int limit = Set.of("problemaCentral", "solucaoProposta").contains(field) ? 5000 : 255;
+            var body = (ObjectNode) mapper.readTree(startupRegistrationBody(email));
+            body.put(field, "x".repeat(limit + 1));
+            mvc.perform(post("/api/v1/startups").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(body)))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.fields." + field).exists());
+        }
+        var invalidStatus = (ObjectNode) mapper.readTree(startupRegistrationBody(email));
+        invalidStatus.put("statusValidacao", "PUBLICADO");
+        mvc.perform(post("/api/v1/startups").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(invalidStatus))).andExpect(status().isBadRequest());
+        assertThat(users.count()).isEqualTo(previousUsers);
+        assertThat(users.findByEmail(email)).isEmpty();
+    }
+
+    private String startupRegistrationBody(String email) {
+        return """
+                {"fundador":{"nome":"Pessoa Fundadora","email":"%s","senha":"%s","tipoUsuario":"ADMIN"},
+                 "nomeProvisorio":" Ideia Ficticia ","pitchCurto":"Uma rede de apoio.",
+                 "problemaCentral":"Poucas conexoes.","solucaoProposta":"Conectar pessoas e ideias.",
+                 "publicoAlvo":"Projetos iniciais","modeloDeNegocio":"Assinatura",
+                 "statusValidacao":"PESQUISA_MERCADO","membros":[{"papelMembro":"REPRESENTANTE"}]}
+                """.formatted(email, PASSWORD);
     }
 
     private Usuario account(TipoUsuario role) {
