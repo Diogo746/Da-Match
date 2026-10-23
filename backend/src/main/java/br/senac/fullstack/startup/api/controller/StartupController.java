@@ -1,6 +1,7 @@
 package br.senac.fullstack.startup.api.controller;
 
 import br.senac.fullstack.startup.api.dto.AdicionarMembroStartupRequest;
+import br.senac.fullstack.startup.api.dto.AtualizarStartupRequest;
 import br.senac.fullstack.startup.api.dto.CriarStartupRequest;
 import br.senac.fullstack.startup.api.dto.MembroStartupResponse;
 import br.senac.fullstack.startup.api.dto.StartupResponse;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +50,19 @@ public class StartupController {
             @PathVariable("startupId") UUID startupId
     ) {
         return ResponseEntity.ok(startupService.buscarStartupPorId(startupId));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<StartupResponse>> listarMinhasStartups() {
+        return ResponseEntity.ok(startupService.listarMinhasStartups());
+    }
+
+    @PatchMapping(value = "/{startupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StartupResponse> atualizarStartup(
+            @PathVariable("startupId") UUID startupId,
+            @RequestBody @Valid AtualizarStartupRequest request
+    ) {
+        return ResponseEntity.ok(startupService.atualizarStartup(startupId, request));
     }
 
     @PostMapping(value = "/{startupId}/membros", consumes = MediaType.APPLICATION_JSON_VALUE)

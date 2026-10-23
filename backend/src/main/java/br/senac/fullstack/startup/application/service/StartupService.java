@@ -1,6 +1,7 @@
 package br.senac.fullstack.startup.application.service;
 
 import br.senac.fullstack.startup.api.dto.AdicionarMembroStartupRequest;
+import br.senac.fullstack.startup.api.dto.AtualizarStartupRequest;
 import br.senac.fullstack.startup.api.dto.CriarStartupRequest;
 import br.senac.fullstack.startup.api.dto.MembroStartupResponse;
 import br.senac.fullstack.startup.api.dto.StartupResponse;
@@ -91,6 +92,45 @@ public class StartupService {
     @Transactional
     public StartupResponse buscarStartupPorId(UUID startupId) {
         return startupMapper.toResponse(buscarStartup(startupId));
+    }
+
+    @Transactional
+    public List<StartupResponse> listarMinhasStartups() {
+        UUID usuarioId = resourceAccess.currentStartupUserId();
+        return startupRepository.findByMembroUsuarioId(usuarioId).stream()
+                .map(startupMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public StartupResponse atualizarStartup(UUID startupId, AtualizarStartupRequest request) {
+        Startup startup = buscarStartup(startupId);
+        resourceAccess.requireStartupManager(startup);
+        if (request == null) {
+            throw new IllegalArgumentException("Os dados da startup são obrigatórios.");
+        }
+        if (request.nomeProvisorio() != null) {
+            startup.setNomeProvisorio(normalizarTextoObrigatorio(request.nomeProvisorio(), "nome provisório"));
+        }
+        if (request.pitchCurto() != null) {
+            startup.setPitchCurto(normalizarTextoObrigatorio(request.pitchCurto(), "pitch curto"));
+        }
+        if (request.problemaCentral() != null) {
+            startup.setProblemaCentral(normalizarTextoObrigatorio(request.problemaCentral(), "problema central"));
+        }
+        if (request.solucaoProposta() != null) {
+            startup.setSolucaoProposta(normalizarTextoObrigatorio(request.solucaoProposta(), "solução proposta"));
+        }
+        if (request.publicoAlvo() != null) {
+            startup.setPublicoAlvo(normalizarTextoObrigatorio(request.publicoAlvo(), "público-alvo"));
+        }
+        if (request.modeloDeNegocio() != null) {
+            startup.setModeloDeNegocio(normalizarTextoObrigatorio(request.modeloDeNegocio(), "modelo de negócio"));
+        }
+        if (request.statusValidacao() != null) {
+            startup.setStatusValidacao(request.statusValidacao());
+        }
+        return startupMapper.toResponse(startup);
     }
 
     @Transactional

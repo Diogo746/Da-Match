@@ -80,6 +80,8 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                             .requestMatchers(HttpMethod.PATCH, "/api/v1/mentores/*", "/api/v1/mentores/*/status")
                             .hasRole(TipoUsuario.MENTOR.name())
+                            .requestMatchers(HttpMethod.GET, "/api/v1/startups/me").hasRole("STARTUP")
+                            .requestMatchers(HttpMethod.PATCH, "/api/v1/startups/*").hasRole("STARTUP")
                             .requestMatchers(HttpMethod.POST, "/api/v1/startups/*/membros")
                             .hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.DELETE, "/api/v1/startups/*/membros/*")
