@@ -409,6 +409,112 @@ class SecurityIntegrationTest {
         assertThat(users.findByEmail(email)).isEmpty();
     }
 
+    @Test
+    void startupSelfQueryUsesSessionMembershipAndSupportsMultipleStartups() throws Exception {
+        Usuario owner = account(TipoUsuario.STARTUP);
+        Startup first = startup(owner, account(TipoUsuario.STARTUP), account(TipoUsuario.STARTUP));
+        Startup second = startup(account(TipoUsuario.STARTUP), owner, account(TipoUsuario.STARTUP));
+        Startup unrelated = startup(account(TipoUsuario.STARTUP), account(TipoUsuario.STARTUP),
+                account(TipoUsuario.STARTUP));
+        MockHttpSession session = login(owner);
+        MvcResult result = mvc.perform(get("/api/v1/startups/me").session(session)
+                        .param("usuarioId", unrelated.getMembros().getFirst().getUsuario().getId().toString())
+                        .param("startupId", unrelated.getId().toString()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].senha").doesNotExist())
+                .andExpect(jsonPath("$[0].membros[0].usuario").doesNotExist()).andReturn();
+        var response = mapper.readTree(result.getResponse().getContentAsString());
+        assertThat(Set.of(response.get(0).get("id").asText(), response.get(1).get("id").asText()))
+                .containsExactlyInAnyOrder(first.getId().toString(), second.getId().toString());
+        mvc.perform(get("/api/v1/startups/me").session(login(account(TipoUsuario.STARTUP))))
+                .andExpect(status().isOk()).andExpect(content().json("[]"));
+        mvc.perform(get("/api/v1/startups/me")).andExpect(status().isUnauthorized());
+        for (TipoUsuario role : Set.of(TipoUsuario.MENTOR, TipoUsuario.ADMIN)) {
+            mvc.perform(get("/api/v1/startups/me").session(login(account(role))))
+                    .andExpect(status().isForbidden());
+        }
+    }
+
+    @Test
+    void startupManagersCanEditOnlyProfileFieldsWithRealCsrfAndReloadThem() throws Exception {
+        Usuario owner = account(TipoUsuario.STARTUP);
+        Usuario representative = account(TipoUsuario.STARTUP);
+        Startup startup = startup(owner, representative, account(TipoUsuario.STARTUP));
+        String path = "/api/v1/startups/" + startup.getId();
+        MockHttpSession session = login(owner);
+        MvcResult token = mvc.perform(get("/csrf").session(session)).andReturn();
+        mvc.perform(withToken(patch(path).session(session), token).contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {"nomeProvisorio":" Ideia Atualizada ","pitchCurto":"Novo resumo",
+                         "problemaCentral":"Novo problema","solucaoProposta":"Nova solução",
+                         "publicoAlvo":"Novo público","modeloDeNegocio":"Novo modelo",
+                         "statusValidacao":"PESQUISA_MERCADO","dataCriacao":"2000-01-01T00:00:00Z",
+                         "membros":[],"fundador":{"tipoUsuario":"ADMIN"}}
+                        """))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.nomeProvisorio").value("Ideia Atualizada"))
+                .andExpect(jsonPath("$.membros.length()").value(3))
+                .andExpect(jsonPath("$.dataCriacao").value("2026-10-20T12:00:00Z"));
+        startups.flush();
+        mvc.perform(get("/api/v1/startups/me").session(session))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].pitchCurto").value("Novo resumo"))
+                .andExpect(jsonPath("$[0].solucaoProposta").value("Nova solução"))
+                .andExpect(jsonPath("$[0].statusValidacao").value("PESQUISA_MERCADO"));
+        mvc.perform(patch(path).session(login(representative)).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"pitchCurto\":\"Pelo representante\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.nomeProvisorio").value("Ideia Atualizada"))
+                .andExpect(jsonPath("$.pitchCurto").value("Pelo representante"));
+    }
+
+    @Test
+    void startupEditRejectsNonManagersMissingSessionAndMissingCsrfWithoutMutating() throws Exception {
+        Usuario owner = account(TipoUsuario.STARTUP);
+        Usuario member = account(TipoUsuario.STARTUP);
+        Startup startup = startup(owner, account(TipoUsuario.STARTUP), member);
+        String path = "/api/v1/startups/" + startup.getId();
+        String body = "{\"nomeProvisorio\":\"Alteração proibida\"}";
+        mvc.perform(patch(path).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(patch(path).session(login(owner)).contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isForbidden());
+        for (Usuario denied : Set.of(member, account(TipoUsuario.STARTUP), account(TipoUsuario.MENTOR),
+                account(TipoUsuario.ADMIN))) {
+            mvc.perform(patch(path).session(login(denied)).with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON).content(body))
+                    .andExpect(status().isForbidden());
+        }
+        MockHttpSession ownerSession = login(owner);
+        mvc.perform(patch("/api/v1/startups/" + UUID.randomUUID()).session(ownerSession).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/startups/me").session(login(member)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].nomeProvisorio").value("Startup ficticia"));
+        startup.getMembros().removeIf(item -> item.getUsuario().getId().equals(owner.getId()));
+        startups.flush();
+        mvc.perform(patch(path).session(ownerSession).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void startupEditValidatesEveryTextLimitAndEnumBeforeChangingAnyField() throws Exception {
+        Usuario owner = account(TipoUsuario.STARTUP);
+        Startup startup = startup(owner, account(TipoUsuario.STARTUP), account(TipoUsuario.STARTUP));
+        MockHttpSession session = login(owner);
+        String path = "/api/v1/startups/" + startup.getId();
+        for (String field : Set.of("nomeProvisorio", "pitchCurto", "problemaCentral", "solucaoProposta",
+                "publicoAlvo", "modeloDeNegocio")) {
+            int limit = Set.of("problemaCentral", "solucaoProposta").contains(field) ? 5000 : 255;
+            for (String value : Set.of("", " \n ", "x".repeat(limit + 1))) {
+                var body = mapper.createObjectNode().put("nomeProvisorio", "Não deve salvar").put(field, value);
+                mvc.perform(patch(path).session(session).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(body)))
+                        .andExpect(status().isBadRequest()).andExpect(jsonPath("$.fields." + field).exists());
+            }
+        }
+        mvc.perform(patch(path).session(session).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"statusValidacao\":\"PUBLICADO\"}")).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/v1/startups/me").session(session)).andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nomeProvisorio").value("Startup ficticia"));
+    }
+
     private String startupRegistrationBody(String email) {
         return """
                 {"fundador":{"nome":"Pessoa Fundadora","email":"%s","senha":"%s","tipoUsuario":"ADMIN"},

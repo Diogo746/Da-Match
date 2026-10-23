@@ -288,7 +288,7 @@
     },
     {
       "name": "Startup",
-      "description": "Execute primeiro a requisição 'Obter token CSRF'. A criação cadastra a conta fictícia da fundadora e a vincula como FUNDADOR.",
+      "description": "A criação exige visitante e CSRF. Depois do login STARTUP, consulte Minhas startups. A edição exige vínculo FUNDADOR/REPRESENTANTE e CSRF renovado após login. A consulta retorna uma lista, pois uma conta pode ter mais de um vínculo.",
       "item": [
         {
           "name": "Criar startup",
@@ -336,6 +336,34 @@
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/api/v1/startups"
+          },
+          "response": []
+        },
+        {
+          "name": "Minhas startups",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups/me",
+            "description": "Exige sessão STARTUP. Retorna somente startups vinculadas ao usuário da sessão; não aceita identificador do ator. Lista vazia quando não há vínculo. Se houver várias, selecione o startupId correto antes de editar."
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Consulta autenticada', () => pm.response.to.have.status(200));",
+            "if (pm.response.code === 200) { const startups = pm.response.json(); pm.test('Resposta em lista', () => pm.expect(startups).to.be.an('array')); if (Array.isArray(startups) && startups.length === 1) pm.collectionVariables.set('startupId', startups[0].id); }"
+          ] } }],
+          "response": []
+        },
+        {
+          "name": "Editar startup",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+              { "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}",
+            "description": "Exige sessão STARTUP vinculada como FUNDADOR/REPRESENTANTE e CSRF. Campos omitidos ou nulos são preservados. Texto enviado não pode ser vazio. Retorna 200; dados inválidos 400, sem permissão/CSRF 403 e startup inexistente 404. Não altera conta, integrantes nem data de criação.",
+            "body": { "mode": "raw", "raw": "{\n  \"nomeProvisorio\": \"Ideia atualizada\",\n  \"pitchCurto\": \"Resumo atualizado do projeto.\",\n  \"statusValidacao\": \"PESQUISA_MERCADO\"\n}", "options": { "raw": { "language": "json" } } }
           },
           "response": []
         },

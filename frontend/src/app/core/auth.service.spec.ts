@@ -9,7 +9,7 @@ import { AuthService } from "./auth.service";
 import { AuthStateStore } from "./auth-state.store";
 import { API_BASE_URL } from "./auth.config";
 import { REGISTRATION_MODE } from "./registration.config";
-import { authGuard, demoProfileGuard, mentorGuard } from "./auth.guard";
+import { authGuard, demoProfileGuard, mentorGuard, startupGuard } from "./auth.guard";
 import { CsrfService } from "./csrf.service";
 
 const base = "https://api.example.test";
@@ -162,9 +162,29 @@ it("keeps demo mode separate from real authentication and network interception",
   expect(TestBed.runInInjectionContext(() => demoProfileGuard({} as never, {} as never))).toBe(true);
   const mentor = TestBed.runInInjectionContext(() => mentorGuard({} as never, {} as never));
   expect(TestBed.inject(Router).serializeUrl(mentor as never)).toBe("/");
+  const startup = TestBed.runInInjectionContext(() => startupGuard({} as never, {} as never));
+  expect(TestBed.inject(Router).serializeUrl(startup as never)).toBe("/");
   const result = firstValueFrom(TestBed.inject(HttpClient).get("/api/v1/auth/me"));
   const request = http.expectOne("/api/v1/auth/me");
   expect(request.request.withCredentials).toBe(false);
   request.flush({});
   await result;
+});
+
+it.each(["MENTOR", "STARTUP", "ADMIN"])("checks startup-only navigation for %s", async tipoUsuario => {
+  const guard = TestBed.runInInjectionContext(() => startupGuard({} as never, {} as never));
+  if (!isObservable(guard)) throw new Error("Expected an observable guard");
+  const result = firstValueFrom(guard);
+  http.expectOne(base + "/api/v1/auth/me").flush({ ...account, tipoUsuario });
+  const value = await result;
+  expect(value === true ? true : TestBed.inject(Router).serializeUrl(value as never))
+    .toBe(tipoUsuario === "STARTUP" ? true : "/conta");
+});
+
+it("redirects an expired startup session to login", async () => {
+  const guard = TestBed.runInInjectionContext(() => startupGuard({} as never, {} as never));
+  if (!isObservable(guard)) throw new Error("Expected an observable guard");
+  const result = firstValueFrom(guard);
+  http.expectOne(base + "/api/v1/auth/me").flush({}, { status: 401, statusText: "Unauthorized" });
+  expect(TestBed.inject(Router).serializeUrl(await result as never)).toBe("/entrar");
 });

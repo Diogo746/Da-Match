@@ -28,3 +28,12 @@ export const mentorGuard: CanActivateFn = () => {
     catchError(() => of(router.createUrlTree(["/entrar"]))),
   );
 };
+
+export const startupGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  if (inject(REGISTRATION_MODE) !== "API") return router.createUrlTree(["/"]);
+  return inject(AuthService).me().pipe(
+    map(user => user.tipoUsuario === "STARTUP" ? true : router.createUrlTree(["/conta"])),
+    catchError(() => of(router.createUrlTree(["/entrar"]))),
+  );
+};

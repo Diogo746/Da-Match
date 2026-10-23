@@ -41,3 +41,5 @@ Project Charter (Visão & Dores)
 - [Segurança, sessões e configuração de produção](backend-security.md).
 - [Integração de mentor e variáveis Render/Vercel](20-mentor-integration.md).
 - [Cadastro de startup e conta da pessoa fundadora](21-startup-integration.md).
+- [Consulta e edição da própria startup](22-startup-profile.md).
+- [Próximas etapas e guia para reformular todas as telas](23-continuity-and-frontend-redesign.md).

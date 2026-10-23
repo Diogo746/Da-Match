@@ -17,6 +17,9 @@ import { AuthStateStore } from "../../core/auth-state.store";
       @if (user.tipoUsuario === 'MENTOR') {
         <a class="button button-primary" routerLink="/mentor/perfil">Abrir meu perfil de mentor</a>
       }
+      @if (user.tipoUsuario === 'STARTUP') {
+        <a class="button button-primary" routerLink="/startup/perfil">Abrir minha startup</a>
+      }
     }
     @if (state.notice()) { <p role="alert">{{ state.notice() }}</p> }
     <button class="button button-primary" type="button" [disabled]="loading()" (click)="logout()">Sair da conta</button>`,

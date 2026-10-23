@@ -79,12 +79,13 @@ O envio consulta `GET /csrf` e realiza `POST /api/v1/mentores` com `usuario: { n
 | Catálogo e salvos | Fictícios | Fictícios, identificados como demonstração |
 | Login autenticado | Não autentica contas reais | `/entrar` e `/conta`, com sessão HttpOnly e CSRF |
 | Perfil do mentor | Temporário | `/mentor/perfil`: consulta privada, edição, agenda e publicação |
+| Perfil da startup | Temporário | `/startup/perfil`: consulta das startups da sessão e edição por fundador/representante |
 
 Para startup, o formulário envia `fundador: { nome, email, senha }`, nome provisório, pitch, problema, solução, público-alvo, modelo de negócio e status de validação. A API cria o vínculo `FUNDADOR` e a tela confirma os dados antes de oferecer o login. Consulte o [guia da integração de startup](../docs/21-startup-integration.md).
 
-O cadastro conectado não acrescenta perfis reais ao catálogo fictício. Questionário, descoberta, edição da startup e recomendações serão integrados em etapas posteriores.
+O cadastro conectado não acrescenta perfis reais ao catálogo fictício. Questionário, descoberta e recomendações serão integrados em etapas posteriores. Após login, abra **Minha conta → Abrir minha startup** para consultar seus projetos. Se houver mais de um vínculo, selecione o projeto. Fundadores e representantes podem editar, salvar ou cancelar a edição; membros têm acesso de consulta. Consulte o [contrato do perfil de startup](../docs/22-startup-profile.md) e o [roteiro para a futura reformulação do frontend](../docs/23-continuity-and-frontend-redesign.md).
 
-Para testar uma conta existente, abra `/entrar`. `/conta` consulta a sessão e permite acessar `/mentor/perfil` ou sair. Senhas e identificadores de sessão não são persistidos pelo JavaScript. O modo DEMO mantém seu perfil separado. Na Vercel, use Root Directory `frontend`, configure `BACKEND_ORIGIN` e mantenha `apiBaseUrl` vazio: `vercel.ts` encaminha `/api/v1/**` e `/csrf` ao Render antes do fallback das rotas Angular. Nenhuma credencial de banco pertence ao frontend.
+Para testar uma conta existente, abra `/entrar`. `/conta` consulta a sessão e permite acessar `/mentor/perfil`, `/startup/perfil` ou sair, conforme o papel. Senhas e identificadores de sessão não são persistidos pelo JavaScript. O modo DEMO mantém seu perfil separado. Na Vercel, use Root Directory `frontend`, configure `BACKEND_ORIGIN` e mantenha `apiBaseUrl` vazio: `vercel.ts` encaminha `/api/v1/**` e `/csrf` ao Render antes do fallback das rotas Angular. Nenhuma credencial de banco pertence ao frontend.
 
 O cliente não repete POST automaticamente. Se o resultado ficar sem confirmação depois do envio, a conta pode ter sido criada. Confira com o responsável pelo backend antes de tentar novamente. Os detalhes de contrato, tratamento de falhas, biografia e e-mail duplicado estão no [guia da integração](../docs/17-mentor-api-integration.md).
 

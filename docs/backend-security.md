@@ -12,9 +12,11 @@ Implementação na branch `feature/security-configuration`. Autenticação por s
 | `POST /api/v1/mentores` e `POST /api/v1/startups` | Visitante sem sessão autenticada, com CSRF |
 | `GET /api/v1/auth/me` | Autenticado |
 | `GET /api/v1/mentores/me` | MENTOR; consulta somente o perfil associado à sessão |
+| `GET /api/v1/startups/me` | STARTUP; consulta somente projetos vinculados à conta da sessão |
 | `POST /api/v1/auth/logout` | Autenticado, com CSRF; retorna 204 |
 | `GET /api/v1/startups`, `/{startupId}`, `/{startupId}/membros` | Autenticado |
 | `PATCH /api/v1/mentores/{mentorId}` e `/{mentorId}/status` | MENTOR titular do recurso, com CSRF |
+| `PATCH /api/v1/startups/{startupId}` | STARTUP com vínculo atual de FUNDADOR/REPRESENTANTE, com CSRF |
 | `POST /api/v1/startups/{startupId}/membros` e `DELETE .../membros/{usuarioId}` | STARTUP com vínculo de FUNDADOR ou REPRESENTANTE nessa startup, com CSRF |
 | `GET /actuator/health` e subrotas de health | ADMIN |
 | `GET /api/v1/hello` | Público fora de `prod`; bloqueado em `prod` |
@@ -81,6 +83,8 @@ O teste `HibernateLegacySchemaTest` inicia um schema fictício já populado, amp
 O modo API oferece `/entrar` e `/conta`. A guarda consulta `/auth/me`, o estado da conta fica em memória e a senha do formulário de login é limpa ao enviar. O interceptor trata 401/403 e invalida o CSRF em memória, sem repetir automaticamente operações de escrita. Login/logout renovam CSRF antes de concluir o fluxo. A página de perfil demonstrativo continua separada; `/meu-perfil` no modo API encaminha para a conta.
 
 O cadastro Angular envia as disponibilidades obrigatórias. `/mentor/perfil` carrega o perfil por `GET /api/v1/mentores/me`, sem receber o identificador do ator do navegador, e usa os PATCH existentes para edição e publicação. Campos sociais omitidos são preservados; strings vazias permitem limpá-los. Questionário persistido, descoberta e matching continuam como próximas etapas.
+
+`GET /api/v1/startups/me` exige STARTUP e lista somente os projetos vinculados à conta da sessão. `PATCH /api/v1/startups/{startupId}` exige STARTUP, CSRF e vínculo atual de FUNDADOR/REPRESENTANTE, verificado no serviço sob bloqueio transacional. ADMIN não tem exceção. `/startup/perfil` permite selecionar projetos, consultar e editar os sete campos do perfil; não altera conta ou integrantes. Os GET gerais de startup anteriores preservam o contrato autenticado. Detalhes: [guia 22](22-startup-profile.md).
 
 O deploy Angular possui `frontend/vercel.ts`: `BACKEND_ORIGIN`, configurada somente no ambiente Vercel, determina os rewrites HTTPS da API e do CSRF. As respostas dessas rotas não devem ser armazenadas em cache nem comprimidas pelo proxy. Com mesma origem, use cookies `Secure; SameSite=Lax` e configure no Render a origem exata do frontend em `APP_SECURITY_CORS_ALLOWED_ORIGINS`. Consulte `docs/20-mentor-integration.md`.
 
