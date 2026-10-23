@@ -1,0 +1,74 @@
+<section class="startup-page" aria-labelledby="startup-profile-title">
+  <p class="eyebrow">SEU PROJETO</p>
+  <h1 id="startup-profile-title">Minha startup</h1>
+  <p class="intro">Consulte os dados do projeto e mantenha sua ideia atualizada.</p>
+  <a routerLink="/conta">Voltar para minha conta</a>
+  @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+  @if (message()) { <output class="notice success">{{ message() }}</output> }
+  @if (loading()) { <output class="notice">Carregando suas startups…</output> }
+  @if (state.user()?.tipoUsuario === 'STARTUP') {
+    <div class="toolbar">
+      <button type="button" class="button button-secondary" [disabled]="loading() || busy()" (click)="load()">
+        {{ editing() ? 'Descartar edição e recarregar' : 'Recarregar dados' }}
+      </button>
+    </div>
+    @if (profiles().length > 1) {
+      <label class="field-label" for="startup-selection">Selecione sua startup</label>
+      <select class="form-input" id="startup-selection" [value]="selectedId()"
+        [disabled]="loading() || busy() || editing() || uncertain()" (change)="select($any($event.target).value)">
+        @for (startup of profiles(); track startup.id) { <option [value]="startup.id">{{ startup.nomeProvisorio }}</option> }
+      </select>
+    }
+    @if (profile(); as startup) {
+      <article class="startup-card" [attr.aria-busy]="busy()">
+        <h2>{{ startup.nomeProvisorio }}</h2>
+        @if (editing()) {
+          <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+            <fieldset [disabled]="busy() || loading() || uncertain()">
+              <legend class="sr-only">Editar os dados da startup</legend>
+              @for (field of fields; track field.key) {
+                <label class="field-label" [for]="'edit-startup-' + field.key">{{ field.label }} <span>Obrigatório</span></label>
+                @if (field.multiline) {
+                  <textarea class="form-input" [id]="'edit-startup-' + field.key" [formControlName]="field.key"
+                    rows="3" [maxlength]="field.maxLength" required [attr.aria-invalid]="invalid(field.key)"
+                    [attr.aria-describedby]="'edit-' + field.key + '-help' + (invalid(field.key) ? ' edit-' + field.key + '-error' : '')"></textarea>
+                } @else {
+                  <input class="form-input" [id]="'edit-startup-' + field.key" [formControlName]="field.key"
+                    [maxlength]="field.maxLength" required [attr.aria-invalid]="invalid(field.key)"
+                    [attr.aria-describedby]="'edit-' + field.key + '-help' + (invalid(field.key) ? ' edit-' + field.key + '-error' : '')" />
+                }
+                <p class="field-help" [id]="'edit-' + field.key + '-help'">{{ field.help }} Até {{ field.maxLength }} caracteres.</p>
+                @if (invalid(field.key)) {
+                  <p class="field-error" [id]="'edit-' + field.key + '-error'">Preencha com até {{ field.maxLength }} caracteres, sem usar apenas espaços.</p>
+                }
+              }
+              <label class="field-label" for="edit-startup-status">Momento da ideia <span>Obrigatório</span></label>
+              <select id="edit-startup-status" class="form-input" formControlName="statusValidacao" required
+                [attr.aria-invalid]="invalid('statusValidacao')" [attr.aria-describedby]="invalid('statusValidacao') ? 'edit-status-error' : null">
+                @for (status of statuses; track status[0]) { <option [value]="status[0]">{{ status[1] }}</option> }
+              </select>
+              @if (invalid('statusValidacao')) { <p id="edit-status-error" class="field-error">Escolha um momento da ideia válido.</p> }
+              <div class="actions">
+                <button type="submit" class="button button-primary">{{ busy() ? 'Salvando…' : 'Salvar alterações' }}</button>
+                <button type="button" class="button button-secondary" (click)="cancel()">Cancelar edição</button>
+              </div>
+            </fieldset>
+          </form>
+        } @else {
+          <dl>
+            @for (field of fields; track field.key) {
+              @if (field.key !== 'nomeProvisorio') { <dt>{{ field.label }}</dt><dd>{{ startup[field.key] }}</dd> }
+            }
+            <dt>Momento da ideia</dt><dd>{{ statusLabels[startup.statusValidacao] }}</dd>
+          </dl>
+          @if (canEdit()) {
+            <button type="button" class="button button-primary edit-button" [disabled]="loading() || busy() || uncertain()" (click)="edit()">Editar startup</button>
+          } @else { <p class="field-help">Você pode consultar este projeto. A edição é permitida a fundadores e representantes.</p> }
+        }
+      </article>
+      <p class="field-help">O momento da ideia descreve seu projeto. Publicação do perfil, questionário e recomendações serão disponibilizados em próximas etapas.</p>
+    } @else if (loaded() && !loading() && !error()) {
+      <p class="notice">Sua conta ainda não possui vínculo com uma startup. Se você já tem um projeto cadastrado, confira o vínculo com a pessoa responsável.</p>
+    }
+  }
+</section>

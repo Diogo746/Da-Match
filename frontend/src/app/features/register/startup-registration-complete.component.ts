@@ -29,7 +29,7 @@ import { LumenGuideComponent } from "../../shared/lumen-guide.component";
       <p>Você já pode entrar com o e-mail e a senha da pessoa fundadora. O cadastro não inicia uma sessão automaticamente.</p>
       <a class="button button-primary" routerLink="/entrar">Entrar na minha conta</a>
       <a class="button button-secondary" routerLink="/">Explorar a demonstração</a>
-      <p class="field-help">O questionário, a edição da startup e as recomendações ainda não estão conectados. Os perfis da descoberta são demonstrativos.</p>
+      <p class="field-help">Depois de entrar, abra Minha conta para consultar e editar sua startup. O questionário e as recomendações ainda são demonstrativos.</p>
     </section>`,
   styles: `
     :host{display:block}.confirmation{max-width:660px;margin:0 auto}.confirmation app-lumen-guide{--lumen-size:85px;margin-bottom:24px}
