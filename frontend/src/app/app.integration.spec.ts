@@ -38,6 +38,12 @@ async function account(kind: ProfileKind) {
   await click("Continuar para meu perfil");
   await click(kind === "MENTOR" ? "Descoberta do problema" : "Um problema que quero entender"); await click("Continuar");
 }
+// Público e áreas fecham a segunda fase; o segundo "Continuar" sai da comemoração.
+async function audience(kind: ProfileKind) {
+  if (kind === "MENTOR") { await click("Pessoas (B2C)"); await click("Negócios e gestão"); await click("2 a 3 startups"); }
+  else { await click("Vou vender para pessoas"); await click("Tecnologia"); }
+  await click("Continuar"); await click("Continuar");
+}
 async function onlineSchedule() {
   await click("Online"); await click("Continuar");
   await click("Podemos combinar");
@@ -90,45 +96,49 @@ it("permite pausar e retomar o movimento mantendo a escolha durante a navegaçã
 describe("Fluxo renderizado de cadastro, perfil e home", () => {
   it("leva o cadastro da startup até indicações reais de 80 pontos na home", async () => {
     await render("/cadastro"); await click("Modo escuro"); await account("STARTUP");
-    await click("Tecnologia"); await click("Continuar");
+    await click("Tecnologia"); await click("Continuar"); await click("Continuar");
     await click("Validar a ideia"); await click("Preços e custos"); await click("Continuar");
-    await onlineSchedule(); await click("Revisar meu perfil"); await click("Concluir meu perfil");
+    await audience("STARTUP"); await onlineSchedule(); await click("Revisar meu perfil"); await click("Concluir meu perfil");
     expect(root.querySelector("app-profile-complete")).not.toBeNull();
     expect(document.activeElement).toBe(root.querySelector("#complete-title"));
     expect(root.textContent).not.toContain("senha-inventada");
+    expect(root.querySelector(".found-count .sr-only")?.textContent).toContain("Encontramos 4 mentores para você");
     await goHomeFromCompletion();
     expect(root.querySelector("#profiles-title")?.textContent).toContain("Indicações");
-    expect(root.querySelector(".compatibility-label")?.textContent).toContain("80%");
+    // A porcentagem (80) fica interna: abaixo de 95 não há selo nem número na tela.
+    expect(root.querySelectorAll("app-profile-card").length).toBeGreaterThan(0);
+    expect(root.querySelector(".match-master-badge")).toBeNull();
+    expect(root.querySelector(".profiles-grid, main")?.textContent).not.toContain("%");
     expect(TestBed.inject(ProfileSessionStore).profile()!.answers.topics).toEqual(["VALIDATION", "PRICING"]);
     const button = root.querySelector<HTMLButtonElement>(".profile-link")!;
     button.click(); await settle();
-    expect(root.querySelector("#matching-title")?.textContent).toContain("80%");
-    expect(root.querySelector(".match-limitations")?.textContent).toContain("Preços e custos");
+    expect(root.querySelector("dialog")?.textContent).not.toContain("%");
+    expect(root.querySelector("dialog .high-match-badge")).toBeNull();
     await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
     expect(root.querySelector("#my-profile-title")?.textContent).toBe("Meu perfil");
     expect(root.querySelector("app-profile-setup")).toBeNull();
     expect(root.querySelector("#profile-topics-title")?.parentElement?.parentElement?.textContent).toContain("Preços e custos");
     root.querySelector<HTMLButtonElement>('button[aria-label="Editar necessidades"]')!.click(); await settle();
-    expect(root.querySelector(".question-title")?.textContent).toContain("O que mais ajudaria");
+    expect(root.querySelector(".question-title")?.textContent).toContain("Se um mentor aparecesse agora");
     await click("Preços e custos"); await click("Salvar alterações");
     expect(root.querySelector("app-profile-setup")).toBeNull();
     expect(root.querySelector("output.profile-notice")?.textContent).toContain("Alterações salvas");
     expect(document.activeElement).toBe(root.querySelector("#my-profile-title"));
     expect(TestBed.inject(ProfileSessionStore).profile()!.answers.topics).toEqual(["VALIDATION"]);
     root.querySelector<HTMLAnchorElement>(".profile-actions a")!.click(); await settle();
-    expect(root.querySelector(".compatibility-label")?.textContent).toContain("100%");
+    expect(root.querySelector("app-profile-card .match-master-badge")?.textContent).toContain("Match master");
     await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
     expect(root.querySelector("app-profile-setup")).toBeNull();
     expect(root.querySelector(".profile-details")?.textContent).not.toContain("Preços e custos");
-  });
+  }, 15000);
   it("mostra startups ao mentor e atualiza a home ao pausar novas mentorias", async () => {
     await render("/cadastro"); await account("MENTOR");
-    await click("Tecnologia"); await click("Continuar");
+    await click("Tecnologia"); await click("Continuar"); await click("Continuar");
     await click("Validar a ideia"); await click("Primeiro protótipo");
     root.querySelector<HTMLButtonElement>('button[aria-label="Experiência prática em Validar a ideia"]')!.click();
     root.querySelector<HTMLButtonElement>('button[aria-label="Experiência prática em Primeiro protótipo"]')!.click(); await settle(); await click("Continuar");
-    await onlineSchedule(); await click("Revisar meu perfil"); await click("Concluir meu perfil"); await goHomeFromCompletion();
-    expect(root.querySelector(".compatibility-label")?.textContent).toContain("100%");
+    await audience("MENTOR"); await onlineSchedule(); await click("Revisar meu perfil"); await click("Concluir meu perfil"); await goHomeFromCompletion();
+    expect(root.querySelector("app-profile-card .match-master-badge")?.textContent).toContain("Match master");
     expect(root.querySelector(".kind-label")?.textContent).toContain("Startup");
     await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
     expect(root.querySelector("app-profile-setup")).toBeNull();
@@ -140,29 +150,29 @@ describe("Fluxo renderizado de cadastro, perfil e home", () => {
     expect(root.querySelectorAll("app-profile-card")).toHaveLength(0);
     expect(root.textContent).toContain("Novas mentorias em pausa");
     expect(root.textContent).toContain("Suas preferências continuam valendo");
-  });
+  }, 15000);
   it("preserva a descoberta pública e os salvos sem exibir porcentagens sem um perfil", async () => {
     await render("/");
     expect(root.querySelectorAll("app-profile-card")).toHaveLength(6);
-    expect(root.querySelector(".compatibility-label")).toBeNull();
+    expect(root.querySelector(".match-master-badge")).toBeNull();
     root.querySelector<HTMLButtonElement>(".save-button")!.click(); await settle();
     await TestBed.inject(Router).navigateByUrl("/salvos"); await settle();
     expect(root.querySelectorAll("app-profile-card")).toHaveLength(1);
     root.querySelector<HTMLButtonElement>(".save-button")!.click(); await settle();
     expect(root.querySelectorAll("app-profile-card")).toHaveLength(0);
   });
-  it("apresenta uma indicação parcial sem fabricar porcentagem", async () => {
+  it("apresenta uma indicação parcial sem selo nem porcentagem", async () => {
     await render("/");
-    const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["DISCOVERING"], topics: ["VALIDATION"], format: "ONLINE", cityId: "", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true };
+    const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["DISCOVERING"], topics: ["VALIDATION"], format: "ONLINE", cityId: "", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true, audiences: ["B2C"], backgrounds: ["TECH"], capacity: "" };
     TestBed.inject(ProfileSessionStore).save("Maria Teste", answers); await settle();
-    expect(root.querySelectorAll(".partial-label").length).toBeGreaterThan(0);
-    expect(root.querySelector(".compatibility-label")).toBeNull();
+    expect(root.querySelectorAll("app-profile-card").length).toBeGreaterThan(0);
+    expect(root.querySelector(".match-master-badge")).toBeNull();
   });
 });
 
 it("cancela alterações e volta a abrir Meu perfil sem reapresentar o questionário", async () => {
   await render("/");
-  const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["TECH"], topics: ["VALIDATION"], format: "PRESENCIAL", cityId: "PE_RECIFE", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true };
+  const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["TECH"], topics: ["VALIDATION"], format: "PRESENCIAL", cityId: "PE_RECIFE", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true, audiences: ["B2C"], backgrounds: ["TECH"], capacity: "" };
   TestBed.inject(ProfileSessionStore).save("Maria Teste", answers);
   await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
   expect(root.querySelector(".profile-details")?.textContent).toContain("Recife");
@@ -182,7 +192,7 @@ it("cancela alterações e volta a abrir Meu perfil sem reapresentar o question�
 
 it.each(["PE_OLINDA", ""])("apresenta a modalidade flexível e a cidade declarada no perfil: %s", async (cityId) => {
   await render("/");
-  const answers: ProfileDraft = { kind: "MENTOR", projectName: "", sectors: ["TECH", "EDUCATION"], topics: ["VALIDATION", "PROTOTYPE"], format: "AMBOS", cityId, moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "MON", period: "MORNING" }, { day: "MON", period: "EVENING" }, { day: "THU", period: "MORNING" }, { day: "THU", period: "EVENING" }], accepting: true };
+  const answers: ProfileDraft = { kind: "MENTOR", projectName: "", sectors: ["TECH", "EDUCATION"], topics: ["VALIDATION", "PROTOTYPE"], format: "AMBOS", cityId, moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "MON", period: "MORNING" }, { day: "MON", period: "EVENING" }, { day: "THU", period: "MORNING" }, { day: "THU", period: "EVENING" }], accepting: true, audiences: ["B2C", "B2B"], backgrounds: ["BUSINESS"], capacity: "FEW" };
   TestBed.inject(ProfileSessionStore).save("Maria Teste", answers);
   await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
   const details = root.querySelector(".profile-details")?.textContent;
@@ -196,13 +206,13 @@ it.each(["PE_OLINDA", ""])("apresenta a modalidade flexível e a cidade declarad
 
 it("limpa o perfil pela interface e mantém acessíveis o cadastro e a explicação do produto", async () => {
   await render("/");
-  const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["TECH"], topics: ["VALIDATION"], format: "ONLINE", cityId: "", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true };
+  const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["TECH"], topics: ["VALIDATION"], format: "ONLINE", cityId: "", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true, audiences: ["B2C"], backgrounds: ["TECH"], capacity: "" };
   TestBed.inject(ProfileSessionStore).save("Maria Teste", answers);
   await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
   await click("Limpar perfil de teste");
   expect(root.querySelector(".no-profile")?.textContent).toContain("Seu próximo passo começa pelo seu perfil");
   expect(TestBed.inject(ProfileSessionStore).profile()).toBeNull();
   await TestBed.inject(Router).navigateByUrl("/como-funciona"); await settle();
-  expect(root.textContent).toContain("monte seu perfil em cinco etapas com o Lumen");
+  expect(root.textContent).toContain("monte seu perfil em seis etapas com o Lumen");
   expect(root.querySelector('.topbar-actions a')?.textContent).toContain("Criar perfil");
 });

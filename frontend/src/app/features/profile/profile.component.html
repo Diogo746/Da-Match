@@ -27,12 +27,19 @@
             <li><small>{{ profile.answers.kind === 'STARTUP' ? (index === 0 ? 'PRIORIDADE' : 'TAMBÉM BUSCA') : (profile.answers.experience[topic] === 'PRACTICAL' ? 'EXPERIÊNCIA PRÁTICA' : 'CONHECIMENTO PARA ORIENTAR') }}</small><span>{{ topicLabel(topic) }}</span></li>
           }</ul>
         </section>
+        <section class="profile-section" aria-labelledby="profile-audience-title">
+          <div class="section-top"><h2 id="profile-audience-title">{{ profile.answers.kind === 'STARTUP' ? 'Público e equipe' : 'Público, área e vagas' }}</h2><button class="text-button" type="button" aria-label="Editar público e área" (click)="edit(3)">Alterar</button></div>
+          <dl><div><dt>{{ profile.answers.kind === 'STARTUP' ? 'Para quem é a solução' : 'Públicos atendidos' }}</dt><dd class="profile-tags">@for (audience of profile.answers.audiences; track audience) { <span>{{ audienceLabel(audience) }}</span> } @empty { <span>A definir</span> }</dd></div>
+            <div><dt>{{ profile.answers.kind === 'STARTUP' ? 'Áreas que o time domina' : 'Formação ou experiência' }}</dt><dd class="profile-tags">@for (background of profile.answers.backgrounds; track background) { <span>{{ backgroundLabel(background) }}</span> } @empty { <span>A definir</span> }</dd></div>
+            @if (profile.answers.kind === 'MENTOR') { <div><dt>Startups ao mesmo tempo</dt><dd>{{ capacityLabel(profile.answers.capacity) }}</dd></div> }
+          </dl>
+        </section>
         <section class="profile-section" aria-labelledby="profile-format-title">
-          <div class="section-top"><h2 id="profile-format-title">Formato das conversas</h2><button class="text-button" type="button" aria-label="Editar modalidade" (click)="edit(3)">Alterar</button></div>
+          <div class="section-top"><h2 id="profile-format-title">Formato das conversas</h2><button class="text-button" type="button" aria-label="Editar modalidade" (click)="edit(4)">Alterar</button></div>
           <dl><div><dt>Modalidade</dt><dd>{{ formatLabels[profile.answers.format] }}</dd></div>@if (profile.answers.format !== 'ONLINE') { <div><dt>Cidade</dt><dd>{{ profile.answers.cityId ? cityLabel(profile.answers.cityId) : 'A combinar para encontros presenciais' }}</dd></div> }</dl>
         </section>
         <section class="profile-section" aria-labelledby="profile-schedule-title">
-          <div class="section-top"><h2 id="profile-schedule-title">Disponibilidade</h2><button class="text-button" type="button" aria-label="Editar disponibilidade" (click)="edit(4)">Alterar</button></div>
+          <div class="section-top"><h2 id="profile-schedule-title">Disponibilidade</h2><button class="text-button" type="button" aria-label="Editar disponibilidade" (click)="edit(5)">Alterar</button></div>
           <dl><div><dt>Frequência</dt><dd>{{ cadenceLabel(profile.answers.cadence) }}</dd></div><div><dt>Dias e períodos</dt><dd class="profile-tags">@for (slot of profile.answers.availability; track slot.day + slot.period) { <span>{{ slotLabel(slot) }}</span> }</dd></div>
             @if (profile.answers.kind === 'MENTOR') { <div><dt>Novas mentorias</dt><dd class="mentoring-status">{{ profile.answers.accepting ? 'Recebendo novas startups' : 'Novas mentorias em pausa' }}</dd></div> }
           </dl><p class="section-note">Horário de Recife. Os horários exatos serão combinados entre vocês.</p>
@@ -43,6 +50,6 @@
     <footer class="profile-session-note"><p>Perfil de demonstração. Nesta versão, recarregar a página reinicia os dados do teste.</p><button class="text-button" type="button" (click)="clear()">Limpar perfil de teste</button></footer>
   }
 } @else {
-  <section class="no-profile"><app-lumen pose="welcome" /><p class="eyebrow">PRAZER EM CONHECER VOCÊ</p><h1>Seu próximo passo começa pelo seu perfil.</h1><p>Um cadastro breve, cinco etapas com o Lumen e indicações com mais contexto.</p><a class="button button-primary" routerLink="/cadastro">Montar meu perfil</a><a class="text-button" routerLink="/">Explorar os perfis</a></section>
+  <section class="no-profile"><app-lumen pose="welcome" /><p class="eyebrow">PRAZER EM CONHECER VOCÊ</p><h1>Seu próximo passo começa pelo seu perfil.</h1><p>Um cadastro breve, seis etapas em três fases com o Lumen e indicações com mais contexto.</p><a class="button button-primary" routerLink="/cadastro">Montar meu perfil</a><a class="text-button" routerLink="/">Explorar os perfis</a></section>
 }
 

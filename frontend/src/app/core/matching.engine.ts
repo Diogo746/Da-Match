@@ -1,6 +1,8 @@
 import { MatchProfile, TopicId, cityLabel, momentLabel, profileIsComplete, sectorLabel, slotLabel, topicLabel } from "./profile.models";
 
 export const MATCH_RULE_VERSION = "damatch-rules-v2";
+// A porcentagem fica só para a equipe; o participante vê apenas o selo das combinações muito fortes.
+export const HIGH_COMPATIBILITY_SCORE = 95;
 export interface MatchCriterion {
   key: "primary" | "secondary" | "sector" | "moment";
   label: string;
@@ -96,4 +98,6 @@ export function calculateMatch(first: MatchProfile, second: MatchProfile): Match
     practicalMatches: [...new Set(startup.topics)].filter((topic) => mentor.topics.includes(topic) && mentor.experience[topic] === "PRACTICAL").length,
   };
 }
-
+export function isHighCompatibility(result: MatchResult | null): boolean {
+  return !!result && result.eligible && result.relevant && result.score !== null && result.score >= HIGH_COMPATIBILITY_SCORE;
+}

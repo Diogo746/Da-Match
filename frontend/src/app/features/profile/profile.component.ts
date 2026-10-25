@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, inject, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import { ProfileDraft, cadenceLabel, cityLabel, momentLabel, sectorLabel, slotLabel, topicLabel } from "../../core/profile.models";
+import { ProfileDraft, audienceLabel, backgroundLabel, cadenceLabel, capacityLabel, cityLabel, momentLabel, sectorLabel, slotLabel, topicLabel } from "../../core/profile.models";
 import { ProfileSessionStore } from "../../core/profile-session.store";
 import { ProfileSetupComponent } from "./profile-setup.component";
 import { ProfilePreviewComponent } from "./profile-preview.component";
@@ -27,6 +27,9 @@ export class ProfileComponent {
   readonly sectorLabel = sectorLabel;
   readonly topicLabel = topicLabel;
   readonly cityLabel = cityLabel;
+  readonly audienceLabel = audienceLabel;
+  readonly backgroundLabel = backgroundLabel;
+  readonly capacityLabel = capacityLabel;
   readonly formatLabels = { ONLINE: "Online", PRESENCIAL: "Presencial", AMBOS: "Online ou presencial", "": "A definir" };
 
   @ViewChild("profileHeading") set profileHeading(heading: ElementRef<HTMLElement> | undefined) {

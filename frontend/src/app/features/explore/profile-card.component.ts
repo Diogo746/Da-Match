@@ -1,12 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   input,
   output,
 } from "@angular/core";
 import { DemoProfile } from "../../core/profiles.store";
 import { IconComponent } from "../../shared/icon.component";
-import { MatchResult } from "../../core/matching.engine";
+import { MatchResult, isHighCompatibility } from "../../core/matching.engine";
 @Component({
   selector: "app-profile-card",
   standalone: true,
@@ -19,6 +20,8 @@ export class ProfileCardComponent {
   readonly profile = input.required<DemoProfile>();
   readonly saved = input(false);
   readonly match = input<MatchResult | null>(null);
+  // A porcentagem não aparece para o participante; só o selo das combinações muito fortes.
+  readonly highMatch = computed(() => isHighCompatibility(this.match()));
   readonly saveToggled = output<void>();
   readonly profileOpened = output<void>();
   label(): string {

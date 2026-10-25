@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateMatch, MATCH_RULE_VERSION } from "./matching.engine";
+import { calculateMatch, isHighCompatibility, MATCH_RULE_VERSION } from "./matching.engine";
 import { MatchProfile, emptyProfile } from "./profile.models";
 import { DEMO_PROFILES } from "./profiles.store";
 
@@ -123,4 +123,12 @@ describe("Viabilidade das conversas", () => {
     }
   });
 });
-
+describe("Selo de grande compatibilidade", () => {
+  it("aparece só a partir de 95 pontos, sem expor a porcentagem", () => {
+    expect(isHighCompatibility(calculateMatch(startup, { ...mentor, topics: ["VALIDATION", "PRICING"] }))).toBe(true);
+    expect(isHighCompatibility(calculateMatch(startup, mentor))).toBe(false);
+    expect(isHighCompatibility(calculateMatch({ ...startup, sectors: ["DISCOVERING"] }, { ...mentor, topics: ["VALIDATION", "PRICING"] }))).toBe(false);
+    expect(isHighCompatibility(calculateMatch(startup, { ...mentor, accepting: false }))).toBe(false);
+    expect(isHighCompatibility(null)).toBe(false);
+  });
+});
