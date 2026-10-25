@@ -44,7 +44,7 @@ import { IconComponent } from "../../shared/icon.component";
       <p>
         Explore perfis fictícios, monte seu perfil em seis etapas com o Lumen e
         receba indicações ordenadas a partir das suas respostas. As combinações
-        muito fortes ganham o selo Match master.
+        muito fortes ganham o selo Super DaMatch.
         Cadastros, perfis e salvos são temporários. Contas reais, login,
         conexões e reuniões dependem da integração com o backend.
       </p>

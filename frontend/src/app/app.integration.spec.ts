@@ -107,7 +107,7 @@ describe("Fluxo renderizado de cadastro, perfil e home", () => {
     expect(root.querySelector("#profiles-title")?.textContent).toContain("Indicações");
     // A porcentagem (80) fica interna: abaixo de 95 não há selo nem número na tela.
     expect(root.querySelectorAll("app-profile-card").length).toBeGreaterThan(0);
-    expect(root.querySelector(".match-master-badge")).toBeNull();
+    expect(root.querySelector(".super-damatch-badge")).toBeNull();
     expect(root.querySelector(".profiles-grid, main")?.textContent).not.toContain("%");
     expect(TestBed.inject(ProfileSessionStore).profile()!.answers.topics).toEqual(["VALIDATION", "PRICING"]);
     const button = root.querySelector<HTMLButtonElement>(".profile-link")!;
@@ -126,7 +126,7 @@ describe("Fluxo renderizado de cadastro, perfil e home", () => {
     expect(document.activeElement).toBe(root.querySelector("#my-profile-title"));
     expect(TestBed.inject(ProfileSessionStore).profile()!.answers.topics).toEqual(["VALIDATION"]);
     root.querySelector<HTMLAnchorElement>(".profile-actions a")!.click(); await settle();
-    expect(root.querySelector("app-profile-card .match-master-badge")?.textContent).toContain("Match master");
+    expect(root.querySelector("app-profile-card .super-damatch-badge")?.textContent).toContain("Super DaMatch");
     await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
     expect(root.querySelector("app-profile-setup")).toBeNull();
     expect(root.querySelector(".profile-details")?.textContent).not.toContain("Preços e custos");
@@ -138,7 +138,7 @@ describe("Fluxo renderizado de cadastro, perfil e home", () => {
     root.querySelector<HTMLButtonElement>('button[aria-label="Experiência prática em Validar a ideia"]')!.click();
     root.querySelector<HTMLButtonElement>('button[aria-label="Experiência prática em Primeiro protótipo"]')!.click(); await settle(); await click("Continuar");
     await audience("MENTOR"); await onlineSchedule(); await click("Revisar meu perfil"); await click("Concluir meu perfil"); await goHomeFromCompletion();
-    expect(root.querySelector("app-profile-card .match-master-badge")?.textContent).toContain("Match master");
+    expect(root.querySelector("app-profile-card .super-damatch-badge")?.textContent).toContain("Super DaMatch");
     expect(root.querySelector(".kind-label")?.textContent).toContain("Startup");
     await TestBed.inject(Router).navigateByUrl("/meu-perfil"); await settle();
     expect(root.querySelector("app-profile-setup")).toBeNull();
@@ -154,7 +154,7 @@ describe("Fluxo renderizado de cadastro, perfil e home", () => {
   it("preserva a descoberta pública e os salvos sem exibir porcentagens sem um perfil", async () => {
     await render("/");
     expect(root.querySelectorAll("app-profile-card")).toHaveLength(6);
-    expect(root.querySelector(".match-master-badge")).toBeNull();
+    expect(root.querySelector(".super-damatch-badge")).toBeNull();
     root.querySelector<HTMLButtonElement>(".save-button")!.click(); await settle();
     await TestBed.inject(Router).navigateByUrl("/salvos"); await settle();
     expect(root.querySelectorAll("app-profile-card")).toHaveLength(1);
@@ -166,7 +166,7 @@ describe("Fluxo renderizado de cadastro, perfil e home", () => {
     const answers: ProfileDraft = { kind: "STARTUP", projectName: "Ideia Teste", sectors: ["DISCOVERING"], topics: ["VALIDATION"], format: "ONLINE", cityId: "", moments: ["PROBLEM"], cadence: "FLEXIBLE", experience: { VALIDATION: "PRACTICAL", CUSTOMERS: "PRACTICAL", BUSINESS: "PRACTICAL", PROTOTYPE: "PRACTICAL", PRICING: "PRACTICAL", PITCH: "PRACTICAL" }, availability: [{ day: "THU", period: "EVENING" }], accepting: true, audiences: ["B2C"], backgrounds: ["TECH"], capacity: "" };
     TestBed.inject(ProfileSessionStore).save("Maria Teste", answers); await settle();
     expect(root.querySelectorAll("app-profile-card").length).toBeGreaterThan(0);
-    expect(root.querySelector(".match-master-badge")).toBeNull();
+    expect(root.querySelector(".super-damatch-badge")).toBeNull();
   });
 });
 

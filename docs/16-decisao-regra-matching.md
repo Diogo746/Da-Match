@@ -104,4 +104,4 @@ Corte: abaixo de 30 o perfil não aparece. A vantagem é usar as perguntas novas
 
 ### Decisão do PO: porcentagem só para a equipe
 
-Seja qual for a regra escolhida, o participante **não vê a porcentagem** nem a explicação por critério. Ele vê as indicações em ordem e o selo **Match master** quando a nota for 95 ou mais. A nota completa fica guardada para a equipe estudar e ajustar o match. Essa decisão muda a RF18 do SRS e a US-18 já foi atualizada.
+Seja qual for a regra escolhida, o participante **não vê a porcentagem** nem a explicação por critério. Ele vê as indicações em ordem e o selo **Super DaMatch** quando a nota for 95 ou mais. A nota completa fica guardada para a equipe estudar e ajustar o match. Essa decisão muda a RF18 do SRS e a US-18 já foi atualizada.

@@ -354,7 +354,7 @@
 > * **Cenário 1 (Combinação muito forte):**
 >   * **Dado** que uma indicação tem nota 95 ou mais,
 >   * **Quando** vejo a lista ou abro os detalhes do perfil,
->   * **Então** o perfil aparece com o selo **Match master** em destaque, sem mostrar a porcentagem.
+>   * **Então** o perfil aparece com o selo **Super DaMatch** em destaque, sem mostrar a porcentagem.
 > * **Cenário 2 (Demais indicações):**
 >   * **Dado** que uma indicação tem nota abaixo de 95,
 >   * **Quando** vejo a lista,
@@ -368,7 +368,7 @@
 >   * **Quando** consulto os dados de matching,
 >   * **Então** vejo a nota, a contribuição de cada critério e a versão do cálculo, para estudar e ajustar a regra.
 * *Prioridade:* P1 · *Rastreabilidade:* RF18, RN16, RN19, CA13, CA14, CA15.
-* *Decisão do PO (25/10/2026):* a porcentagem e a explicação por critério ficam só com a equipe; o participante vê apenas a ordem e o selo Match master. Isso altera a RF18 do SRS v1.0 e precisa entrar na próxima revisão do documento de requisitos. Ver [documento 24](24-questionario-v3.md).
+* *Decisão do PO (25/10/2026):* a porcentagem e a explicação por critério ficam só com a equipe; o participante vê apenas a ordem e o selo Super DaMatch. Isso altera a RF18 do SRS v1.0 e precisa entrar na próxima revisão do documento de requisitos. Ver [documento 24](24-questionario-v3.md).
 
 ---
 

@@ -29,7 +29,7 @@
           <span>{{ tag }}</span>
         }
       </div>
-      @if (highMatch()) { <p class="high-match-badge"><app-icon name="spark" />Match master: uma combinação muito forte com o seu perfil</p> }
+      @if (highMatch()) { <p class="high-match-badge"><app-icon name="spark" />Super DaMatch: uma combinação muito forte com o seu perfil</p> }
       <h3>Sobre este perfil</h3><ul class="reasons">@for (reason of profile.reasons; track reason) { <li><app-icon name="check" />{{ reason }}</li> }</ul>
       @if (!matching()) { <p class="dialog-note">Monte seu perfil para receber indicações a partir das suas necessidades, experiência e disponibilidade.</p> }
       <div class="dialog-actions">

@@ -19,7 +19,7 @@ Esta versão traz de volta partes do quiz original do DaMatch que ficaram de for
 | — | Pergunta nova: **áreas que o time domina** (startup, até 3) / **formação ou experiência** (mentor, até 2) |
 | Mentor só com "recebendo startups" | Pergunta nova: **quantas startups o mentor topa acompanhar** |
 | Tela final só com texto | Tela final mostra **quantas indicações foram encontradas**, com animação |
-| Porcentagem visível nos cards e nos detalhes | **A porcentagem não aparece para o participante.** Só o selo **Match master** quando a nota é 95 ou mais |
+| Porcentagem visível nos cards e nos detalhes | **A porcentagem não aparece para o participante.** Só o selo **Super DaMatch** quando a nota é 95 ou mais |
 
 As perguntas novas são guardadas, mas **não mudam a nota do match** por enquanto. A regra de cálculo continua sendo a decisão pendente do [documento 16](16-decisao-regra-matching.md).
 
@@ -30,7 +30,7 @@ As perguntas novas são guardadas, mas **não mudam a nota do match** por enquan
 | # | Decisão | Motivo |
 | --- | --- | --- |
 | Q1 | A porcentagem fica só com a equipe | Evita desanimar com notas baixas e permite estudar e ajustar o match com os dados. |
-| Q2 | Selo **Match master** para nota ≥ 95, com destaque no card | Deixa claras as combinações muito fortes sem expor números. Com a regra atual, só a nota 100 recebe o selo. |
+| Q2 | Selo **Super DaMatch** para nota ≥ 95, com destaque no card | Deixa claras as combinações muito fortes sem expor números. Com a regra atual, só a nota 100 recebe o selo. |
 | Q3 | A pergunta de áreas da startup fala do **time**, não só do CEO | O objetivo é achar o mentor que cobre o que falta no time. Limite de 3 para forçar prioridade. |
 | Q4 | Mentor marca até 2 áreas de formação ou experiência | Ele fala só de si; as especialidades já dizem como ajuda. |
 | Q5 | Sem card de "tipo de fundador" | Não ajuda quem quer achar um mentor e tirava o foco do botão de indicações. |
@@ -86,7 +86,7 @@ Nada abaixo foi alterado nesta branch. São pontos para conversar antes de integ
 1. **Guardar as respostas.** Hoje o questionário fica só no navegador. É preciso decidir as tabelas e campos para os códigos acima, ligados à startup ou ao mentor.
 2. **Receber as respostas.** Um endpoint para salvar e ler o perfil de match (sugestão: `PUT/GET /api/v1/{startups|mentores}/{id}/perfil-match`).
 3. **Agenda do mentor.** O backend já usa `diaSemana` (1 a 7) e `MANHA / TARDE / NOITE`; o questionário usa `MON…SUN` e `MORNING / AFTERNOON / EVENING`. É preciso escolher um formato ou converter.
-4. **Calcular o match no servidor.** A nota calculada no navegador não é confiável. O backend calcula, guarda a porcentagem para a equipe e devolve ao participante só a ordem e um indicador `matchMaster` (nota ≥ 95), **sem o número**.
+4. **Calcular o match no servidor.** A nota calculada no navegador não é confiável. O backend calcula, guarda a porcentagem para a equipe e devolve ao participante só a ordem e um indicador `superDamatch` (nota ≥ 95), **sem o número**.
 5. **Área da equipe.** Para "só nós vemos a porcentagem", é preciso uma tela ou relatório administrativo.
 6. **Texto da tela de cadastro.** `register.component.html` ainda diz "cinco etapas". Agora são seis. O trecho é do Mário e não foi alterado.
 7. **Testes instáveis.** `mentor-flow.integration.spec.ts` e `startup-flow.integration.spec.ts` às vezes passam do limite de 5 segundos quando a máquina está carregada (acontece também na `main`).
@@ -96,4 +96,4 @@ Nada abaixo foi alterado nesta branch. São pontos para conversar antes de integ
 ## 5. Verificação
 
 * 315 testes do frontend passando (`ng test --watch=false`), lint sem erros e build de produção sem avisos.
-* Testado no navegador: cadastro de startup e de mentor, comemoração das fases, tela final com contagem e selo Match master no card.
+* Testado no navegador: cadastro de startup e de mentor, comemoração das fases, tela final com contagem e selo Super DaMatch no card.

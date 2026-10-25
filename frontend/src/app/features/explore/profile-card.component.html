@@ -1,11 +1,11 @@
-<article [class]="'profile-card ' + profile().theme + (highMatch() ? ' match-master' : '')">
+<article [class]="'profile-card ' + profile().theme + (highMatch() ? ' super-damatch' : '')">
   <div [class]="'profile-cover ' + profile().theme">
     <span class="cover-word">{{
       profile().kind === "MENTOR"
         ? "Compartilhar. Construir."
         : "Imaginar. Transformar."
     }}</span
-    >@if (highMatch()) { <span class="match-master-badge"><app-icon name="spark" />Match master</span> }<button
+    >@if (highMatch()) { <span class="super-damatch-badge"><app-icon name="spark" />Super DaMatch</span> }<button
       class="save-button"
       type="button"
       [class.saved]="saved()"
