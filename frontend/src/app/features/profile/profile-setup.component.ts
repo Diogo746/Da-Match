@@ -11,6 +11,35 @@ import { ProfilePreviewComponent } from "./profile-preview.component";
 const LAST_STEP = PROFILE_STEPS.length - 1;
 const normalize = (text: string) => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLocaleLowerCase("pt-BR");
 
+// Uma reação por etapa, na ordem de PROFILE_STEPS.
+type LumenReaction = (answers: ProfileDraft, startup: boolean) => string;
+function sectorReaction(answers: ProfileDraft, startup: boolean): string {
+  if (answers.sectors.includes("GENERAL")) return "Generalistas são ouro para quem está começando.";
+  if (answers.sectors.includes("DISCOVERING")) return "Tudo bem! Um mentor pode te ajudar a enxergar o seu mercado.";
+  return startup ? "Boa! Isso ajuda a achar quem conhece esse universo." : "Anotado no seu perfil.";
+}
+function topicReaction(answers: ProfileDraft, startup: boolean): string {
+  if (!startup) return "Experiência prática vale ouro para quem está começando.";
+  return answers.topics.includes("VALIDATION") ? "Boa! Validar o problema cedo evita o erro mais comum das startups." : "Anotado! Vamos atrás de quem já fez isso na prática.";
+}
+function audienceReaction(answers: ProfileDraft, startup: boolean): string {
+  if (!startup) return "Vamos te apresentar a quem precisa da sua experiência.";
+  return answers.audiences.includes("UNKNOWN") ? "Tudo bem, um mentor pode te ajudar a descobrir." : "Perfeito, isso afina bastante a busca.";
+}
+function formatReaction(answers: ProfileDraft, startup: boolean): string {
+  if (answers.format !== "ONLINE") return "Vamos priorizar quem está perto de você.";
+  const others = startup ? "mentores" : "startups";
+  return "Online abre portas para " + others + " do Brasil todo.";
+}
+const LUMEN_REACTIONS: readonly LumenReaction[] = [
+  (_, startup) => startup ? "Toda grande startup começou exatamente aí." : "Ótimo, já sabemos em que fase você brilha.",
+  sectorReaction,
+  topicReaction,
+  audienceReaction,
+  formatReaction,
+  () => "Constância vale mais que intensidade.",
+];
+
 @Component({
   selector: "app-profile-setup",
   standalone: true,
@@ -105,24 +134,8 @@ export class ProfileSetupComponent implements OnInit, AfterViewInit {
   });
   // Resposta curta do Lumen depois que a etapa atual foi respondida.
   readonly reaction = computed<string | null>(() => {
-    const answers = this.draft();
-    if (this.editing() || !stepIsComplete(answers, this.step())) return null;
-    const startup = this.isStartup();
-    switch (this.step()) {
-      case 0: return startup ? "Toda grande startup começou exatamente aí." : "Ótimo, já sabemos em que fase você brilha.";
-      case 1:
-        if (answers.sectors.includes("GENERAL")) return "Generalistas são ouro para quem está começando.";
-        if (answers.sectors.includes("DISCOVERING")) return "Tudo bem! Um mentor pode te ajudar a enxergar o seu mercado.";
-        return startup ? "Boa! Isso ajuda a achar quem conhece esse universo." : "Anotado no seu perfil.";
-      case 2:
-        if (!startup) return "Experiência prática vale ouro para quem está começando.";
-        return answers.topics.includes("VALIDATION") ? "Boa! Validar o problema cedo evita o erro mais comum das startups." : "Anotado! Vamos atrás de quem já fez isso na prática.";
-      case 3:
-        if (!startup) return "Vamos te apresentar a quem precisa da sua experiência.";
-        return answers.audiences.includes("UNKNOWN") ? "Tudo bem, um mentor pode te ajudar a descobrir." : "Perfeito, isso afina bastante a busca.";
-      case 4: return answers.format === "ONLINE" ? "Online abre portas para " + (startup ? "mentores" : "startups") + " do Brasil todo." : "Vamos priorizar quem está perto de você.";
-      default: return "Constância vale mais que intensidade.";
-    }
+    if (this.editing() || !stepIsComplete(this.draft(), this.step())) return null;
+    return LUMEN_REACTIONS[this.step()](this.draft(), this.isStartup());
   });
   readonly message = computed(() => {
     const celebrated = this.celebrating();
