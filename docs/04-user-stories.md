@@ -345,21 +345,30 @@
 
 ---
 
-### 🔹 `US-18`: Entender por que recebi uma recomendação
+### 🔹 `US-18`: Saber quais indicações são as mais fortes
 * **Como** participante,
-* **Quero** ver a pontuação, o peso e a contribuição de cada critério, o que não se aplicou e a versão do cálculo,
-* **Para que** eu confie na indicação e saiba o que pesou a favor ou contra.
+* **Quero** ver minhas indicações em ordem e saber quais são as combinações mais fortes,
+* **Para que** eu comece pelos perfis com mais chance de fazer sentido, sem precisar entender números.
 
 > **Critérios de aceitação:**
-> * **Cenário 1 (Explicação completa):**
->   * **Dado** que recebi uma recomendação,
->   * **Quando** abro os detalhes,
->   * **Então** vejo cada critério com peso e contribuição, os itens não aplicáveis e a versão (ex.: match-1.0), e consigo refazer a conta.
-> * **Cenário 2 (Dado faltando):**
+> * **Cenário 1 (Combinação muito forte):**
+>   * **Dado** que uma indicação tem nota 95 ou mais,
+>   * **Quando** vejo a lista ou abro os detalhes do perfil,
+>   * **Então** o perfil aparece com o selo **Match master** em destaque, sem mostrar a porcentagem.
+> * **Cenário 2 (Demais indicações):**
+>   * **Dado** que uma indicação tem nota abaixo de 95,
+>   * **Quando** vejo a lista,
+>   * **Então** ela aparece na ordem da nota, sem selo e sem número.
+> * **Cenário 3 (Dado faltando):**
 >   * **Dado** que não preenchi um dado obrigatório para o meu objetivo,
 >   * **Quando** peço recomendações,
->   * **Então** o sistema avisa o que falta e não mostra uma pontuação como se o dado fosse compatível.
+>   * **Então** o sistema avisa o que falta e não trata o dado ausente como compatível.
+> * **Cenário 4 (Uso interno):**
+>   * **Dado** que sou da equipe do DaMatch,
+>   * **Quando** consulto os dados de matching,
+>   * **Então** vejo a nota, a contribuição de cada critério e a versão do cálculo, para estudar e ajustar a regra.
 * *Prioridade:* P1 · *Rastreabilidade:* RF18, RN16, RN19, CA13, CA14, CA15.
+* *Decisão do PO (25/10/2026):* a porcentagem e a explicação por critério ficam só com a equipe; o participante vê apenas a ordem e o selo Match master. Isso altera a RF18 do SRS v1.0 e precisa entrar na próxima revisão do documento de requisitos. Ver [documento 24](24-questionario-v3.md).
 
 ---
 
