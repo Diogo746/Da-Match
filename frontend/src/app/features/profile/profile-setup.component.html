@@ -103,7 +103,7 @@
               <fieldset class="choice-fieldset"><legend class="small-legend">Quantas startups você topa acompanhar ao mesmo tempo?</legend><div class="cadence-choices">
                 @for (capacity of capacities; track capacity.id) { <button type="button" class="period-choice" [class.chosen]="draft().capacity === capacity.id" [attr.aria-pressed]="draft().capacity === capacity.id" (click)="chooseCapacity(capacity.id)"><strong>{{ capacity.label }}</strong><small>{{ capacity.detail }}</small></button> }
               </div></fieldset>
-              <p class="field-help">Assim você nunca recebe pedidos demais.</p>
+              <p class="field-help">Informe sua capacidade atual de acompanhamento.</p>
             }
           }
           @case (4) {
@@ -128,7 +128,7 @@
             </div></fieldset>
             <output class="selection-note">{{ draft().availability.length }} {{ draft().availability.length === 1 ? 'janela adicionada' : 'janelas adicionadas' }}. Marque outros dias se quiser.</output>
             <div class="availability-chips">@for (slot of draft().availability; track slot.day + slot.period) { <button type="button" [attr.aria-label]="'Remover ' + slotLabel(slot)" (click)="toggleSlot(slot.day, slot.period)">{{ slotLabel(slot) }}<app-icon name="close" /></button> }</div>
-            <p class="field-help">Horário de Recife. São janelas de disponibilidade; o horário exato será combinado entre vocês.</p>
+            <p class="field-help">Horário de Brasília (America/Sao_Paulo). São janelas de disponibilidade; o horário exato será combinado entre vocês.</p>
             @if (!isStartup()) { <label class="accepting-choice"><input type="checkbox" formControlName="accepting" /><span><strong>Estou recebendo novas startups</strong><small>Você pode pausar e retomar quando quiser.</small></span></label> }
           }
         }

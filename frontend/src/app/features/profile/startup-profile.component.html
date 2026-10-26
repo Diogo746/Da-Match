@@ -22,6 +22,7 @@
     @if (profile(); as startup) {
       <article class="startup-card" [attr.aria-busy]="busy()">
         <h2>{{ startup.nomeProvisorio }}</h2>
+        @if (!editing()) { <a class="button button-secondary" [routerLink]="['/startup/perfil', startup.id, 'questionario']">Abrir questionário deste projeto</a> }
         @if (editing()) {
           <form [formGroup]="form" (ngSubmit)="save()" novalidate>
             <fieldset [disabled]="busy() || loading() || uncertain()">
