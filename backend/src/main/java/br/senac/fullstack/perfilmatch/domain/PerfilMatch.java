@@ -33,7 +33,7 @@ import org.hibernate.annotations.Check;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -112,7 +112,7 @@ public class PerfilMatch {
     @MapKeyColumn(name = "topico")
     @Enumerated(EnumType.STRING)
     @Column(name = "experiencia", nullable = false)
-    private Map<Topico, Experiencia> experience = new HashMap<>();
+    private Map<Topico, Experiencia> experience = new EnumMap<>(Topico.class);
 
     @Enumerated(EnumType.STRING)
     private Capacidade capacity;

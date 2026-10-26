@@ -7,17 +7,20 @@ import br.senac.fullstack.perfilmatch.api.dto.PerfilMatchResponse;
 import br.senac.fullstack.perfilmatch.api.dto.SalvarPerfilMatchRequest;
 import br.senac.fullstack.perfilmatch.domain.AgendaPerfilMatch;
 import br.senac.fullstack.perfilmatch.domain.CodigosPerfilMatch.Dia;
+import br.senac.fullstack.perfilmatch.domain.CodigosPerfilMatch.Experiencia;
 import br.senac.fullstack.perfilmatch.domain.CodigosPerfilMatch.Periodo;
+import br.senac.fullstack.perfilmatch.domain.CodigosPerfilMatch.Topico;
 import br.senac.fullstack.perfilmatch.domain.PerfilMatch;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class PerfilMatchMapper {
@@ -36,7 +39,7 @@ public class PerfilMatchMapper {
         entity.setFormat(request.format());
         entity.setCityId(request.cityId() == null ? "" : request.cityId());
         entity.setAvailability(request.availability() == null ? null : request.availability().stream()
-                .map(slot -> slot == null ? null : new AgendaPerfilMatch(slot.day(), slot.period())).toList());
+                .map(this::toAgendaEntity).toList());
         entity.setCadence(request.cadence());
         entity.setAccepting(request.accepting() == null || request.accepting());
         return entity;
@@ -49,7 +52,9 @@ public class PerfilMatchMapper {
         target.setMoments(new ArrayList<>(source.getMoments()));
         target.setSectors(new ArrayList<>(source.getSectors()));
         target.setTopics(new ArrayList<>(source.getTopics()));
-        target.setExperience(new HashMap<>(source.getExperience()));
+        Map<Topico, Experiencia> experience = new EnumMap<>(Topico.class);
+        experience.putAll(source.getExperience());
+        target.setExperience(experience);
         target.setAudiences(new ArrayList<>(source.getAudiences()));
         target.setBackgrounds(new ArrayList<>(source.getBackgrounds()));
         target.setCapacity(source.getCapacity());
@@ -70,16 +75,18 @@ public class PerfilMatchMapper {
     }
 
     public Set<DisponibilidadeMentor> toMentorAvailability(List<AgendaPerfilMatch> slots) {
-        Set<DisponibilidadeMentor> result = new LinkedHashSet<>();
-        for (AgendaPerfilMatch slot : slots) {
-            result.add(new DisponibilidadeMentor(slot.getDay().ordinal() + 1, switch (slot.getPeriod()) {
-                case MORNING -> PeriodoDisponibilidade.MANHA;
-                case AFTERNOON -> PeriodoDisponibilidade.TARDE;
-                case EVENING -> PeriodoDisponibilidade.NOITE;
-                default -> throw new IllegalArgumentException("Período inválido.");
-            }));
-        }
-        return result;
+        return slots.stream()
+                .map(slot -> new DisponibilidadeMentor(slot.getDay().ordinal() + 1, switch (slot.getPeriod()) {
+                    case MORNING -> PeriodoDisponibilidade.MANHA;
+                    case AFTERNOON -> PeriodoDisponibilidade.TARDE;
+                    case EVENING -> PeriodoDisponibilidade.NOITE;
+                    default -> throw new IllegalArgumentException("Período inválido.");
+                }))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private AgendaPerfilMatch toAgendaEntity(AgendaPerfilMatchDto slot) {
+        return slot == null ? null : new AgendaPerfilMatch(slot.day(), slot.period());
     }
 
     public List<AgendaPerfilMatch> fromMentorAvailability(Set<DisponibilidadeMentor> slots) {
