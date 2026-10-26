@@ -110,11 +110,14 @@ class PerfilMatchIntegrationTest {
         write(path, owner, body, 200);
         mvc.perform(get(path).with(as(owner))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.topics.length()").value(6)).andExpect(jsonPath("$.accepting").value(false));
+        // Mentor availability is a set: validate complete pairs without assuming database iteration order.
         mvc.perform(get("/api/v1/mentores/me").with(as(owner)))
                 .andExpect(jsonPath("$.status").value("RASCUNHO"))
                 .andExpect(jsonPath("$.disponibilidades.length()").value(2))
-                .andExpect(jsonPath("$.disponibilidades[0].diaSemana").value(1))
-                .andExpect(jsonPath("$.disponibilidades[1].diaSemana").value(7));
+                .andExpect(content().json("""
+                        {"disponibilidades":[{"diaSemana":1,"periodo":"MANHA"},
+                                             {"diaSemana":7,"periodo":"NOITE"}]}
+                        """));
         mvc.perform(patch("/api/v1/mentores/" + mentor.getId()).with(as(owner)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content("""
                         {"disponibilidades":[{"diaSemana":4,"periodo":"TARDE"}]}
