@@ -67,7 +67,7 @@ export class QuestionnaireComponent implements OnInit {
 
   async load(): Promise<void> {
     const user = this.state.user();
-    if (!user || user.tipoUsuario !== this.kind || this.loading() || this.busy()) return;
+    if (user?.tipoUsuario !== this.kind || this.loading() || this.busy()) return;
     this.actor.set(user.id);
     this.clear();
     this.loading.set(true);
