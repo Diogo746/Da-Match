@@ -3,11 +3,17 @@ package br.senac.fullstack.mentor.infrastructure.persistence.repository;
 import br.senac.fullstack.mentor.domain.Mentor;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import jakarta.persistence.LockModeType;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public interface MentorRepository extends JpaRepository<Mentor, UUID> {
+    @Override
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<Mentor> findById(UUID id);
+
     Optional<Mentor> findByUsuarioId(UUID usuarioId);
 
     Optional<Mentor> findByUsuario(Usuario usuario);
