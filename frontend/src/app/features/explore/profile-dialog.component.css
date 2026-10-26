@@ -176,4 +176,4 @@
   }
 }
 
-.match-explanation>h3:first-child{font-size:23px;letter-spacing:-.6px;color:var(--teal)}.match-limitations{font-size:11px;line-height:1.8;color:var(--attention-text);padding-left:18px}.match-limitations li{margin:8px 0}.calculation-details{margin-top:24px;padding:13px;background:var(--surface-soft);border-radius:9px;font-size:11px;color:var(--text-soft)}.calculation-details summary{cursor:pointer;font-weight:650;line-height:1.7}.score-breakdown{margin:14px 0}.score-breakdown>div{display:flex;gap:15px;justify-content:space-between;padding:9px 0;border-top:1px solid var(--border-soft)}.score-breakdown dt{font-size:10px;line-height:1.8}.score-breakdown dd{font-size:10px;white-space:nowrap;font-weight:650;margin:0}.calculation-details p{font-size:10px;line-height:1.8;color:var(--muted)}
+.high-match-badge{display:inline-flex;align-items:center;gap:7px;margin:0 0 14px;padding:7px 12px;border-radius:20px;background:var(--profile-tint);color:var(--profile-ink);font-size:12px;font-weight:650}.high-match-badge app-icon{width:15px;height:15px}

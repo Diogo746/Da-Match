@@ -24,12 +24,12 @@ describe("Perfil temporário", () => {
     store.save("Maria Teste", { ...answers, projectName: "" });
     expect(store.profile()!.displayName).toBe("Ideia de Maria");
   });
-  it("exige as cinco etapas antes de ativar um perfil", () => {
+  it("exige as etapas usadas pela compatibilidade antes de ativar um perfil", () => {
     const store = new ProfileSessionStore();
     expect(() => store.save("Maria", emptyProfile("STARTUP"))).toThrow("Perfil incompleto");
     expect(profileIsComplete(answers)).toBe(true);
-    expect(stepIsComplete(answers, 5)).toBe(false);
-    expect(stepIsComplete({ ...answers, format: "PRESENCIAL", cityId: "" }, 3)).toBe(false);
+    expect(stepIsComplete(answers, 6)).toBe(false);
+    expect(stepIsComplete({ ...answers, format: "PRESENCIAL", cityId: "" }, 4)).toBe(false);
   });
   it("apresenta os códigos e as alternativas do perfil em português", () => {
     expect(sectorLabel("GENERAL")).toBe("Atuação geral");

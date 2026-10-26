@@ -29,20 +29,9 @@
           <span>{{ tag }}</span>
         }
       </div>
-      @if (matching(); as result) {
-        @if (result.eligible && result.relevant) {
-          <section class="match-explanation" aria-labelledby="matching-title">
-            <h3 id="matching-title">{{ result.score !== null ? result.score + '% de compatibilidade' : 'Compatibilidade em construção' }}</h3>
-            <p class="dialog-note">{{ result.partial ? 'O setor ainda está em descoberta. Mostramos os pontos em comum sem atribuir uma porcentagem completa.' : 'Índice calculado a partir das respostas dos dois perfis. Representa aderência aos critérios, sem garantir o resultado de uma parceria.' }}</p>
-            <ul class="reasons">@for (reason of result.reasons; track reason) { <li><app-icon name="check" />{{ reason }}</li> }</ul>
-            @if (result.limitations.length) { <h3>Pontos de atenção</h3><ul class="match-limitations">@for (limitation of result.limitations; track limitation) { <li>{{ limitation }}</li> }</ul> }
-            <details class="calculation-details"><summary>Como essa indicação foi calculada</summary><dl class="score-breakdown">@for (criterion of result.criteria; track criterion.key) { <div><dt>{{ criterion.label }}</dt><dd>{{ criterion.maximum ? criterion.points + ' / ' + criterion.maximum : 'Pendente' }}</dd></div> }</dl><p>Regra {{ result.version }}. Necessidades: até 70 pontos. Setor: até 20. Momento da ideia: até 10. Sem uma segunda necessidade, a principal vale os 70 pontos. Modalidade, frequência e agenda verificam a possibilidade de conversar.</p></details>
-          </section>
-        } @else { <h3>Sem indicação para este momento</h3><ul class="match-limitations">@for (blocker of result.blockers; track blocker) { <li>{{ blocker }}</li> } @if (result.eligible && !result.relevant) { <li>Este perfil não atende às suas necessidades declaradas.</li> }</ul> }
-      } @else {
-        <h3>Sobre este perfil</h3><ul class="reasons">@for (reason of profile.reasons; track reason) { <li><app-icon name="check" />{{ reason }}</li> }</ul>
-        <p class="dialog-note">Monte seu perfil para receber indicações a partir das suas necessidades, experiência e disponibilidade.</p>
-      }
+      @if (highMatch()) { <p class="high-match-badge"><app-icon name="spark" />Super DaMatch: uma combinação muito forte com o seu perfil</p> }
+      <h3>Sobre este perfil</h3><ul class="reasons">@for (reason of profile.reasons; track reason) { <li><app-icon name="check" />{{ reason }}</li> }</ul>
+      @if (!matching()) { <p class="dialog-note">Monte seu perfil para receber indicações a partir das suas necessidades, experiência e disponibilidade.</p> }
       <div class="dialog-actions">
         <button
           class="button button-secondary"

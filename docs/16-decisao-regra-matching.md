@@ -84,3 +84,24 @@ O setor "ainda descobrindo" precisa de uma decisão própria: ou o SRS passa a a
 O frontend demonstrativo passa a usar `damatch-rules-v2`: necessidades até 70, setor até 20 e momento dentro da ideação até 10, com filtros de modalidade, pares de agenda e frequência. Experiência prática desempata notas iguais. O setor em descoberta continua parcial. A especificação atual está no [documento 18](18-frontend-v0.5.0.md).
 
 Essa implementação experimental não registra uma aprovação do PO ou uma alteração automática do SRS. O alinhamento da regra definitiva e dos critérios de aceitação com a equipe continua necessário antes do cálculo no backend.
+
+## Atualização — 25/10/2026
+
+### Mais uma opção: regra do quiz original
+
+O quiz que serviu de base para o cadastro usava outra pontuação. Ela entra como opção **D** para a reunião:
+
+| Critério | Peso |
+| --- | --- |
+| Tipo de ajuda (necessidades atendidas; experiência prática vale mais) | 35 |
+| Área / setor | 25 |
+| Momento da ideia | 15 |
+| Público (B2C, B2B…) | 10 |
+| Frequência e horários | 10 |
+| Formação complementar (áreas diferentes valem mais) | 5 |
+
+Corte: abaixo de 30 o perfil não aparece. A vantagem é usar as perguntas novas de público e formação (ver [documento 24](24-questionario-v3.md)). A desvantagem é não diferenciar a necessidade principal da secundária.
+
+### Decisão do PO: porcentagem só para a equipe
+
+Seja qual for a regra escolhida, o participante **não vê a porcentagem** nem a explicação por critério. Ele vê as indicações em ordem e o selo **Super DaMatch** quando a nota for 95 ou mais. A nota completa fica guardada para a equipe estudar e ajustar o match. Essa decisão muda a RF18 do SRS e a US-18 já foi atualizada.

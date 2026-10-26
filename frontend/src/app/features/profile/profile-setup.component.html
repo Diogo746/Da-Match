@@ -1,6 +1,13 @@
 <div class="setup-layout">
   <section class="setup-panel" aria-labelledby="lumen-question">
-    <div class="setup-top"><p class="eyebrow">{{ editing() ? 'EDITAR RESPOSTAS' : 'SEU PERFIL, SEU MOMENTO' }}</p><span>{{ reviewing() ? 'Revisão' : step() + 1 + ' de 5' }}</span></div>
+    <div class="setup-top"><p class="eyebrow">{{ editing() ? 'EDITAR RESPOSTAS' : 'SEU PERFIL, SEU MOMENTO' }}</p><span>{{ reviewing() ? 'Revisão' : 'Etapa ' + (step() + 1) + ' de ' + steps.length }}</span></div>
+    @if (!editing()) {
+      <ol class="phase-track" aria-label="Fases do perfil">
+        @for (item of phaseProgress(); track item.name; let index = $index) {
+          <li [class.current]="!reviewing() && phase() === index" [attr.aria-current]="!reviewing() && phase() === index ? 'step' : null"><span>{{ item.name }}</span><span class="phase-bar" aria-hidden="true"><i [style.width.%]="item.percent"></i></span><span class="sr-only">{{ item.percent }}% concluída</span></li>
+        }
+      </ol>
+    } @else {
     <fieldset class="step-track" [class.edit-sections]="editing()">
       <legend class="sr-only">{{ editing() ? 'Seções do perfil' : 'Etapas do perfil' }}</legend>
       @for (label of steps; track label; let index = $index) {
@@ -11,10 +18,19 @@
         }
       }
     </fieldset>
+    }
     <app-lumen-guide class="lumen-message" [question]="title()" [message]="message()" [pose]="pose()" questionId="lumen-question" />
     <form [formGroup]="form" (ngSubmit)="next()" novalidate>
       @if (error()) { <p #errorSummary class="error-summary" role="alert" tabindex="-1">{{ error() }}</p> }
-      @if (reviewing()) {
+      @if (celebrating() !== null) {
+        <div class="phase-celebration">
+          @if (motion.allowed()) { <span class="confetti" aria-hidden="true">@for (piece of confetti; track piece) { <i></i> }</span> }
+          <span class="phase-level">O que você contou nesta fase</span>
+          <dl class="phase-summary">
+            @for (section of phaseSummary(); track section.step) { <div><dt><app-icon name="check" />{{ section.title }}</dt><dd>{{ section.value }}</dd></div> }
+          </dl>
+        </div>
+      } @else if (reviewing()) {
         <dl class="review-list">
           @for (section of summary(); track section.step) {
             <div><dt>{{ section.title }}<button type="button" class="text-button" [attr.aria-label]="'Rever ' + section.title" (click)="selectStep(section.step)">Ajustar</button></dt><dd>{{ section.value }}</dd></div>
@@ -32,11 +48,16 @@
             <p class="selection-note">Todos os caminhos aqui são de ideação. Seu perfil pode acompanhar as mudanças da sua ideia.</p>
           }
           @case (1) {
-            <fieldset class="choice-fieldset"><legend class="sr-only">Setor de atuação</legend><div class="choice-grid sector-grid">
-              @for (sector of sectors; track sector.id) {
+            <fieldset class="choice-fieldset"><legend class="sr-only">Setor de atuação</legend>
+            <label class="sr-only" for="sector-search">Buscar área</label>
+            <input id="sector-search" class="form-input sector-search" type="search" placeholder="Buscar área..." [value]="sectorSearch()" (input)="searchSectors($event)" autocomplete="off" />
+            <div class="choice-grid sector-grid">
+              @for (sector of sectors(); track sector.id) {
                 <button type="button" class="choice" [class.chosen]="draft().sectors.includes(sector.id)" [attr.aria-pressed]="draft().sectors.includes(sector.id)" (click)="selectSector(sector.id)"><app-icon [name]="sector.icon" /><span>{{ sector.label }}</span><app-icon class="choice-check" name="check" /></button>
               }
+              @empty { <p class="selection-note">Nenhuma área encontrada.</p> }
             </div>
+            <p class="selection-note">{{ draft().sectors.length }} de {{ sectorLimit() }} escolhidas.</p>
             @if (isStartup()) { <button type="button" class="soft-choice" [class.chosen]="draft().sectors.includes('DISCOVERING')" [attr.aria-pressed]="draft().sectors.includes('DISCOVERING')" (click)="selectSector('DISCOVERING')">Ainda estou descobrindo meu setor<app-icon name="compass" /></button> }
             @else { <button type="button" class="soft-choice" [class.chosen]="draft().sectors.includes('GENERAL')" [attr.aria-pressed]="draft().sectors.includes('GENERAL')" (click)="selectSector('GENERAL')">Minha orientação serve a diferentes setores<app-icon name="network" /></button> }
             </fieldset>
@@ -65,9 +86,27 @@
                 </fieldset>
               }
             }
-            <p class="selection-note">{{ draft().topics.length }} de {{ isStartup() ? 2 : 3 }} escolhidos. Você pode desmarcar para trocar.</p>
+            <p class="selection-note">{{ draft().topics.length }} de {{ topicLimit() }} escolhidos. Você pode desmarcar para trocar.</p>
           }
           @case (3) {
+            <fieldset class="choice-fieldset"><legend class="small-legend">{{ isStartup() ? 'Para quem é a solução?' : 'Públicos com que já trabalhou' }}</legend><div class="choice-grid audience-grid">
+              @for (audience of audiences(); track audience.id) {
+                <button type="button" class="choice" [class.chosen]="draft().audiences.includes(audience.id)" [attr.aria-pressed]="draft().audiences.includes(audience.id)" (click)="toggleAudience(audience.id)"><app-icon [name]="audience.icon" /><span>{{ isStartup() ? audience.startup : audience.label }}</span><app-icon class="choice-check" name="check" /></button>
+              }
+            </div></fieldset>
+            <p class="selection-note">{{ draft().audiences.length }} de {{ audienceLimit() }} escolhidos.</p>
+            <fieldset class="choice-fieldset"><legend class="small-legend">{{ isStartup() ? 'Quais áreas o seu time já domina para tocar essa ideia?' : 'Qual é a sua área de formação ou experiência?' }}</legend><div class="cadence-choices background-choices">
+              @for (background of backgrounds(); track background.id) { <button type="button" class="period-choice" [class.chosen]="draft().backgrounds.includes(background.id)" [attr.aria-pressed]="draft().backgrounds.includes(background.id)" (click)="toggleBackground(background.id)"><strong>{{ background.label }}</strong></button> }
+            </div></fieldset>
+            <p class="field-help">{{ draft().backgrounds.length }} de {{ backgroundLimit() }} escolhidas. {{ isStartup() ? 'Marque o que vocês já sabem fazer bem. O mentor ideal cobre o que falta.' : 'Formação ou experiência, como preferir.' }}</p>
+            @if (!isStartup()) {
+              <fieldset class="choice-fieldset"><legend class="small-legend">Quantas startups você topa acompanhar ao mesmo tempo?</legend><div class="cadence-choices">
+                @for (capacity of capacities; track capacity.id) { <button type="button" class="period-choice" [class.chosen]="draft().capacity === capacity.id" [attr.aria-pressed]="draft().capacity === capacity.id" (click)="chooseCapacity(capacity.id)"><strong>{{ capacity.label }}</strong><small>{{ capacity.detail }}</small></button> }
+              </div></fieldset>
+              <p class="field-help">Assim você nunca recebe pedidos demais.</p>
+            }
+          }
+          @case (4) {
             <fieldset class="choice-fieldset"><legend class="sr-only">Modalidade dos encontros</legend><div class="format-choices">
               @for (format of formats; track format.id) { <button type="button" class="choice topic-choice" [class.chosen]="draft().format === format.id" [attr.aria-pressed]="draft().format === format.id" (click)="chooseFormat(format.id)"><app-icon [name]="format.icon" /><span><strong>{{ format.label }}</strong><small>{{ format.detail }}</small></span><app-icon class="choice-check" name="check" /></button> }
             </div></fieldset>
@@ -77,7 +116,7 @@
               <p class="field-help" id="city-hint">{{ draft().format === 'AMBOS' ? 'Sem uma cidade, suas indicações considerarão encontros online.' : 'Nesta prévia, o catálogo de cidades é reduzido. Se a sua não estiver aqui, você pode escolher online ou voltar depois.' }}</p>
             }
           }
-          @case (4) {
+          @case (5) {
             <fieldset class="choice-fieldset"><legend class="small-legend">Com qual frequência?</legend><div class="cadence-choices">
               @for (cadence of cadences; track cadence.id) { <button type="button" class="period-choice" [class.chosen]="draft().cadence === cadence.id" [attr.aria-pressed]="draft().cadence === cadence.id" (click)="chooseCadence(cadence.id)"><strong>{{ cadence.label }}</strong><small>{{ cadence.detail }}</small></button> }
             </div></fieldset>
@@ -96,16 +135,16 @@
       }
       <div class="wizard-actions">
         @if (editing()) { <button class="button button-secondary" type="button" (click)="cancelled.emit()">Cancelar</button> }
-        @else if (step() > 0 || reviewing()) { <button class="button button-secondary" type="button" (click)="back()">Voltar</button> }
+        @else if (step() > 0 || reviewing() || celebrating() !== null) { <button class="button button-secondary" type="button" (click)="back()">Voltar</button> }
         @else { <span class="first-step-note">Um passo de cada vez.</span> }
-        <button class="button button-primary" type="submit">{{ editing() ? 'Salvar alterações' : reviewing() ? 'Concluir meu perfil' : step() === 4 ? 'Revisar meu perfil' : 'Continuar' }}<app-icon [name]="editing() || reviewing() ? 'check' : 'arrow'" /></button>
+        <button class="button button-primary" type="submit">{{ editing() ? 'Salvar alterações' : reviewing() ? 'Concluir meu perfil' : celebrating() !== null ? 'Continuar para ' + phaseNames()[celebrating()! + 1] : step() === lastStep ? 'Revisar meu perfil' : 'Continuar' }}<app-icon [name]="editing() || reviewing() ? 'check' : 'arrow'" /></button>
       </div>
     </form>
   </section>
   <aside class="preview-column" aria-label="Seu perfil em construção">
     <p class="eyebrow">{{ editing() ? 'PRÉVIA DAS ALTERAÇÕES' : 'DO SEU JEITO' }}</p><h2>{{ editing() ? 'Veja como ficará.' : 'Seu perfil ganha forma.' }}</h2>
     <app-profile-preview [name]="name()" [draft]="draft()" />
-    @if (!editing()) { <div class="real-progress"><label for="profile-progress">{{ completed() }} de 5 etapas preenchidas</label><progress id="profile-progress" max="5" [value]="completed()"></progress></div> }
+    @if (!editing()) { <div class="real-progress"><label for="profile-progress">{{ completed() }} de {{ steps.length }} etapas preenchidas</label><progress id="profile-progress" [max]="steps.length" [value]="completed()"></progress></div> }
     <p class="preview-note"><app-icon name="shield" />{{ editing() ? 'As mudanças são aplicadas ao salvar. Você pode cancelar a edição.' : 'Suas respostas ajudam a personalizar as indicações. Você pode editar depois.' }}</p>
   </aside>
 </div>
