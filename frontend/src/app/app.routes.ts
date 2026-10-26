@@ -21,6 +21,8 @@ export const routes: Routes = [
   { path: "entrar", loadComponent: () => import("./features/auth/login.component").then(module => module.LoginComponent), title: "Entrar | DaMatch" },
   { path: "conta", loadComponent: () => import("./features/auth/account.component").then(module => module.AccountComponent), canActivate: [authGuard], title: "Minha conta | DaMatch" },
   { path: "mentor/perfil", loadComponent: () => import("./features/profile/mentor-profile.component").then(module => module.MentorProfileComponent), canActivate: [mentorGuard], title: "Perfil de mentor | DaMatch" },
+  { path: "mentor/questionario", loadComponent: () => import("./features/profile/questionnaire.component").then(module => module.QuestionnaireComponent), canActivate: [mentorGuard], data: { kind: "MENTOR" }, title: "Questionário | DaMatch" },
+  { path: "startup/perfil/:startupId/questionario", loadComponent: () => import("./features/profile/questionnaire.component").then(module => module.QuestionnaireComponent), canActivate: [startupGuard], data: { kind: "STARTUP" }, title: "Questionário | DaMatch" },
   { path: "startup/perfil", loadComponent: () => import("./features/profile/startup-profile.component").then(module => module.StartupProfileComponent), canActivate: [startupGuard], title: "Minha startup | DaMatch" },
   {
     path: "como-funciona",

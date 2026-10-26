@@ -431,6 +431,136 @@
       ]
     },
     {
+      "name": "Questionário v3",
+      "description": "Respostas ligadas a perfil existente e identificadas pela sessão. Startup: membro consulta; FUNDADOR/REPRESENTANTE salva. Mentor: somente titular. PUT substitui integralmente e exige CSRF. Perfil existente sem questionário retorna 204; não confundir com 404. Não calcula matching nem publica o perfil.",
+      "item": [
+        {
+          "name": "Consultar questionário de startup",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/perfil-match",
+            "description": "200 com respostas; 204 quando ainda não preenchido; 403 sem vínculo/titularidade; 404 perfil inexistente. Sem nota de matching."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta confirmada ou ainda sem respostas', () => pm.expect([200, 204]).to.include(pm.response.code));",
+                  "if (pm.response.code === 200) pm.test('Contrato v3 sem credenciais nem nota', () => { const body = pm.response.json(); pm.expect(body.questionnaireVersion).to.eql('damatch-profile-v3'); pm.expect(body).not.to.have.property('senha'); pm.expect(body).not.to.have.property('score'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Salvar questionário de startup",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/perfil-match",
+            "description": "Substitui todas as respostas v3. Obtenha /csrf, preserve cookies e use sessão. Não aceita ator/IDs no corpo. Mentor atualiza sua agenda real; accepting não altera o status de publicação.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionnaireVersion\": \"damatch-profile-v3\",\n  \"kind\": \"STARTUP\",\n  \"projectName\": \"Ideia fictícia\",\n  \"moments\": [\n    \"PROBLEM\"\n  ],\n  \"sectors\": [\n    \"TECH\",\n    \"HEALTH\"\n  ],\n  \"topics\": [\n    \"VALIDATION\",\n    \"PRICING\"\n  ],\n  \"experience\": {},\n  \"audiences\": [\n    \"B2C\"\n  ],\n  \"backgrounds\": [\n    \"TECH\",\n    \"BUSINESS\"\n  ],\n  \"capacity\": null,\n  \"format\": \"ONLINE\",\n  \"cityId\": \"\",\n  \"availability\": [\n    {\n      \"day\": \"THU\",\n      \"period\": \"EVENING\"\n    }\n  ],\n  \"cadence\": \"FLEXIBLE\",\n  \"accepting\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Questionário salvo', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) pm.test('Contrato v3 sem credenciais nem nota', () => { const body = pm.response.json(); pm.expect(body.questionnaireVersion).to.eql('damatch-profile-v3'); pm.expect(body).not.to.have.property('senha'); pm.expect(body).not.to.have.property('score'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar questionário de mentor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/mentores/{{mentorId}}/perfil-match",
+            "description": "200 com respostas; 204 quando ainda não preenchido; 403 sem vínculo/titularidade; 404 perfil inexistente. Sem nota de matching."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta confirmada ou ainda sem respostas', () => pm.expect([200, 204]).to.include(pm.response.code));",
+                  "if (pm.response.code === 200) pm.test('Contrato v3 sem credenciais nem nota', () => { const body = pm.response.json(); pm.expect(body.questionnaireVersion).to.eql('damatch-profile-v3'); pm.expect(body).not.to.have.property('senha'); pm.expect(body).not.to.have.property('score'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Salvar questionário de mentor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/mentores/{{mentorId}}/perfil-match",
+            "description": "Substitui todas as respostas v3. Obtenha /csrf, preserve cookies e use sessão. Não aceita ator/IDs no corpo. Mentor atualiza sua agenda real; accepting não altera o status de publicação.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionnaireVersion\": \"damatch-profile-v3\",\n  \"kind\": \"MENTOR\",\n  \"projectName\": \"\",\n  \"moments\": [\n    \"PROBLEM\"\n  ],\n  \"sectors\": [\n    \"TECH\",\n    \"HEALTH\"\n  ],\n  \"topics\": [\n    \"VALIDATION\",\n    \"PRICING\"\n  ],\n  \"experience\": {\n    \"VALIDATION\": \"PRACTICAL\",\n    \"PRICING\": \"KNOWLEDGE\"\n  },\n  \"audiences\": [\n    \"B2C\"\n  ],\n  \"backgrounds\": [\n    \"TECH\",\n    \"BUSINESS\"\n  ],\n  \"capacity\": \"FEW\",\n  \"format\": \"ONLINE\",\n  \"cityId\": \"\",\n  \"availability\": [\n    {\n      \"day\": \"THU\",\n      \"period\": \"EVENING\"\n    }\n  ],\n  \"cadence\": \"FLEXIBLE\",\n  \"accepting\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Questionário salvo', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) pm.test('Contrato v3 sem credenciais nem nota', () => { const body = pm.response.json(); pm.expect(body.questionnaireVersion).to.eql('damatch-profile-v3'); pm.expect(body).not.to.have.property('senha'); pm.expect(body).not.to.have.property('score'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "PENDENTE — Mentor",
       "description": "Contratos propostos para busca e listagem de mentores. Estes endpoints ainda não foram implementados e retornam 404.",
       "item": [

@@ -1,0 +1,27 @@
+<a class="back-link" [routerLink]="kind === 'MENTOR' ? '/mentor/perfil' : '/startup/perfil'">← Voltar ao perfil</a>
+<section aria-labelledby="questionnaire-title" [attr.aria-busy]="loading() || busy()">
+  <h1 id="questionnaire-title">Questionário do perfil</h1>
+  <p>Suas respostas ficam salvas na sua conta. As indicações reais estarão disponíveis após a definição das regras de matching.</p>
+  @if (kind === 'MENTOR') { <p>A agenda preenchida aqui também atualiza a disponibilidade do seu perfil. Receber novas startups e publicar o perfil são escolhas separadas.</p> }
+  @if (error()) { <p role="alert">{{ error() }}</p> }
+  @if (message()) { <output>{{ message() }}</output> }
+  @if (loading()) { <output>Carregando questionário…</output> }
+  @if (busy()) { <output>Salvando respostas…</output> }
+  @if (ready()) {
+    <h2>{{ name() }}</h2>
+    @if (editing()) {
+      <fieldset [disabled]="busy()"><legend class="sr-only">Respostas do questionário</legend>
+        <app-profile-setup [kind]="kind" [name]="name()" [initial]="initial()" [editing]="saved() !== null"
+          (finished)="save($event)" (cancelled)="cancel()" />
+      </fieldset>
+      @if (!saved()) { <button class="button button-secondary" type="button" [disabled]="busy()" (click)="cancel()">Cancelar preenchimento</button> }
+    } @else {
+      @if (saved()) {
+        <dl>@for (row of summary(); track row.label) { <dt>{{ row.label }}</dt><dd>{{ row.value }}</dd> }</dl>
+      } @else { <p>Este perfil ainda não tem questionário salvo.</p> }
+      @if (canEdit()) { <button class="button button-primary" type="button" [disabled]="uncertain() || loading() || busy()" (click)="edit()">{{ saved() ? 'Editar respostas' : 'Preencher questionário' }}</button> }
+      @else { <p>Somente fundadores e representantes podem alterar as respostas deste projeto.</p> }
+    }
+  }
+  @if (!editing()) { <button class="button button-secondary" type="button" [disabled]="loading() || busy()" (click)="load()">Recarregar respostas</button> }
+</section>

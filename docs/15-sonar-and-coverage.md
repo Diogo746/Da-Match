@@ -96,3 +96,11 @@ Em 22/10/2026, os dois apontamentos do perfil de mentor tinham a mesma causa: me
 Validação local desta correção: lint aprovado; 231 testes Angular/Vitest e 8 testes da configuração Vercel aprovados; cobertura de linhas de 98,10%; builds DEMO e API aprovados. A busca em templates HTML e TypeScript não encontrou outros usos de `role="status"`. Não foi executada nova análise remota do SonarQube nem validação com leitor de tela.
 
 Referência: [W3C — ARIA in HTML, semântica implícita de output](https://www.w3.org/TR/html-aria/#el-output).
+
+## Prevenção de reincidência: typescript:S6582
+
+Em 26/10/2026, o carregamento do questionário verificava `!user || user.tipoUsuario !== this.kind`. A condição foi simplificada para `user?.tipoUsuario !== this.kind`, preservando o retorno antecipado sem usuário ou com papel incorreto e os bloqueios de carregamento/salvamento em andamento.
+
+- Prefira optional chaining ao testar a existência do objeto somente para acessar uma propriedade ou método. Preserve a semântica da comparação e de curto-circuito; não substitua automaticamente condições que exigem outro comportamento para valores ausentes.
+- A validação local após as correções do questionário passou com lint, 360 testes Angular/Vitest, 8 de configuração, 98,98% de linhas e builds DEMO/API. Backend: 135 testes e Checkstyle aprovados. A aprovação remota precisa corresponder ao novo commit.
+- As análises atuais de PR e main usam a mesma branch dos projetos SonarQube. Uma análise posterior da main pode substituir o painel de um PR: confira a revisão SHA no histórico de análises e os jobs do commit correto, além da lista de issues abertas. Um apontamento fechado por remoção de arquivo em outra revisão não significa que foi corrigido na branch de trabalho.

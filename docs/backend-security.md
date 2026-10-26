@@ -17,6 +17,9 @@ Implementação na branch `feature/security-configuration`. Autenticação por s
 | `GET /api/v1/startups`, `/{startupId}`, `/{startupId}/membros` | Autenticado |
 | `PATCH /api/v1/mentores/{mentorId}` e `/{mentorId}/status` | MENTOR titular do recurso, com CSRF |
 | `PATCH /api/v1/startups/{startupId}` | STARTUP com vínculo atual de FUNDADOR/REPRESENTANTE, com CSRF |
+| `GET /api/v1/startups/{startupId}/perfil-match` | STARTUP com vínculo atual de qualquer papel; 204 se ainda sem questionário |
+| `PUT /api/v1/startups/{startupId}/perfil-match` | STARTUP com vínculo atual de FUNDADOR/REPRESENTANTE, com CSRF |
+| `GET/PUT /api/v1/mentores/{mentorId}/perfil-match` | MENTOR titular; PUT exige CSRF; consulta sem questionário retorna 204 |
 | `POST /api/v1/startups/{startupId}/membros` e `DELETE .../membros/{usuarioId}` | STARTUP com vínculo de FUNDADOR ou REPRESENTANTE nessa startup, com CSRF |
 | `GET /actuator/health` e subrotas de health | ADMIN |
 | `GET /api/v1/hello` | Público fora de `prod`; bloqueado em `prod` |
@@ -58,7 +61,7 @@ Os arquivos de CI apontam para frontend no Vercel e backend no Render; o domíni
 | `APP_SECURITY_COOKIES_SAME_SITE` | `Lax` | `Lax` para mesmo site; `None` para sites distintos |
 | `APP_SECURITY_SESSION_TIMEOUT` | `30m` | `30m` por padrão; ajustar no ambiente |
 
-Origens devem conter somente esquema HTTP(S), host e porta opcional, sem caminho, barra final, credenciais, query, fragmento ou curinga. Lista ausente em produção ou inválida impede inicialização. `SameSite=None` sem `Secure` também impede inicialização. CORS permite apenas GET, POST, PATCH, DELETE, OPTIONS e headers Content-Type, Accept, X-XSRF-TOKEN, com credenciais e preflight de 600 segundos. Chamadas sem Origin continuam sujeitas às mesmas regras de acesso.
+Origens devem conter somente esquema HTTP(S), host e porta opcional, sem caminho, barra final, credenciais, query, fragmento ou curinga. Lista ausente em produção ou inválida impede inicialização. `SameSite=None` sem `Secure` também impede inicialização. CORS permite apenas GET, POST, PUT, PATCH, DELETE, OPTIONS e headers Content-Type, Accept, X-XSRF-TOKEN, com credenciais e preflight de 600 segundos. Chamadas sem Origin continuam sujeitas às mesmas regras de acesso.
 
 Preferir uma mesma origem com reverse proxy para `/api/v1/**` e `/csrf`. O Angular já usa esse desenho localmente por `npm.cmd run start:api`, mantendo `environment.apiBaseUrl` vazio. Para origens distintas, injetar a origem exata da API no build pelo valor `apiBaseUrl` de `environment.api.ts` (sem versionar endereços de produção). O interceptor transforma somente caminhos relativos da API e envia `withCredentials: true`; a obtenção de CSRF usa a mesma origem configurada. Não são enviados cookies ou headers CSRF a URLs absolutas de terceiros.
 
@@ -82,7 +85,7 @@ O teste `HibernateLegacySchemaTest` inicia um schema fictício já populado, amp
 
 O modo API oferece `/entrar` e `/conta`. A guarda consulta `/auth/me`, o estado da conta fica em memória e a senha do formulário de login é limpa ao enviar. O interceptor trata 401/403 e invalida o CSRF em memória, sem repetir automaticamente operações de escrita. Login/logout renovam CSRF antes de concluir o fluxo. A página de perfil demonstrativo continua separada; `/meu-perfil` no modo API encaminha para a conta.
 
-O cadastro Angular envia as disponibilidades obrigatórias. `/mentor/perfil` carrega o perfil por `GET /api/v1/mentores/me`, sem receber o identificador do ator do navegador, e usa os PATCH existentes para edição e publicação. Campos sociais omitidos são preservados; strings vazias permitem limpá-los. Questionário persistido, descoberta e matching continuam como próximas etapas.
+O cadastro Angular envia as disponibilidades obrigatórias. `/mentor/perfil` carrega o perfil por `GET /api/v1/mentores/me`, sem receber o identificador do ator do navegador, e usa os PATCH existentes para edição e publicação. Campos sociais omitidos são preservados; strings vazias permitem limpá-los. O questionário v3 persistido está documentado no guia 25; descoberta e matching continuam pendentes.
 
 `GET /api/v1/startups/me` exige STARTUP e lista somente os projetos vinculados à conta da sessão. `PATCH /api/v1/startups/{startupId}` exige STARTUP, CSRF e vínculo atual de FUNDADOR/REPRESENTANTE, verificado no serviço sob bloqueio transacional. ADMIN não tem exceção. `/startup/perfil` permite selecionar projetos, consultar e editar os sete campos do perfil; não altera conta ou integrantes. Os GET gerais de startup anteriores preservam o contrato autenticado. Detalhes: [guia 22](22-startup-profile.md).
 

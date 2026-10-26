@@ -249,7 +249,7 @@ class SecurityIntegrationTest {
                     .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
         }
         mvc.perform(options("/api/v1/auth/login").header(HttpHeaders.ORIGIN, "http://localhost:4200")
-                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "PUT")).andExpect(status().isForbidden());
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "TRACE")).andExpect(status().isForbidden());
         mvc.perform(options("/api/v1/auth/login").header(HttpHeaders.ORIGIN, "http://localhost:4200")
                         .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
                         .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Authorization")).andExpect(status().isForbidden());

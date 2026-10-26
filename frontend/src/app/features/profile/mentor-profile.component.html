@@ -9,6 +9,7 @@
     @if (loading()) { <output>Carregando seu perfil…</output> }
     @if (profile(); as mentor) {
       <p>{{ mentor.nome }} · {{ mentor.email }}</p>
+      <a class="button button-secondary" routerLink="/mentor/questionario">Abrir questionário</a>
       <p>Estado: <strong>{{ statusLabels[mentor.status] }}</strong></p>
       <p>O perfil começa como rascunho. Publicar autoriza sua participação na descoberta quando ela estiver disponível.</p>
       <form [formGroup]="form" (ngSubmit)="save()">

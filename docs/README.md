@@ -43,3 +43,5 @@ Project Charter (Visão & Dores)
 - [Cadastro de startup e conta da pessoa fundadora](21-startup-integration.md).
 - [Consulta e edição da própria startup](22-startup-profile.md).
 - [Próximas etapas e guia para reformular todas as telas](23-continuity-and-frontend-redesign.md).
+- [Questionário v3: decisões de produto e campos](24-questionario-v3.md).
+- [Persistência e integração autenticada do questionário v3](25-questionnaire-api.md).

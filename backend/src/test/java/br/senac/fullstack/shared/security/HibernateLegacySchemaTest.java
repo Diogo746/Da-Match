@@ -29,6 +29,7 @@ class HibernateLegacySchemaTest {
                 """, Integer.class)).isEqualTo(1000);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM disponibilidade_mentor", Integer.class)).isZero();
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM startup", Integer.class)).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM perfil_match", Integer.class)).isZero();
         assertThat(jdbc.queryForObject("""
                 SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'FLYWAY_SCHEMA_HISTORY'
                 """, Integer.class)).isZero();

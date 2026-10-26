@@ -1,6 +1,6 @@
 # Continuidade da startup e futura reformulação do frontend
 
-Atualizado em 22/10/2026. Este é o ponto de retomada solicitado pelo usuário: primeiro concluir funcionalidades reais; posteriormente reformular **todas as telas do frontend**, com organização consistente. A reformulação visual completa ainda não foi iniciada. A ordem abaixo é recomendada; decisões de produto pendentes não devem ser presumidas como aprovadas.
+Atualizado em 26/10/2026. Este é o ponto de retomada solicitado pelo usuário: primeiro concluir funcionalidades reais; posteriormente reformular **todas as telas do frontend**, com organização consistente. A reformulação visual completa ainda não foi iniciada. A ordem abaixo é recomendada; decisões de produto pendentes não devem ser presumidas como aprovadas.
 
 ## Como retomar em uma próxima sessão
 
@@ -18,16 +18,18 @@ Atualizado em 22/10/2026. Este é o ponto de retomada solicitado pelo usuário: 
 - [x] `PATCH /api/v1/startups/{startupId}`, validação, autorização no serviço e preservação de conta/integrantes/data.
 - [x] Cancelamento da edição e proteção contra repetição de escrita após resultado sem confirmação.
 - [x] Mentor: cadastro com agenda, consulta própria, edição e publicação/pausa integrados.
+- [x] Perfil da startup integrado à main pelo PR #18 (`85e770b`).
+- [x] Questionário v3 da equipe analisado (PR #19, `e2238ff`): seis etapas/três fases, públicos, formação/time e capacidade. Persistência e integração autenticada implementadas na branch `feature/questionnaire-api`; [contrato e validação](25-questionnaire-api.md). Integração à main e homologação remota devem ser verificadas antes de considerar publicado.
 
 ## Pendências em ordem de dependência
 
 | Etapa | Entrega e critério de conclusão |
 | --- | --- |
-| 1. Questionário persistido | Definir DTOs/códigos e salvar setor, necessidades com prioridades, momento dentro da ideação, modalidade, cidade, frequência e pares exatos de dia/período. Restaurar após logout/login; editar/cancelar sem perder dados; versionar questionário. Vincular respostas da startup ao projeto, não confundir com a pessoa fundadora. Completar os dados correspondentes dos mentores. |
+| 1. Integrar/homologar questionário v3 | Implementação concluída na branch `feature/questionnaire-api`, dependente da base do PR #19. Conferir PRs/gates e homologar navegador/mobile e schema PostgreSQL. Inclui novos públicos/formações/capacidade, prioridade dos assuntos e agenda do mentor compartilhada com o perfil real. |
 | 2. Publicação da startup | Criar estado próprio `RASCUNHO/PUBLICADO/PAUSADO`, sem reutilizar `statusValidacao`. Definir mínimos de publicação, mostrar pendências, permitir salvar rascunho e publicar/pausar com autorização de gestão. Ensaiar qualquer adição obrigatória de coluna em schema populado antes do deploy. |
 | 3. Gestão de integrantes | Interface para listar, adicionar e remover usando as rotas existentes. Definir localização/convite de contas existentes e alteração de papéis antes de criar esses fluxos. Preservar fundador obrigatório, ausência de duplicidade, autorização de gestão e tratamento de vínculos legados. |
 | 4. Descoberta real | API de catálogo e detalhes com filtros/paginação, somente perfis elegíveis. Definir DTO de descoberta e quais dados de gestão/contato ficam privados. Trocar dados fictícios por API sem mistura silenciosa de modos. |
-| 5. Matching real | Alinhar regra definitiva com equipe/PO e SRS: [decisão pendente](16-decisao-regra-matching.md). O protótipo usa `damatch-rules-v2`; isso não comprova aprovação. Calcular no backend, versionar, explicar critérios/limitações, ordenar com desempate e recalcular após edição. Nunca confiar na nota enviada pelo cliente. |
+| 5. Matching real | Alinhar regra definitiva com equipe/PO e SRS: [decisão pendente](16-decisao-regra-matching.md). O protótipo usa `damatch-rules-v2`; isso não comprova aprovação. Calcular no backend, versionar e ordenar com desempate. Participante recebe apenas ordem/selo `superDamatch` (≥95), sem porcentagem ou detalhes numéricos; dados completos ficam em área administrativa autorizada. Nunca confiar na nota enviada pelo cliente. |
 | 6. Salvos persistidos | Se mantidos no produto, salvar por conta e restaurar após novo acesso. Favorito não equivale a demonstrar interesse. Hoje existe apenas estado em memória para perfis fictícios. |
 | 7. Interesses e conexões | Implementar interesse enviado/recebido e conexão por reciprocidade, com autorização e prevenção de duplicidade/concorrência. Definir disponibilidade de contato após conexão. |
 | 8. Reuniões | Propor e confirmar/recusar reunião dentro de conexão ativa, com data, duração, formato, local/link e fuso explícito. Depois tratar remarcação, cancelamento e histórico conforme escopo aprovado. |
@@ -49,8 +51,8 @@ Investidores, administração completa e desativação de perfis pertencem à ev
 | Mentor `/mentor/perfil` | Perfil próprio, biografia, links, pares de disponibilidade, editar/salvar, publicar/pausar e dados confirmados pelo servidor. Preservar autorização por titularidade. |
 | Startup `/startup/perfil` | Projetos da conta, seleção quando múltiplos, consulta e edição apenas por fundador/representante; membro consulta. Cancelar preserva dados; recarregar descarta edição explicitamente. Tratar ausência de vínculo sem oferecer onboarding autenticado. |
 | Meu perfil DEMO `/meu-perfil` | Perfil temporário e edição do questionário, com cancelamento. No modo API essa rota redireciona para conta; não presumir que já representa dados persistidos. |
-| Questionário/revisão | Cinco etapas: momento, setor, objetivos, encontro e agenda. Preservar prioridades, experiência declarada do mentor, pares de agenda, edição por seção e revisão antes de concluir. Conectar ao backend somente com contrato definido. |
-| Cards e detalhes | Conteúdo legível, rótulos além de cor, salvos, explicação de compatibilidade e limitações. Separar informação pública de gestão e contato. Dialog acessível com foco inicial, Escape e retorno ao acionador. |
+| Questionário/revisão | Seis etapas em três fases: momento, setor, objetivos, público/formação/capacidade, encontro e agenda. Contrato v3 no guia 25. Preservar prioridades, pares de agenda, revisão e cancelamento; conta da pessoa separada de cada projeto. API: `/mentor/questionario` e `/startup/perfil/{startupId}/questionario`; DEMO permanece separado. |
+| Cards e detalhes | Conteúdo legível, rótulos além de cor, salvos e selo Super DaMatch; sem porcentagem ou detalhes numéricos por decisão do PO. Separar informação pública de gestão e contato. Dialog acessível com foco inicial, Escape e retorno ao acionador. |
 | Como funciona `/como-funciona` | Explicar o fluxo realmente disponível, uso da pontuação e limites da demonstração; atualizar quando interesses, conexões e reuniões existirem. |
 | Telas futuras | Integrantes, pendências de publicação, interesses, conexões e reuniões só devem exibir ações operacionais quando APIs correspondentes existirem. |
 
@@ -76,7 +78,7 @@ Ainda é necessário alinhar as duas opções de `statusValidacao` com os quatro
 
 Biografia do mentor: obrigatória, até 1.000 caracteres. Links sociais/site: opcionais, até 255. Disponibilidade real: `diaSemana` de 1 a 7 e período `MANHA/TARDE/NOITE`; pelo menos um par. Questionário DEMO usa outros códigos, frequência, setores, momentos e experiência declarada; mapear explicitamente antes de persistir. Não transformar pares em produto cartesiano de dias e períodos.
 
-A lista demonstrativa de cidades é reduzida; definir fonte/códigos territoriais antes da integração. O código Java usa `America/Sao_Paulo`, enquanto o protótipo explica janelas no horário de Recife. Definir o fuso de referência do produto e mostrá-lo nas telas de agenda/reunião; não depender do fuso do dispositivo.
+A lista inicial de cidades permanece reduzida às oito opções do protótipo, com códigos compartilhados no contrato v3. Sua ampliação e futura fonte territorial precisam de contrato próprio. A interface informa `America/Sao_Paulo`, alinhada à aplicação; não depender do fuso do dispositivo. Reuniões futuras deverão persistir instantes e explicitar o fuso.
 
 ### Matriz de estados obrigatórios
 

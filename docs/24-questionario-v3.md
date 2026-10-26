@@ -2,7 +2,7 @@
 
 **Responsável:** Christopher (Product Owner) · **Data:** 25/10/2026 · **Branch:** `feature/quiz-gamificacao`
 
-Esta versão traz de volta partes do quiz original do DaMatch que ficaram de fora na v0.5.0, sem mudar o visual nem o Lumen. Tudo continua no modo demonstração: as respostas ficam só no navegador.
+Esta versão traz de volta partes do quiz original do DaMatch que ficaram de fora na v0.5.0, sem mudar o visual nem o Lumen. No PR #19 original, as respostas continuam no modo demonstração. A branch `feature/questionnaire-api` acrescenta a [integração autenticada e persistência](25-questionnaire-api.md), preservando esse modo.
 
 ---
 
@@ -81,14 +81,14 @@ Exemplo de startup, sem credenciais:
 
 ## 4. O que depende do backend (combinar com o Mário)
 
-Nada abaixo foi alterado nesta branch. São pontos para conversar antes de integrar:
+Situação após a implementação em `feature/questionnaire-api` (o PR #19 original não contém backend):
 
-1. **Guardar as respostas.** Hoje o questionário fica só no navegador. É preciso decidir as tabelas e campos para os códigos acima, ligados à startup ou ao mentor.
-2. **Receber as respostas.** Um endpoint para salvar e ler o perfil de match (sugestão: `PUT/GET /api/v1/{startups|mentores}/{id}/perfil-match`).
-3. **Agenda do mentor.** O backend já usa `diaSemana` (1 a 7) e `MANHA / TARDE / NOITE`; o questionário usa `MON…SUN` e `MORNING / AFTERNOON / EVENING`. É preciso escolher um formato ou converter.
+1. **Guardar as respostas — implementado.** `perfil_match` ligado à startup ou ao mentor, com coleções ordenadas e códigos por texto; ver guia 25.
+2. **Receber as respostas — implementado.** `PUT/GET /api/v1/{startups|mentores}/{id}/perfil-match`, com sessão, CSRF e autorização no serviço. Acesso pelo perfil real após login. GET sem questionário retorna 204.
+3. **Agenda do mentor — implementado.** Conversão explícita entre os códigos; a coleção existente `disponibilidade_mentor` é a única fonte de agenda do mentor, inclusive após edição pelo PATCH antigo.
 4. **Calcular o match no servidor.** A nota calculada no navegador não é confiável. O backend calcula, guarda a porcentagem para a equipe e devolve ao participante só a ordem e um indicador `superDamatch` (nota ≥ 95), **sem o número**.
 5. **Área da equipe.** Para "só nós vemos a porcentagem", é preciso uma tela ou relatório administrativo.
-6. **Texto da tela de cadastro.** `register.component.html` ainda diz "cinco etapas". Agora são seis. O trecho é do Mário e não foi alterado.
+6. **Texto da tela de cadastro — corrigido.** `register.component.html` informa seis etapas.
 7. **Testes instáveis.** `mentor-flow.integration.spec.ts` e `startup-flow.integration.spec.ts` às vezes passam do limite de 5 segundos quando a máquina está carregada (acontece também na `main`).
 
 ---

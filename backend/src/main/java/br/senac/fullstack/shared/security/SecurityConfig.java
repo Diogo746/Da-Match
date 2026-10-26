@@ -77,11 +77,19 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
                             .requestMatchers(HttpMethod.GET, "/api/v1/mentores/me")
                             .hasRole(TipoUsuario.MENTOR.name())
+                            .requestMatchers(HttpMethod.GET, "/api/v1/mentores/*/perfil-match")
+                            .hasRole(TipoUsuario.MENTOR.name())
+                            .requestMatchers(HttpMethod.PUT, "/api/v1/mentores/*/perfil-match")
+                            .hasRole(TipoUsuario.MENTOR.name())
+                            .requestMatchers(HttpMethod.GET, "/api/v1/startups/*/perfil-match")
+                            .hasRole(TipoUsuario.STARTUP.name())
+                            .requestMatchers(HttpMethod.PUT, "/api/v1/startups/*/perfil-match")
+                            .hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                             .requestMatchers(HttpMethod.PATCH, "/api/v1/mentores/*", "/api/v1/mentores/*/status")
                             .hasRole(TipoUsuario.MENTOR.name())
-                            .requestMatchers(HttpMethod.GET, "/api/v1/startups/me").hasRole("STARTUP")
-                            .requestMatchers(HttpMethod.PATCH, "/api/v1/startups/*").hasRole("STARTUP")
+                            .requestMatchers(HttpMethod.GET, "/api/v1/startups/me").hasRole(TipoUsuario.STARTUP.name())
+                            .requestMatchers(HttpMethod.PATCH, "/api/v1/startups/*").hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.POST, "/api/v1/startups/*/membros")
                             .hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.DELETE, "/api/v1/startups/*/membros/*")
@@ -118,7 +126,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(SecurityProperties properties) {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(properties.getCors().getAllowedOrigins());
-        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Content-Type", "Accept", "X-XSRF-TOKEN"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(600L);
