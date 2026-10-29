@@ -46,3 +46,4 @@ Project Charter (Visão & Dores)
 - [Questionário v3: decisões de produto e campos](24-questionario-v3.md).
 - [Persistência e integração autenticada do questionário v3](25-questionnaire-api.md).
 - [Revisão da base e ajustes antes de concluir startup](26-startup-code-review.md).
+- [Roteiro por etapas para as próximas sessões](27-startup-next-sessions.md).
