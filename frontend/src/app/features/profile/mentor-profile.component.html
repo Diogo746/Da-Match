@@ -13,7 +13,7 @@
       <p>Estado: <strong>{{ statusLabels[mentor.status] }}</strong></p>
       <p>O perfil começa como rascunho. Publicar autoriza sua participação na descoberta quando ela estiver disponível.</p>
       <form [formGroup]="form" (ngSubmit)="save()">
-        <fieldset [disabled]="busy() || loading()">
+        <fieldset [disabled]="busy() || loading() || uncertain()">
           <legend>Informações do perfil</legend>
           <label for="mentor-biography">Biografia (obrigatória)</label>
           <textarea id="mentor-biography" class="form-input" formControlName="biografia" rows="6" maxlength="1000" required
@@ -25,14 +25,14 @@
           <input id="mentor-instagram" class="form-input" formControlName="instagram" maxlength="255" />
           <label for="mentor-site">Site (opcional)</label>
           <input id="mentor-site" class="form-input" formControlName="site" maxlength="255" />
-          <app-mentor-availability [value]="availability()" (valueChange)="availability.set($event)" [disabled]="busy() || loading()" />
-          <button class="button button-primary" type="submit" [disabled]="busy() || loading()">{{ busy() ? 'Aguarde…' : 'Salvar perfil' }}</button>
+          <app-mentor-availability [value]="availability()" (valueChange)="availability.set($event)" [disabled]="busy() || loading() || uncertain()" />
+          <button class="button button-primary" type="submit" [disabled]="busy() || loading() || uncertain()">{{ busy() ? 'Aguarde…' : 'Salvar perfil' }}</button>
         </fieldset>
       </form>
       <div class="publication" aria-label="Publicação do perfil">
-        <button class="button button-primary" type="button" (click)="changeStatus('PUBLICADO')" [disabled]="busy() || loading() || mentor.status === 'PUBLICADO'">Publicar perfil</button>
-        <button class="button button-secondary" type="button" (click)="changeStatus('PAUSADO')" [disabled]="busy() || loading() || mentor.status === 'PAUSADO'">Pausar perfil</button>
-        <button class="button button-secondary" type="button" (click)="changeStatus('RASCUNHO')" [disabled]="busy() || loading() || mentor.status === 'RASCUNHO'">Voltar a rascunho</button>
+        <button class="button button-primary" type="button" (click)="changeStatus('PUBLICADO')" [disabled]="busy() || loading() || uncertain() || mentor.status === 'PUBLICADO'">Publicar perfil</button>
+        <button class="button button-secondary" type="button" (click)="changeStatus('PAUSADO')" [disabled]="busy() || loading() || uncertain() || mentor.status === 'PAUSADO'">Pausar perfil</button>
+        <button class="button button-secondary" type="button" (click)="changeStatus('RASCUNHO')" [disabled]="busy() || loading() || uncertain() || mentor.status === 'RASCUNHO'">Voltar a rascunho</button>
       </div>
     }
     <button class="text-button" type="button" (click)="load()" [disabled]="loading() || busy()">Recarregar perfil</button>

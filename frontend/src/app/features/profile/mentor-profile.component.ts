@@ -23,6 +23,7 @@ export class MentorProfileComponent implements OnInit {
   readonly availability = signal<MentorAvailability[]>([]);
   readonly loading = signal(false);
   readonly busy = signal(false);
+  readonly uncertain = signal(false);
   readonly error = signal("");
   readonly message = signal("");
   readonly statusLabels: Record<MentorStatus, string> = {
@@ -42,6 +43,7 @@ export class MentorProfileComponent implements OnInit {
     if (this.loading() || this.busy() || this.state.user()?.tipoUsuario !== "MENTOR") return;
     this.loading.set(true);
     this.error.set("");
+    this.message.set("");
     try { this.applyProfile(await firstValueFrom(this.mentors.me())); }
     catch (error: unknown) { this.showError(error, false); }
     finally { this.loading.set(false); }
@@ -49,7 +51,7 @@ export class MentorProfileComponent implements OnInit {
 
   async save(): Promise<void> {
     const profile = this.profile();
-    if (!profile || this.busy() || this.loading() || !this.state.user()) return;
+    if (!profile || this.busy() || this.loading() || this.uncertain() || profile.usuarioId !== this.state.user()?.id) return;
     this.error.set("");
     this.message.set("");
     this.form.markAllAsTouched();
@@ -71,7 +73,7 @@ export class MentorProfileComponent implements OnInit {
 
   async changeStatus(status: MentorStatus): Promise<void> {
     const profile = this.profile();
-    if (!profile || this.busy() || this.loading() || !this.state.user() || profile.status === status) return;
+    if (!profile || this.busy() || this.loading() || this.uncertain() || profile.usuarioId !== this.state.user()?.id || profile.status === status) return;
     this.error.set("");
     this.message.set("");
     if (this.form.dirty || JSON.stringify(this.availability()) !== JSON.stringify(profile.disponibilidades)) {
@@ -89,6 +91,7 @@ export class MentorProfileComponent implements OnInit {
   private applyProfile(profile: MentorProfile): void {
     if (profile.usuarioId !== this.state.user()?.id) throw new Error("Perfil não pertence à sessão atual.");
     this.profile.set(profile);
+    this.uncertain.set(false);
     this.availability.set(profile.disponibilidades.map(item => ({ ...item })));
     this.form.reset({ biografia: profile.biografia, linkedin: profile.linkedin ?? "",
       instagram: profile.instagram ?? "", site: profile.site ?? "" });
@@ -108,6 +111,7 @@ export class MentorProfileComponent implements OnInit {
       if (error.status === 404) { this.profile.set(null); this.error.set("Não encontramos um perfil de mentor para esta conta."); return; }
       if (error.status === 400) { this.error.set("O servidor não aceitou os dados. Revise o preenchimento e a disponibilidade."); return; }
     }
+    this.uncertain.set(write || this.uncertain());
     this.error.set(write
       ? "Não foi possível confirmar a alteração. Recarregue o perfil para conferir o resultado antes de enviar novamente."
       : "Não foi possível carregar o perfil. Tente novamente.");

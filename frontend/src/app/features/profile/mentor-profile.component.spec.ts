@@ -1,7 +1,7 @@
 import { HttpErrorResponse, provideHttpClient } from "@angular/common/http";
 import { TestBed } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
-import { Subject, of, throwError } from "rxjs";
+import { Subject, TimeoutError, of, throwError } from "rxjs";
 import { beforeEach, expect, it, vi } from "vitest";
 import { AuthStateStore } from "../../core/auth-state.store";
 import { MentorProfile } from "../../core/mentor.models";
@@ -97,6 +97,46 @@ it("handles a publication failure without changing the displayed status", async 
   await component.changeStatus("PUBLICADO");
   expect(component.profile()?.status).toBe("RASCUNHO");
   expect(component.error()).toContain("confirmar");
+});
+
+it.each([0, 500, "timeout"] as const)("blocks all writes after an unconfirmed profile update (%s) until a successful GET", async failure => {
+  const { component, fixture } = await create();
+  const error = failure === "timeout" ? new TimeoutError() : new HttpErrorResponse({ status: failure });
+  service.update.mockReturnValue(throwError(() => error));
+  await component.save();
+  expect(component.uncertain()).toBe(true);
+  fixture.detectChanges();
+  expect(fixture.nativeElement.querySelector("textarea").matches(":disabled")).toBe(true);
+  expect(fixture.nativeElement.querySelector(".publication button").disabled).toBe(true);
+  await component.save(); await component.changeStatus("PUBLICADO");
+  expect(service.update).toHaveBeenCalledOnce();
+  expect(service.setStatus).not.toHaveBeenCalled();
+  service.me.mockReturnValueOnce(throwError(() => new Error("unavailable")));
+  await component.load(); await component.save();
+  expect(component.uncertain()).toBe(true);
+  expect(service.update).toHaveBeenCalledOnce();
+  await component.load();
+  expect(component.uncertain()).toBe(false);
+  service.update.mockReturnValue(of(profile));
+  await component.save();
+  expect(service.update).toHaveBeenCalledTimes(2);
+});
+
+it("blocks saving and publication after an unconfirmed status change, then restores the confirmed server state", async () => {
+  const { component } = await create();
+  service.setStatus.mockReturnValue(throwError(() => new Error("invalid response")));
+  await component.changeStatus("PUBLICADO");
+  await component.save(); await component.changeStatus("PAUSADO");
+  expect(component.uncertain()).toBe(true);
+  expect(service.setStatus).toHaveBeenCalledOnce();
+  expect(service.update).not.toHaveBeenCalled();
+  service.me.mockReturnValue(of({ ...profile, status: "PUBLICADO" }));
+  await component.load();
+  expect(component.profile()?.status).toBe("PUBLICADO");
+  expect(component.uncertain()).toBe(false);
+  service.setStatus.mockReturnValue(of({ ...profile, status: "PAUSADO" }));
+  await component.changeStatus("PAUSADO");
+  expect(component.profile()?.status).toBe("PAUSADO");
 });
 
 it("explains an unavailable profile and allows a GET retry", async () => {
