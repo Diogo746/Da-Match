@@ -29,7 +29,8 @@ async function create(kind: ProfileKind = "STARTUP") {
   TestBed.configureTestingModule({ imports: [QuestionnaireComponent], providers: [provideRouter([]), provideHttpClient(),
     { provide: QuestionnaireService, useValue: service }, { provide: MentorService, useValue: mentors },
     { provide: StartupService, useValue: startups },
-    { provide: ActivatedRoute, useValue: { snapshot: { data: { kind }, paramMap: convertToParamMap({ startupId: startup.id }) } } },
+    { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({ startupId: startup.id })),
+      snapshot: { data: { kind }, paramMap: convertToParamMap({ startupId: startup.id }) } } },
   ] });
   TestBed.inject(AuthStateStore).setUser({ id: "user-test", nome: "Pessoa Fictícia", email: "person@example.test", tipoUsuario: kind });
   const fixture = TestBed.createComponent(QuestionnaireComponent);
