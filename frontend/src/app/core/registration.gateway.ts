@@ -4,6 +4,7 @@ import { Observable, defer, delay, of, throwError } from "rxjs";
 import { ProfileKind } from "./profiles.store";
 import { MentorAvailability, MentorProfile, validAvailability } from "./mentor.models";
 import { StartupProfile, StartupRegistrationDetails, normalizeStartupDetails, validStartupDetails } from "./startup.models";
+import { passwordFitsBcrypt } from "./password-policy";
 
 // Campos declarados em CadastrarUsuarioRequest no backend enviado pela equipe.
 export interface RegistrationRequest {
@@ -79,7 +80,7 @@ export function validMentorBiography(value: string): boolean {
 export function normalizeRegistration(kind: ProfileKind, request: RegistrationRequest): RegistrationRequest {
   const nome = request.nome.trim();
   const email = request.email.trim().toLowerCase();
-  if (nome.length < 4 || nome.length > 255 || !isValidEmail(email) || request.senha.length < 6 || request.senha.length > 72 ||
+  if (nome.length < 4 || nome.length > 255 || !isValidEmail(email) || request.senha.length < 6 || !passwordFitsBcrypt(request.senha) ||
       request.senha.trim().length === 0 || !["STARTUP", "MENTOR"].includes(kind)) {
     throw new RegistrationError("INVALID_INPUT");
   }

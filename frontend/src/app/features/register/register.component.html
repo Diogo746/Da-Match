@@ -23,7 +23,7 @@
   <div class="register-layout">
     <section class="register-intro"><app-lumen-guide class="register-guide" [message]="apiMode ? 'Uma ideia ou uma experiência para compartilhar. Escolha como quer participar e vamos começar.' : 'Vamos começar pelo básico. Depois, conto com você em seis etapas rápidas.'" /><p class="eyebrow">IDEIAS ENCONTRAM EXPERIÊNCIA</p><h1>Uma boa conexão começa com você.</h1><p>Uma ideia para tirar do papel ou uma experiência para compartilhar. Conte um pouco sobre você e encontre novos caminhos.</p>
       @if (!apiMode) {
-      <ol class="register-steps"><li><span>01</span><div><h2>Seu lugar nessa história</h2><p>Startup em ideação ou mentor.</p></div></li><li><span>02</span><div><h2>Quatro pequenos passos</h2><p>Mais escolhas por toque, menos digitação.</p></div></li><li><span>03</span><div><h2>Indicações com contexto</h2><p>Conheça perfis e entenda o que aproxima vocês.</p></div></li></ol>
+      <ol class="register-steps"><li><span>01</span><div><h2>Seu lugar nessa história</h2><p>Startup em ideação ou mentor.</p></div></li><li><span>02</span><div><h2>Seis pequenas etapas</h2><p>Mais escolhas por toque, menos digitação.</p></div></li><li><span>03</span><div><h2>Indicações com contexto</h2><p>Conheça perfis e entenda o que aproxima vocês.</p></div></li></ol>
       }
       <div class="privacy-note"><app-icon name="shield" /><p>{{ apiMode ? 'Ao confirmar, seus dados serão enviados ao servidor para criar sua conta e o perfil escolhido. A aplicação não armazena sua senha neste navegador.' : 'Demonstração: use nome, e-mail e senha inventados. O teste é temporário e a senha não é armazenada.' }}</p></div>
     </section>
@@ -31,7 +31,7 @@
       <p class="eyebrow">{{ apiMode ? 'CADASTRO · CONECTADO' : 'CADASTRO · DEMONSTRAÇÃO' }}</p>
       <h2 id="register-title">Como você quer participar?</h2>
       <p class="form-intro">
-        {{ apiMode ? 'Crie uma conta de mentor ou cadastre sua startup com a conta da pessoa fundadora.' : 'Comece pelos dados da conta. Depois, cinco pequenas etapas para montar seu perfil.' }}
+        {{ apiMode ? 'Crie uma conta de mentor ou cadastre sua startup com a conta da pessoa fundadora.' : 'Comece pelos dados da conta. Depois, seis pequenas etapas para montar seu perfil.' }}
       </p>
       <form
         [formGroup]="form"
@@ -139,11 +139,11 @@
           </div>
           <p class="field-help" id="password-help">
             {{ apiMode ? 'Pelo menos 6 caracteres. Sua senha é enviada apenas para o cadastro.' : 'Pelo menos 6 caracteres. Use uma senha inventada para este teste.' }}
+            Até 72 bytes: letras com acento e emojis podem ocupar mais de um byte.
           </p>
           @if (invalid("senha")) {
             <p class="field-error" id="password-error">
-              Informe uma senha com pelo menos 6 caracteres, sem usar apenas
-              espaços.
+              Informe uma senha com pelo menos 6 caracteres e até 72 bytes, sem usar apenas espaços.
             </p>
           }
           @if (isMentor()) {
