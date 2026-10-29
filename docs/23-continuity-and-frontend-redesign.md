@@ -4,7 +4,7 @@ Atualizado em 29/10/2026. Este é o ponto de retomada solicitado pelo usuário: 
 
 ## Como retomar em uma próxima sessão
 
-O [roteiro por etapas do guia 27](27-startup-next-sessions.md) é o ponto de entrada solicitado em 28/10. Retomada em 29/10: PR #22 integrado em `e8c851b`; workflows #83 e #84 aprovados, incluindo gates e DAST; job de deploy da main aprovado. Main local atualizada e branch `chore/startup-base-homologation` criada, preservando o planejamento. Homologação HTTP/backend aprovada; conferência de interface ainda pendente por indisponibilidade do acesso ao navegador. Evidências e roteiro manual no guia 27. Publicação continua separada em contrato, backend e frontend.
+O [roteiro por etapas do guia 27](27-startup-next-sessions.md) é o ponto de entrada solicitado em 28/10. Retomada em 29/10: PR #22 integrado em `e8c851b`; workflows #83 e #84 aprovados, incluindo gates e DAST; job de deploy da main aprovado. Main local atualizada e branch `chore/startup-base-homologation` criada, preservando o planejamento. Homologação HTTP/backend e de interface local concluída após retomar esta conversa no desktop, com desktop/360 px, permissões, múltiplos projetos e falha de conexão; pequena correção textual do cadastro segue para CI/integração. Evidências e limitações no guia 27. Próxima etapa: contrato de publicação, antes de backend/frontend.
 
 1. Ler `AGENTS.md`, este documento e os contratos dos guias [20](20-mentor-integration.md), [21](21-startup-integration.md) e [22](22-startup-profile.md).
 2. Conferir branch, alterações locais e estado remoto de PR/CI antes de implementar. Preservar trabalho existente; documentos antigos e referências a branches podem estar desatualizados.
@@ -27,8 +27,8 @@ O [roteiro por etapas do guia 27](27-startup-next-sessions.md) é o ponto de ent
 
 | Etapa | Entrega e critério de conclusão |
 | --- | --- |
-| 0. Homologar ajustes integrados da revisão | Main/CI conferidos em 29/10, workflow #84 aprovado. Backend (145 testes) e 27 cenários HTTP pelo proxy/H2 isolado aprovados, incluindo limites UTF-8, vínculos, persistência e agenda. Concluir navegador/mobile, histórico e recuperação de escrita incerta pela interface. Evidências no [guia 27](27-startup-next-sessions.md). |
-| 1. Homologar questionário v3 | Já integrado à main com gates aprovados. Homologar navegador/mobile e schema PostgreSQL, incluindo prioridade dos assuntos, agenda compartilhada do mentor e troca de projeto. |
+| 0. Homologar ajustes integrados da revisão | Homologação local concluída em 29/10: 145 testes backend, 27 cenários HTTP e fluxo real no navegador, múltiplos projetos, histórico, contas, agenda e perda de conexão. Corrigido rodapé desatualizado do cadastro; lint, 378 + 8 testes e builds aprovados. Acompanhar CI/integração. Evidências no [guia 27](27-startup-next-sessions.md). |
+| 1. Homologar questionário v3 | Fluxos locais e mobile 360 px inspecionados no escopo do guia 27. Schema PostgreSQL e validação operacional completa permanecem na etapa 10 desse roteiro. |
 | 2. Publicação da startup | Criar estado próprio `RASCUNHO/PUBLICADO/PAUSADO`, sem reutilizar `statusValidacao`. Definir mínimos de publicação, mostrar pendências, permitir salvar rascunho e publicar/pausar com autorização de gestão. Ensaiar qualquer adição obrigatória de coluna em schema populado antes do deploy. |
 | 3. Gestão de integrantes | Interface para listar, adicionar e remover usando as rotas existentes. Definir localização/convite de contas existentes e alteração de papéis antes de criar esses fluxos. Preservar fundador obrigatório, ausência de duplicidade, autorização de gestão e tratamento de vínculos legados. |
 | 4. Descoberta real | API de catálogo e detalhes com filtros/paginação, somente perfis elegíveis. Definir DTO de descoberta e quais dados de gestão/contato ficam privados. Trocar dados fictícios por API sem mistura silenciosa de modos. |

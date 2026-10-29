@@ -16,7 +16,7 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 
 | Etapa | Situação | Resultado esperado |
 | --- | --- | --- |
-| 0. Retomada e homologação da base | Em andamento: remoto, backend e HTTP aprovados; navegador pendente | Main conferida e fluxo atual homologado |
+| 0. Retomada e homologação da base | Concluída no ambiente local; correção textual segue para CI/integração | Main conferida e fluxos atuais homologados em navegador/H2 |
 | 1. Contrato de publicação | Pendente | Regras de estados, requisitos e pendências definidas |
 | 2. Publicação no backend | Pendente; depende da 1 | Estado persistido, autorização, endpoint e testes |
 | 3. Publicação no frontend | Pendente; depende da 2 | Publicar/pausar e consultar pendências pela API |
@@ -53,23 +53,33 @@ História validada: onboarding → sessão/CSRF → consulta/edição → questi
 | Mentor | Agenda nula rejeitada com 400 sem criação parcial; PATCH inválido preserva dados; questionário e perfil compartilham agenda; outro titular é bloqueado; publicar → pausar → retomar e novo login preservam estado. |
 | Cookies/senha | `JSESSIONID` e `XSRF-TOKEN` HttpOnly; escritas sem CSRF rejeitadas; senha Unicode de 72 bytes aceita, 74 bytes rejeitada no cadastro e sufixo acima de 72 bytes rejeitado no login novo. |
 | Encerramento de sessões | Todas as cinco sessões autenticadas do ensaio final encerradas por logout; GET de conta após logout retorna 401. |
-| Navegador | Não executado: inventário retornou `browsers: []` e `The browser access host is unavailable`. Não alegar revisão visual, mobile, teclado, console ou tráfego de navegador. |
+| Navegador, primeira rodada | Inicialmente indisponível: `browsers: []` e `The browser access host is unavailable`. Resolvido na retomada pelo aplicativo desktop; resultados da segunda rodada abaixo. |
 
 O script de homologação compara a data de criação antes/depois da edição com o valor já persistido obtido por GET. O POST pode retornar nanossegundos enquanto o banco representa microssegundos; essa diferença de representação não demonstra que o PATCH alterou a data. Nenhuma mudança de código foi feita por esse diagnóstico.
 
 Limitação do runner local: a primeira execução padrão do frontend teve seis timeouts de 5 segundos; a segunda, depois de terminar as validações pesadas, ainda teve cinco timeouts. Com arquivos em sequência e limite de dois workers, os mesmos 378 testes passaram em 21,51 segundos. Isso indica contenção na execução concorrente local. Não houve aumento de timeout, alteração de testes, exclusões, redução de cobertura nem mudança na configuração versionada/CI. Lint e builds não foram repetidos nesta entrega exclusivamente documental; o frontend API compilou para servir a homologação e os resultados do CI da base foram conferidos.
 
-### Conferência de interface ainda necessária
+### Conferência de interface executada no desktop
 
 Ambiente local: frontend `http://127.0.0.1:4200/`, API somente em `127.0.0.1:8080`, H2 em `backend/target/homologation-20261029.mv.db`. A configuração de execução aponta explicitamente para H2; não reutilizar a configuração padrão de banco remoto para esses testes. Os registros são exclusivamente fictícios. Não versionar o banco nem usar credenciais reais.
 
-- [ ] Startup pelo navegador: cadastro → entrar → conta → perfil → editar/cancelar/salvar → questionário → salvar → recarregar → sair → entrar novamente. Usar e-mail fictício único e senha inventada.
-- [ ] Conta com múltiplos projetos: alternar projeto, questionário e histórico voltar/avançar; confirmar nome/URL, respostas e permissão do contexto atual. Preparar vínculos locais pela API, se necessário.
-- [ ] Contas diferentes e membro comum: não exibir dados privados da sessão anterior, nem permitir edição por membro.
-- [ ] Mentor: agenda no perfil/questionário, edição, publicar/pausar e recarga. Induzir resposta perdida/500 em ambiente local e confirmar bloqueio de escrita até GET válido; os testes de componente simulam essas falhas, mas não equivalem ao navegador.
-- [ ] Desktop, 360 px e zoom de 200%: conferir campos, mensagens e ações sem cortes; navegar por teclado, verificar foco e console. Não marcar essas verificações apenas por aprovação de JSDOM.
+- [x] Startup pelo navegador: cadastro → entrar → conta → perfil → editar/cancelar/salvar → questionário completo → salvar → recarregar → sair → entrar novamente. Dados e credenciais exclusivamente fictícios.
+- [x] Múltiplos projetos: três vínculos, seleção e questionários distintos; voltar/avançar confirmou projeto Beta editável como REPRESENTANTE e projeto Gama somente leitura como MEMBRO. O teste de reuso direto da mesma instância do componente continua coberto pelo RouterTestingHarness; não confundir com navegação entre páginas no navegador.
+- [x] Contas diferentes e membro comum: após troca de conta, somente o projeto próprio apareceu; URL direta do questionário da conta anterior exibiu indisponibilidade sem respostas privadas. MEMBRO não recebeu controles de edição no perfil nem no questionário.
+- [x] Mentor: cadastro com agenda, consulta em RASCUNHO, edição/PATCH, PUT do questionário, sincronização da agenda nos dois sentidos, publicar → pausar → retomar, recarga e novo login. Respostas iniciais completas do mentor e vínculos extras das startups foram preparados pela API local; o cadastro, as edições e as ações verificadas depois foram feitos pela interface.
+- [x] Resultado sem confirmação: frontend local interrompido após carregar o formulário, API/H2 mantidos; envio falhou por conexão e bloqueou salvar/publicar/pausar. GET ainda indisponível manteve bloqueio. Ao restaurar o frontend, Vite recarregou a aplicação e o GET válido recuperou os dados confirmados; nova gravação funcionou. Falha HTTP 500 continua coberta nos testes de componente, não foi induzida nesta rodada do navegador.
+- [x] Desktop e 360 px: cadastro de startup no tema claro, questionário e perfil/ações do mentor no tema escuro; sem rolagem horizontal nos estados inspecionados. Teclado: Tab entre campos, Enter para pausar mentor e enviar formulário vazio; resumo de erros recebeu foco. Tema e viewport originais restaurados. Console consultado após recuperação sem erros registrados naquele momento; erros de rede durante a interrupção foram intencionais.
+- [ ] Etapa 10: ensaio de zoom real a 200%, leitor de tela, acessibilidade completa e revisão de todas as telas/estados. Os atalhos de zoom pela API de navegador não alteraram a escala, portanto não considerar zoom testado. Viewport estreito não comprova zoom real.
 
-Homologação publicada e ensaio em cópia PostgreSQL permanecem separados. A etapa 0 continua em andamento até concluir a conferência de interface; não iniciar backend/frontend de publicação antes do contrato da etapa 1.
+Na sessão desktop, a extensão Chrome e o navegador integrado passaram a aparecer no inventário e foi possível operar uma aba de homologação desta conversa. O rótulo de origem registrado no início de uma conversa não comprova seu contexto de execução após retomá-la no desktop. Não forjar configurações de autorização do host.
+
+Achado corrigido: o rodapé de `/cadastro` ainda dizia que o questionário era demonstrativo. O texto agora orienta preencher o questionário da startup ou do mentor após login e mantém descoberta/recomendações como demonstração. Nenhuma regra de negócio ou endpoint foi alterado.
+
+Validação após essa correção: lint, **378 testes frontend + 8 de configuração**, **99,05% de linhas / 96,53% de branches**, builds DEMO/API aprovados. Suíte usa a mesma configuração local de concorrência reduzida. Backend não foi alterado; os 145 testes aprovados da primeira rodada continuam sendo a referência da mesma base. Logs locais: `frontend/.angular/cache/homologation-desktop-{lint,tests,build-demo,build-api}.log`.
+
+Evidências visuais locais ignoradas, em `frontend/.angular/cache/`: `homologation-questionnaire-desktop.jpg`, `homologation-questionnaire-360.jpg`, `homologation-registration-360-light.jpg`, `homologation-mentor-360.jpg`, `homologation-mentor-actions-360.jpg`, `homologation-mentor-uncertain.jpg` e `homologation-mentor-confirmed-desktop.jpg`. Capturas completas de algumas páginas excederam o limite do serviço; as evidências salvas são da viewport. Credenciais temporárias fictícias dos preparadores foram removidas; todas as sessões abertas para os ensaios foram encerradas por logout. Registros fictícios permanecem apenas no H2 local.
+
+Homologação publicada e ensaio em cópia PostgreSQL permanecem separados na etapa 10. A base foi homologada nos fluxos locais descritos, sem regressão funcional encontrada; a correção textual deve concluir CI/integração. Não iniciar backend/frontend de publicação antes do contrato da etapa 1.
 
 ## Etapa 1 — Definir publicação da startup
 
@@ -139,6 +149,6 @@ Conclusão de cada entrega: autorização, persistência, fluxo pela interface e
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** terminar a conferência de interface da etapa 0 no ambiente local acima, quando houver acesso ao navegador (ou em execução manual acompanhada); registrar desktop/mobile/teclado e limitações. Depois fechar o contrato de publicação da etapa 1 com os mínimos ainda pendentes de decisão.
-- **Implementação nova nesta sessão:** nenhuma. Homologação HTTP/backend e preparação do ambiente isolado; evidências acima. Planejamento anterior preservado na branch `chore/startup-base-homologation`, baseada em `e8c851b`.
+- **Próxima ação exata:** conferir CI/integração da correção textual e fechar o contrato de publicação da etapa 1: requisitos mínimos, obrigatoriedade do questionário, transições e edição de perfil publicado. Esses mínimos ainda exigem decisão de produto; não implementar regras presumidas.
+- **Implementação nova nesta sessão:** somente correção de mensagem desatualizada do cadastro. Homologação funcional no navegador, desktop/360 px e ensaio real de falha de conexão executados; evidências/limitações acima. Branch `chore/startup-base-homologation`, baseada em `e8c851b`.
 - **Ao encerrar a próxima sessão:** atualizar etapa, evidências, branch/head/PR/checks e este ponteiro, além de `AGENTS.md` local.
