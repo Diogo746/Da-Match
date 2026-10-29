@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,6 +74,14 @@ class UsuarioServiceTest {
         assertEquals("Email existente", exception.getMessage());
         verify(passwordEncoder, never()).encode("senha-segura");
         verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    void shouldRejectOversizedUtf8PasswordBeforeHashingOrPersistence() {
+        String password = "é".repeat(37);
+        assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.criarConta("Pessoa Ficticia", "person@example.test", password, TipoUsuario.STARTUP));
+        verifyNoInteractions(passwordEncoder, usuarioRepository);
     }
 
     @Test

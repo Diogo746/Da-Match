@@ -1,5 +1,6 @@
 package br.senac.fullstack.usuario.api.dto;
 
+import br.senac.fullstack.usuario.api.validation.SenhaCompativelBcrypt;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,6 +16,7 @@ public record CadastrarUsuarioRequest(
         String email,
 
         @NotBlank(message = "Senha não pode estar vazia")
+        @SenhaCompativelBcrypt
         @Size(min = 6, max = 72, message = "Senha deve conter de 6 a 72 caracteres")
         String senha
 ) {

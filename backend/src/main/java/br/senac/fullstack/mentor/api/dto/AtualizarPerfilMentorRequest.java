@@ -2,6 +2,7 @@ package br.senac.fullstack.mentor.api.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 import java.util.Set;
@@ -18,6 +19,6 @@ public record AtualizarPerfilMentorRequest(
         String site,
         @Size(min = 1, message = "Disponibilidades não podem ficar vazias")
         @Valid
-        Set<DisponibilidadeMentorRequest> disponibilidades
+        Set<@NotNull DisponibilidadeMentorRequest> disponibilidades
 ) {
 }
