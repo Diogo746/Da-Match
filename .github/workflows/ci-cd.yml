@@ -44,9 +44,14 @@ jobs:
               - 'Dockerfile'
               - 'render.yaml'
               - '.github/workflows/ci-cd.yml'
+              - '.github/scripts/**'
             frontend:
               - 'frontend/**'
               - '.github/workflows/ci-cd.yml'
+              - '.github/scripts/**'
+
+      - name: Validate SonarQube readiness check
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
 
   # =========================================================================
   # 1. PHASE 1: LINT & AUTOMATED TESTS (Unit, Architecture & Coverage)
@@ -227,6 +232,8 @@ jobs:
     name: 🛡️ SonarQube Quality Gate - Backend
     needs: [changes, test, sast-semgrep, secret-scanning, supply-chain]
     runs-on: ubuntu-latest
+    env:
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || 'https://sonar.fchicout.dev' }}
 
     steps:
       - name: 📥 Checkout Repository
@@ -251,10 +258,18 @@ jobs:
         run: |
           mvn -B -DskipTests compile -f backend/pom.xml
 
+      - name: Wait for SonarQube availability
+        timeout-minutes: 3
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACKEND }}
+        run: |
+          if [ -n "$SONAR_TOKEN" ]; then
+            python3 .github/scripts/wait_for_sonar.py
+          fi
+
       - name: 🔍 Run SonarQube Scanner (damatch-backend) & Wait for Quality Gate
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACKEND }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || 'https://sonar.fchicout.dev' }}
         run: |
           if [ -z "$SONAR_TOKEN" ]; then
             echo "⚠️ SONAR_TOKEN não configurado nos segredos do repositório. Análise SonarQube opcional concluída."
@@ -277,15 +292,17 @@ jobs:
     name: 🛡️ SonarQube Quality Gate - Frontend
     needs: [changes, test, sast-semgrep, secret-scanning, supply-chain]
     runs-on: ubuntu-latest
+    env:
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || 'https://sonar.fchicout.dev' }}
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4 # Corrigido de v7 para v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: 📦 Setup Node.js 22 LTS
-        uses: actions/setup-node@v4 # Corrigido de v7 para v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: 'npm'
@@ -305,11 +322,14 @@ jobs:
         working-directory: ./frontend
         run: test -s coverage/frontend/lcov.info
 
+      - name: Wait for SonarQube availability
+        timeout-minutes: 3
+        run: python3 .github/scripts/wait_for_sonar.py
+
       - name: 🔍 Run SonarQube Scanner (damatch-frontend) & Wait for Quality Gate
-        uses: SonarSource/sonarqube-scan-action@v5 # v5 é a versão estável atual mais recomendada
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONTEND }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || 'https://sonar.fchicout.dev' }}
         with:
           projectBaseDir: frontend
           args: >
