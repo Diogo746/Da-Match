@@ -36,6 +36,7 @@ import { MentorAvailabilityComponent } from "../../shared/mentor-availability.co
 import { STARTUP_FIELDS, STARTUP_STATUS_LABELS, StartupValidationStatus } from "../../core/startup.models";
 import { StartupRegistrationCompleteComponent } from "./startup-registration-complete.component";
 import { AuthStateStore } from "../../core/auth-state.store";
+import { passwordFitsBcrypt } from "../../core/password-policy";
 
 const API_ERRORS = {
   INVALID_INPUT: "Confira os dados do cadastro. O servidor não aceitou o preenchimento enviado.",
@@ -95,6 +96,7 @@ export class RegisterComponent {
         Validators.required,
         Validators.minLength(6),
         Validators.maxLength(72),
+        control => passwordFitsBcrypt(control.value) ? null : { bcryptBytes: true },
         Validators.pattern(/\S/),
       ],
     }),

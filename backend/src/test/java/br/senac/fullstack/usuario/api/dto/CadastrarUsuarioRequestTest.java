@@ -7,7 +7,10 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,5 +59,25 @@ class CadastrarUsuarioRequestTest {
         assertTrue(camposInvalidos.contains("nome"));
         assertTrue(camposInvalidos.contains("email"));
         assertTrue(camposInvalidos.contains("senha"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "é", "\uD83D\uDE00"})
+    void shouldValidateTheUtf8BoundaryInsteadOfOnlyCharacterCount(String symbol) {
+        int repetitions = 72 / symbol.getBytes(StandardCharsets.UTF_8).length;
+        CadastrarUsuarioRequest valid = new CadastrarUsuarioRequest(
+                "Pessoa Ficticia", "person@example.test", symbol.repeat(repetitions));
+        CadastrarUsuarioRequest oversized = new CadastrarUsuarioRequest(
+                "Pessoa Ficticia", "person@example.test", symbol.repeat(repetitions + 1));
+
+        assertTrue(validator.validate(valid).isEmpty());
+        assertTrue(validator.validate(oversized).stream()
+                .anyMatch(violation -> violation.getPropertyPath().toString().equals("senha")));
+    }
+
+    @Test
+    void shouldLeaveNullPasswordToTheRequiredConstraint() {
+        CadastrarUsuarioRequest request = new CadastrarUsuarioRequest("Pessoa Ficticia", "person@example.test", null);
+        assertEquals(1, validator.validate(request).size());
     }
 }

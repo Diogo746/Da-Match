@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "89f937f0-df1e-43b4-92d1-19b7680021bb",
     "name": "Da-Match API",
-    "description": "API com autenticação por sessão. Preserve os cookies no Postman e obtenha CSRF antes de escritas, inclusive login/logout. Após login/logout, obtenha um novo CSRF. Cadastro exige visitante sem sessão; leitura de startups exige sessão; edição de mentor exige titular e gestão de membros exige fundador/representante. PENDENTE contém somente propostas.",
+    "description": "API com autenticação por sessão. Preserve os cookies no Postman e obtenha CSRF antes de escritas, inclusive login/logout. Após login/logout, obtenha um novo CSRF. Cadastro exige visitante sem sessão e senha de 6 ou mais caracteres e até 72 bytes UTF-8. Agenda de mentor não aceita itens nulos. Leitura de startups exige sessão; edição de mentor exige titular e gestão de membros exige fundador/representante. PENDENTE contém somente propostas.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

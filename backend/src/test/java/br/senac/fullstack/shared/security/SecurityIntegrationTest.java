@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -513,6 +514,87 @@ class SecurityIntegrationTest {
                         .content("{\"statusValidacao\":\"PUBLICADO\"}")).andExpect(status().isBadRequest());
         mvc.perform(get("/api/v1/startups/me").session(session)).andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nomeProvisorio").value("Startup ficticia"));
+    }
+
+    @Test
+    void bothOnboardingsRejectOversizedUtf8PasswordsWithoutCreatingAnyAccountOrProfile() throws Exception {
+        long accountCount = users.count();
+        long mentorCount = mentors.count();
+        long startupCount = startups.count();
+        for (String password : Set.of("é".repeat(37), "\uD83D\uDE00".repeat(19))) {
+            String email = UUID.randomUUID() + "@example.test";
+            ObjectNode body = (ObjectNode) mapper.readTree(startupRegistrationBody(email));
+            ((ObjectNode) body.get("fundador")).put("senha", password);
+            mvc.perform(post("/api/v1/startups").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(body)))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.fields['fundador.senha']").exists());
+            mvc.perform(post("/api/v1/mentores").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                            .content(mentorRegistrationBody(email, password)))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.fields['usuario.senha']").exists());
+        }
+        assertThat(users.count()).isEqualTo(accountCount);
+        assertThat(mentors.count()).isEqualTo(mentorCount);
+        assertThat(startups.count()).isEqualTo(startupCount);
+    }
+
+    @Test
+    void newAccountsRejectIgnoredPasswordSuffixesWhileLegacyAccountsKeepAccess() throws Exception {
+        String password = "é".repeat(36);
+        String email = UUID.randomUUID() + "@example.test";
+        mvc.perform(post("/api/v1/mentores").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(mentorRegistrationBody(email, password)))
+                .andExpect(status().isCreated());
+        mvc.perform(post("/api/v1/auth/login").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(credentials(email, password + "X")))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(post("/api/v1/auth/login").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(credentials(email, password)))
+                .andExpect(status().isOk());
+
+        String legacyPassword = password + "X";
+        String legacyHash = new BCryptPasswordEncoder().encode(legacyPassword);
+        Usuario legacy = users.saveAndFlush(new Usuario("Pessoa Ficticia", UUID.randomUUID() + "@example.test",
+                legacyHash, TipoUsuario.MENTOR));
+        mvc.perform(post("/api/v1/auth/login").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(credentials(legacy.getEmail(), legacyPassword)))
+                .andExpect(status().isOk());
+        assertThat(users.findById(legacy.getId()).orElseThrow().getSenha()).isEqualTo(legacyHash);
+    }
+
+    @Test
+    void nullAgendaItemsReturnBadRequestWithoutCreatingAnAccountOrReplacingTheExistingAgenda() throws Exception {
+        Usuario owner = account(TipoUsuario.MENTOR);
+        Mentor mentor = mentors.saveAndFlush(new Mentor(owner, LocalDate.of(2026, 10, 28), "Biografia original",
+                null, null, Set.of(new DisponibilidadeMentor(1, PeriodoDisponibilidade.MANHA))));
+        MockHttpSession session = login(owner);
+        long accountCount = users.count();
+        long mentorCount = mentors.count();
+        for (String slots : Set.of("[null]", "[{\"diaSemana\":4,\"periodo\":\"NOITE\"},null]")) {
+            ObjectNode body = (ObjectNode) mapper.readTree(mentorRegistrationBody(UUID.randomUUID() + "@example.test", PASSWORD));
+            body.set("disponibilidades", mapper.readTree(slots));
+            mvc.perform(post("/api/v1/mentores").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(body)))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.fields").isNotEmpty());
+            mvc.perform(patch("/api/v1/mentores/" + mentor.getId()).session(session).with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"biografia\":\"Não alterar\",\"disponibilidades\":" + slots + "}"))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.fields").isNotEmpty());
+        }
+        assertThat(users.count()).isEqualTo(accountCount);
+        assertThat(mentors.count()).isEqualTo(mentorCount);
+        mentors.flush();
+        mvc.perform(get("/api/v1/mentores/me").session(session))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.biografia").value("Biografia original"))
+                .andExpect(jsonPath("$.disponibilidades.length()").value(1))
+                .andExpect(jsonPath("$.disponibilidades[0].diaSemana").value(1))
+                .andExpect(jsonPath("$.disponibilidades[0].periodo").value("MANHA"));
+    }
+
+    private String mentorRegistrationBody(String email, String password) throws Exception {
+        return mapper.writeValueAsString(java.util.Map.of(
+                "usuario", java.util.Map.of("nome", "Pessoa Ficticia", "email", email, "senha", password),
+                "biografia", "Biografia ficticia",
+                "disponibilidades", Set.of(java.util.Map.of("diaSemana", 1, "periodo", "MANHA"))));
     }
 
     private String startupRegistrationBody(String email) {

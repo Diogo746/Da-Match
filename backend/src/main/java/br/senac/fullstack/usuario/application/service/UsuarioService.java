@@ -1,6 +1,7 @@
 package br.senac.fullstack.usuario.application.service;
 
 import br.senac.fullstack.shared.enums.TipoUsuario;
+import br.senac.fullstack.shared.security.PasswordPolicy;
 import br.senac.fullstack.usuario.application.exception.EmailExistenteException;
 import br.senac.fullstack.usuario.application.exception.UsuarioNaoEncontradoException;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
@@ -23,6 +24,9 @@ public class UsuarioService {
     }
 
     public Usuario criarConta(String nome, String email, String senha, TipoUsuario tipoUsuario) {
+        if (!PasswordPolicy.fitsBcrypt(senha)) {
+            throw new IllegalArgumentException("Senha deve ter no máximo 72 bytes em UTF-8.");
+        }
         if (emailExiste(email)) {
             throw new EmailExistenteException("Email existente");
         }

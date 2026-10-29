@@ -23,6 +23,6 @@ public record CadastrarMentorRequest(
         String instagram,
         @NotEmpty
         @Valid
-        Set<DisponibilidadeMentorRequest> disponibilidades
+        Set<@NotNull DisponibilidadeMentorRequest> disponibilidades
 ) {
 }

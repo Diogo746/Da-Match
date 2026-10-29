@@ -47,6 +47,14 @@ Sessão: `HttpOnly=true`, `Path=/`, apenas transporte por cookie, sem reescrita 
 
 Falha de credenciais retorna o mesmo 401 para conta inexistente ou senha incorreta. A consulta de e-mail mantém a semântica exata do banco existente. Cadastro duplicado retorna 409 com mensagem genérica de conflito; o status ainda permite inferir a existência da conta. Essa é uma limitação assumida do cadastro imediato existente. Verificação de e-mail e resposta indistinguível de cadastro exigem outro fluxo de produto.
 
+## Senhas e compatibilidade BCrypt
+
+Os dois cadastros exigem ao menos seis caracteres e no máximo **72 bytes UTF-8**, sem aparar ou normalizar a senha. Acentos e emojis podem ocupar vários bytes. A validação ocorre no DTO, antes de criar conta/perfil, e também no serviço de criação; erro HTTP 400 informa o campo da senha sem devolver seu valor. O frontend aplica o mesmo limite. Agenda de mentor rejeita itens nulos no cadastro/PATCH com 400 e preserva os dados anteriores.
+
+Novos hashes continuam usando BCrypt, com o identificador `{bcrypt-utf8}` do `DelegatingPasswordEncoder`. Esse identificador permite recusar, no login, um sufixo que ultrapasse os 72 bytes em contas novas, em vez de ignorá-lo. Hashes antigos sem identificador continuam sendo conferidos pelo BCrypt legado, inclusive para senhas Unicode já cadastradas acima desse limite. Não há reescrita automática, alteração de algoritmo ou migração de dados. A limitação de truncamento permanece nos hashes legados; removê-la exige um fluxo de redefinição de senha. O limite de caracteres do contrato de login foi preservado por compatibilidade.
+
+O formato novo permanece interno ao banco; não retorna em DTOs nem logs. Para rollback, a versão do backend deve reconhecer `{bcrypt-utf8}`: voltar para uma versão anterior a esse suporte impede o login das contas criadas com o novo identificador. Preservar esse suporte em qualquer correção de rollback.
+
 ## Ambiente e topologia
 
 Os arquivos de CI apontam para frontend no Vercel e backend no Render; o domínio final e a configuração dos proxies não estão confirmados no repositório. Nenhuma infraestrutura remota foi alterada.

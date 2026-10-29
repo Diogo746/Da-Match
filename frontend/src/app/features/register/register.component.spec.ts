@@ -71,6 +71,9 @@ describe("Formulário de cadastro", () => {
     { email: "sem-email" },
     { senha: "12345" },
     { senha: "      " },
+    { senha: "a".repeat(73) },
+    { senha: "é".repeat(37) },
+    { senha: "😀".repeat(19) },
     { demoConsent: false },
   ])("bloqueia cadastro com entrada inválida: %o", async (invalidValue) => {
     const { component, register } = create();

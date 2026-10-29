@@ -1,6 +1,6 @@
 # Continuidade da startup e futura reformulação do frontend
 
-Atualizado em 26/10/2026. Este é o ponto de retomada solicitado pelo usuário: primeiro concluir funcionalidades reais; posteriormente reformular **todas as telas do frontend**, com organização consistente. A reformulação visual completa ainda não foi iniciada. A ordem abaixo é recomendada; decisões de produto pendentes não devem ser presumidas como aprovadas.
+Atualizado em 28/10/2026. Este é o ponto de retomada solicitado pelo usuário: primeiro concluir funcionalidades reais; posteriormente reformular **todas as telas do frontend**, com organização consistente. A reformulação visual completa ainda não foi iniciada. A ordem abaixo é recomendada; decisões de produto pendentes não devem ser presumidas como aprovadas. A [revisão da base atual](26-startup-code-review.md) registra os ajustes encontrados antes de continuar startup.
 
 ## Como retomar em uma próxima sessão
 
@@ -19,13 +19,14 @@ Atualizado em 26/10/2026. Este é o ponto de retomada solicitado pelo usuário: 
 - [x] Cancelamento da edição e proteção contra repetição de escrita após resultado sem confirmação.
 - [x] Mentor: cadastro com agenda, consulta própria, edição e publicação/pausa integrados.
 - [x] Perfil da startup integrado à main pelo PR #18 (`85e770b`).
-- [x] Questionário v3 da equipe analisado (PR #19, `e2238ff`): seis etapas/três fases, públicos, formação/time e capacidade. Persistência e integração autenticada implementadas na branch `feature/questionnaire-api`; [contrato e validação](25-questionnaire-api.md). Integração à main e homologação remota devem ser verificadas antes de considerar publicado.
+- [x] Questionário v3 e integração autenticada integrados pelo PR #20; [contrato e validação](25-questionnaire-api.md). PR #21 também integrado; main `709bdab` com workflow aprovado, incluindo Sonar backend/frontend e deploy. Homologação funcional/visual e PostgreSQL permanece separada desses checks.
 
 ## Pendências em ordem de dependência
 
 | Etapa | Entrega e critério de conclusão |
 | --- | --- |
-| 1. Integrar/homologar questionário v3 | Implementação concluída na branch `feature/questionnaire-api`, dependente da base do PR #19. Conferir PRs/gates e homologar navegador/mobile e schema PostgreSQL. Inclui novos públicos/formações/capacidade, prioridade dos assuntos e agenda do mentor compartilhada com o perfil real. |
+| 0. Integrar/homologar ajustes da revisão | Correções implementadas na branch `fix/startup-review-findings`: contexto por projeto, limite UTF-8 da senha com login legado compatível, agenda sem itens nulos, bloqueio de escrita incerta do mentor e mensagens atuais. Validação e estado de integração no [guia 26](26-startup-code-review.md). |
+| 1. Homologar questionário v3 | Já integrado à main com gates aprovados. Homologar navegador/mobile e schema PostgreSQL, incluindo prioridade dos assuntos, agenda compartilhada do mentor e troca de projeto. |
 | 2. Publicação da startup | Criar estado próprio `RASCUNHO/PUBLICADO/PAUSADO`, sem reutilizar `statusValidacao`. Definir mínimos de publicação, mostrar pendências, permitir salvar rascunho e publicar/pausar com autorização de gestão. Ensaiar qualquer adição obrigatória de coluna em schema populado antes do deploy. |
 | 3. Gestão de integrantes | Interface para listar, adicionar e remover usando as rotas existentes. Definir localização/convite de contas existentes e alteração de papéis antes de criar esses fluxos. Preservar fundador obrigatório, ausência de duplicidade, autorização de gestão e tratamento de vínculos legados. |
 | 4. Descoberta real | API de catálogo e detalhes com filtros/paginação, somente perfis elegíveis. Definir DTO de descoberta e quais dados de gestão/contato ficam privados. Trocar dados fictícios por API sem mistura silenciosa de modos. |

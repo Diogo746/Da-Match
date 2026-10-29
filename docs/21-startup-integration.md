@@ -16,7 +16,7 @@ O frontend consulta `GET /csrf` e envia `POST /api/v1/startups` com a conta anin
 
 O backend existente cria a conta com `TipoUsuario.STARTUP` e o vínculo `FUNDADOR` na mesma transação. A resposta é `StartupResponse`, com DTOs de integrantes, sem senha, hash ou entidade de usuário. A tela só confirma HTTP `201` com os campos esperados e um único vínculo de fundador. Senhas e propriedades inesperadas da resposta não são copiadas para o recibo.
 
-O cadastro não autentica automaticamente. Depois da confirmação, a pessoa fundadora usa `/entrar` e acessa `/conta`. A entrega inicial não adicionou edição da startup, gestão de integrantes ou questionário persistido à interface. A consulta e edição próprias foram acrescentadas na [entrega seguinte](22-startup-profile.md); integrantes e questionário continuam pendentes. Os endpoints existentes de consulta e gestão de integrantes mantêm as regras anteriores.
+O cadastro não autentica automaticamente. Depois da confirmação, a pessoa fundadora usa `/entrar` e acessa `/conta`. A entrega inicial não adicionou edição da startup, gestão de integrantes ou questionário persistido à interface. Consulta/edição próprias foram acrescentadas no [guia 22](22-startup-profile.md), e o questionário persistido no [guia 25](25-questionnaire-api.md). A interface de integrantes continua pendente; os endpoints existentes de consulta e gestão mantêm suas regras.
 
 ## Segurança e falhas
 
