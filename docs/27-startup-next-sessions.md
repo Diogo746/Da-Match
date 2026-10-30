@@ -10,6 +10,7 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 - [Workflow #84 após merge](https://github.com/Diogo746/Da-Match/actions/runs/40799178596): conferido em 29/10/2026, concluído com sucesso em testes, ambos os Quality Gates, DAST e job de deploy de produção. Esse resultado não substitui homologação funcional do ambiente publicado.
 - Retomada em 29/10/2026: main local atualizada por fast-forward até `e8c851b`; nova branch `chore/startup-base-homologation`. Planejamento local preservado; cópia adicional em `backend/target/retomada-20261029/` (ignorada). `AGENTS.md` é local e ignorado, não deve ser versionado.
 - Retomada em 30/10/2026: [PR #23](https://github.com/Diogo746/Da-Match/pull/23) integrado à main `52055a0`. [Workflow #85](https://github.com/Diogo746/Da-Match/actions/runs/40958003237) aprovado no head `0f3cf70`, incluindo lint/testes/build, segurança e Quality Gate frontend; backend/DAST dispensados por seleção de componentes. [Workflow #86 da main](https://github.com/Diogo746/Da-Match/actions/runs/41101543709) concluído com sucesso no SHA `52055a0`, com ambos os gates aprovados. Esse resultado não substitui homologação funcional publicada. Nova branch `docs/startup-publication-contract`, baseada em `52055a0`.
+- Contrato da etapa 1 introduzido no commit `f38ada6`, enviado no [PR #24](https://github.com/Diogo746/Da-Match/pull/24). Validação documental: três exemplos JSON válidos, links relativos conferidos e `git diff --check` aprovado. A entrega altera apenas documentação; o workflow do PR deve respeitar a seleção de componentes, sem alegar novos testes/gates de código quando dispensados. Integrar esse PR antes da etapa 2.
 
 ## Como executar o roteiro
 
@@ -151,6 +152,6 @@ Conclusão de cada entrega: autorização, persistência, fluxo pela interface e
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** integrar o contrato do guia 28; depois iniciar etapa 2 em nova branch da main atualizada. Implementar enum/default textual, aptidão/pendências, GET/PATCH de status, validação sob bloqueio, conflitos HTTP e testes. Não alterar banco remoto; ensaiar cópia PostgreSQL antes de deploy com coluna nova. Workflow #86 já concluído com sucesso.
+- **Próxima ação exata:** conferir checks e integrar o [PR #24](https://github.com/Diogo746/Da-Match/pull/24) do contrato; depois iniciar etapa 2 em nova branch da main atualizada. Implementar enum/default textual, aptidão/pendências, GET/PATCH de status, validação sob bloqueio, conflitos HTTP e testes. Não alterar banco remoto; ensaiar cópia PostgreSQL antes de deploy com coluna nova. Workflow #86 já concluído com sucesso.
 - **Implementação nova nesta sessão (30/10):** nenhuma. Somente contrato/documentação, com duas decisões de produto confirmadas pelo usuário. Branch `docs/startup-publication-contract`, baseada em `52055a0`; backend/frontend de publicação ainda não implementados.
 - **Ao encerrar a próxima sessão:** atualizar etapa, evidências, branch/head/PR/checks e este ponteiro, além de `AGENTS.md` local.
