@@ -1,6 +1,6 @@
 # Contrato de publicação da startup
 
-Definido na etapa 1 em 30/10/2026, a partir da main `52055a0`, após a homologação local e integração do PR #23. **Este documento especifica a próxima implementação; os endpoints e campos novos abaixo ainda não estão disponíveis.** Não houve mudança de código, schema ou dados remotos nesta etapa.
+Definido na etapa 1 em 30/10/2026 e integrado pelo PR #24 na main `852db0a`. **Backend implementado na etapa 2, branch `feature/startup-publication-api`; a interface de publicação será feita na etapa 3.** As rotas abaixo estão disponíveis nessa implementação local. Integração à main e implantação dependem do PR e das verificações correspondentes. Nenhum banco remoto foi alterado.
 
 ## Decisões e alcance
 
@@ -65,14 +65,14 @@ ADMIN não tem exceção; MENTOR e STARTUP sem vínculo são negados. O ator vem
 
 No serviço, obter a startup sob o bloqueio transacional já usado por PATCH, questionário e integrantes, conferir vínculo atual e calcular aptidão antes de alterar o estado. Não reutilizar pendências ou permissões enviadas pelo cliente. Isso serializa as escritas relevantes, mas não introduz controle otimista para formulários antigos.
 
-## Contrato HTTP a implementar na etapa 2
+## Contrato HTTP implementado na etapa 2
 
-| Rota proposta | Resultado |
+| Rota | Resultado |
 | --- | --- |
 | `GET /api/v1/startups/{startupId}/status` | `200` com `PublicacaoStartupResponse`, inclusive quando ainda não existe questionário; `401/403/404` conforme sessão, vínculo e existência. |
 | `PATCH /api/v1/startups/{startupId}/status` | JSON `AtualizarStatusPerfilStartupRequest` com somente `status`; `200` com a mesma resposta confirmada, `400` para payload inválido, `409` quando o destino é `PUBLICADO` e há pendências; demais erros `401/403/404`. Exige CSRF. |
 
-Usar nomes explícitos em `@PathVariable("startupId")`. `StartupResponse` ganhará apenas o campo `status` com o enum textual, para os contratos existentes de criação, consulta e edição. O PATCH antigo do perfil continua restrito aos sete campos atuais; nenhum campo de onboarding pode impor estado inicial diferente de `RASCUNHO`.
+Os controllers usam nomes explícitos em `@PathVariable("startupId")`. `StartupResponse` recebeu apenas o campo `status` com o enum textual, para os contratos existentes de criação, consulta e edição. O PATCH antigo do perfil continua restrito aos sete campos atuais; nenhum campo de onboarding pode impor estado inicial diferente de `RASCUNHO`.
 
 O novo GET retorna pendências apenas a integrantes autorizados. Não acrescentar pendências/respostas do questionário à listagem geral de startups, que hoje pode ser consultada por outras contas autenticadas. Essa listagem mantém seu contrato e ainda pode retornar projetos em rascunho/pausados; ela não passa a ser um catálogo de descoberta filtrado por publicação. A política de descoberta será tratada na etapa 5.
 
@@ -164,4 +164,12 @@ Testes obrigatórios da implementação:
 - HTTP `400/401/403/404/409/415`, corpo de conflito específico e DTOs sem segredos/entidades.
 - Frontend: estados, permissões, troca de conta/projeto, resposta antiga, `409`, resultado incerto/GET de confirmação, recarga e novo login; desktop/mobile e teclado.
 
-Atualizar Postman na implementação, mantendo as rotas em `PENDENTE` até existirem. Executar backend/Checkstyle, lint, cobertura e builds relevantes, conferir gates do commit e registrar a homologação no [guia 27](27-startup-next-sessions.md). A etapa 1 termina com este contrato; as etapas 2 e 3 continuam sem implementação.
+A pasta Startup do Postman inclui os GET/PATCH implementados, com sessão/CSRF e verificações de resposta confirmada ou conflito. O frontend continua sem ações de publicação, conforme a etapa 3. Evidências da etapa 2 e checks remotos ficam no [guia 27](27-startup-next-sessions.md).
+
+### Validação local da etapa 2 — 30/10/2026
+
+- **165 testes backend**, sem falhas/erros/ignorados; Checkstyle e arquitetura aprovados. Aptidão usa uma regra compartilhada para consulta, publicação e candidato completo de edição publicada; o questionário reutiliza `PerfilMatch.validar`.
+- Integração HTTP sem transação de teste confirma commits e rollback reais, nove transições/repetições, aptidão por projeto, membros/representantes/intrusos, revogação, ADMIN/MENTOR, CSRF obtido em `/csrf`, erros `400/401/403/404/409/415` e corpo seguro de conflito.
+- Dois testes concorrentes mantêm o bloqueio da startup enquanto outra transação solicita publicação; após o commit da alteração do questionário ou revogação do representante, a publicação reavalia e retorna respectivamente `409` ou `403`, sem mudar estado.
+- `HibernateStartupPublicationSchemaTest` parte de startup populada sem a coluna nova e confirma default textual obrigatório, dados, fundador e `statusValidacao` preservados, sem inventar questionário. O ensaio usa H2 em modo PostgreSQL; a cópia PostgreSQL real continua obrigatória antes do deploy.
+- **19 cenários HTTP reais** em `127.0.0.1:8081`, com sessão/cookies, CSRF e H2 em arquivo isolado: cadastro → login → pendências → conflito → questionário → publicação → edição/rollback → logout → novo login → pausa/retomada/rascunho. Relatório local ignorado em `backend/target/startup-publication-http-report.json`. Não houve revisão de interface de publicação nesta etapa, pois ela ainda será implementada.
