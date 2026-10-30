@@ -2,6 +2,8 @@
 
 **Data:** 17/10/2026. **Base:** frontend v0.4.3 e main fornecida em `Da-Match-main-att.zip`.
 
+Registro histórico do protótipo: a regra futura do servidor foi definida pelo usuário em 30/10/2026 no [guia 29](29-matching-rule-decisions.md). Os pesos/filtros descritos abaixo continuam específicos da demonstração `damatch-rules-v2`; não representam a regra `damatch-mentoria-v1` nem sua implementação no backend.
+
 ## Escopo
 
 O MVP do frontend contempla startups em ideação e mentores. Esta revisão preserva o cadastro conectado de mentor e refina a demonstração de perfil e descoberta. Os arquivos do backend permanecem iguais à base fornecida.
