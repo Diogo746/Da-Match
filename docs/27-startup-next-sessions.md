@@ -9,6 +9,7 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 - [Workflow #83 do PR](https://github.com/Diogo746/Da-Match/actions/runs/40798248553): concluído com sucesso, incluindo ambos os Quality Gates e DAST. Validação: 145 testes backend/Checkstyle, 378 frontend + 8 de configuração, 99,05% de linhas frontend, lint e builds DEMO/API.
 - [Workflow #84 após merge](https://github.com/Diogo746/Da-Match/actions/runs/40799178596): conferido em 29/10/2026, concluído com sucesso em testes, ambos os Quality Gates, DAST e job de deploy de produção. Esse resultado não substitui homologação funcional do ambiente publicado.
 - Retomada em 29/10/2026: main local atualizada por fast-forward até `e8c851b`; nova branch `chore/startup-base-homologation`. Planejamento local preservado; cópia adicional em `backend/target/retomada-20261029/` (ignorada). `AGENTS.md` é local e ignorado, não deve ser versionado.
+- Retomada em 30/10/2026: [PR #23](https://github.com/Diogo746/Da-Match/pull/23) integrado à main `52055a0`. [Workflow #85](https://github.com/Diogo746/Da-Match/actions/runs/40958003237) aprovado no head `0f3cf70`, incluindo lint/testes/build, segurança e Quality Gate frontend; backend/DAST dispensados por seleção de componentes. [Workflow #86 da main](https://github.com/Diogo746/Da-Match/actions/runs/41101543709) concluído com sucesso no SHA `52055a0`, com ambos os gates aprovados. Esse resultado não substitui homologação funcional publicada. Nova branch `docs/startup-publication-contract`, baseada em `52055a0`.
 
 ## Como executar o roteiro
 
@@ -16,8 +17,8 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 
 | Etapa | Situação | Resultado esperado |
 | --- | --- | --- |
-| 0. Retomada e homologação da base | Concluída no ambiente local; correção textual segue para CI/integração | Main conferida e fluxos atuais homologados em navegador/H2 |
-| 1. Contrato de publicação | Pendente | Regras de estados, requisitos e pendências definidas |
+| 0. Retomada e homologação da base | Concluída localmente e integrada pelo PR #23; CI pós-merge #86 aprovado | Main conferida e fluxos atuais homologados em navegador/H2 |
+| 1. Contrato de publicação | Concluída em 30/10; [guia 28](28-startup-publication-contract.md) | Cadastro + questionário completo exigidos; estados, pendências, HTTP e acesso definidos |
 | 2. Publicação no backend | Pendente; depende da 1 | Estado persistido, autorização, endpoint e testes |
 | 3. Publicação no frontend | Pendente; depende da 2 | Publicar/pausar e consultar pendências pela API |
 | 4. Integrantes | Pendente | Regras de contas e interface de gestão |
@@ -79,14 +80,15 @@ Validação após essa correção: lint, **378 testes frontend + 8 de configura�
 
 Evidências visuais locais ignoradas, em `frontend/.angular/cache/`: `homologation-questionnaire-desktop.jpg`, `homologation-questionnaire-360.jpg`, `homologation-registration-360-light.jpg`, `homologation-mentor-360.jpg`, `homologation-mentor-actions-360.jpg`, `homologation-mentor-uncertain.jpg` e `homologation-mentor-confirmed-desktop.jpg`. Capturas completas de algumas páginas excederam o limite do serviço; as evidências salvas são da viewport. Credenciais temporárias fictícias dos preparadores foram removidas; todas as sessões abertas para os ensaios foram encerradas por logout. Registros fictícios permanecem apenas no H2 local.
 
-Homologação publicada e ensaio em cópia PostgreSQL permanecem separados na etapa 10. A base foi homologada nos fluxos locais descritos, sem regressão funcional encontrada; a correção textual deve concluir CI/integração. Não iniciar backend/frontend de publicação antes do contrato da etapa 1.
+Homologação publicada e ensaio em cópia PostgreSQL permanecem separados na etapa 10. A base foi homologada nos fluxos locais descritos, sem regressão funcional encontrada; a correção textual foi integrada pelo PR #23, com workflows #85 do PR e #86 pós-merge aprovados.
 
 ## Etapa 1 — Definir publicação da startup
 
-- Criar contrato de estado próprio `RASCUNHO`, `PUBLICADO` e `PAUSADO`, separado de `statusValidacao` e dos momentos do questionário.
-- Definir os campos/requisitos mínimos para publicar, se questionário completo será obrigatório e quais pendências a API informa. Esses mínimos ainda não foram aprovados.
-- Definir transições permitidas e o que acontece se uma edição tornar um projeto publicado incompleto. Salvar perfil/questionário não deve publicar implicitamente.
-- Preservar gestão por FUNDADOR/REPRESENTANTE, consulta por membro e ausência de exceção automática para ADMIN.
+- Contrato no [guia 28](28-startup-publication-contract.md), definido em 30/10. Endpoints novos continuam indisponíveis nesta etapa documental.
+- O usuário aprovou exigir os dados obrigatórios do cadastro e o questionário v3 completo e salvo para a startup selecionada.
+- O usuário aprovou voltar manualmente a `RASCUNHO`, além de publicar/pausar/retomar. Estado próprio, separado de `statusValidacao`; destino PUBLICADO sempre exige aptidão, demais destinos preservam dados sem exigir quiz.
+- Edição válida preserva estado; edição que retire requisito de perfil publicado é rejeitada atomicamente, sem despublicação implícita. Salvar não publica.
+- GET/PATCH propostos em `/api/v1/startups/{startupId}/status`, DTO de estado/aptidão/pendências e `409` específico para publicação incompleta. Gestão por FUNDADOR/REPRESENTANTE, consulta por membro, sem exceção ADMIN.
 
 Conclusão: contrato documentado com exemplos de estados/transições, pendências e respostas HTTP; resolver com o usuário apenas decisões de produto sem resposta no projeto.
 
@@ -149,6 +151,6 @@ Conclusão de cada entrega: autorização, persistência, fluxo pela interface e
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** conferir CI/integração da correção textual e fechar o contrato de publicação da etapa 1: requisitos mínimos, obrigatoriedade do questionário, transições e edição de perfil publicado. Esses mínimos ainda exigem decisão de produto; não implementar regras presumidas.
-- **Implementação nova nesta sessão:** somente correção de mensagem desatualizada do cadastro. Homologação funcional no navegador, desktop/360 px e ensaio real de falha de conexão executados; evidências/limitações acima. Branch `chore/startup-base-homologation`, baseada em `e8c851b`.
+- **Próxima ação exata:** integrar o contrato do guia 28; depois iniciar etapa 2 em nova branch da main atualizada. Implementar enum/default textual, aptidão/pendências, GET/PATCH de status, validação sob bloqueio, conflitos HTTP e testes. Não alterar banco remoto; ensaiar cópia PostgreSQL antes de deploy com coluna nova. Workflow #86 já concluído com sucesso.
+- **Implementação nova nesta sessão (30/10):** nenhuma. Somente contrato/documentação, com duas decisões de produto confirmadas pelo usuário. Branch `docs/startup-publication-contract`, baseada em `52055a0`; backend/frontend de publicação ainda não implementados.
 - **Ao encerrar a próxima sessão:** atualizar etapa, evidências, branch/head/PR/checks e este ponteiro, além de `AGENTS.md` local.
