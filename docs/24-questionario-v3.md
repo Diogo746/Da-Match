@@ -21,7 +21,7 @@ Esta versão traz de volta partes do quiz original do DaMatch que ficaram de for
 | Tela final só com texto | Tela final mostra **quantas indicações foram encontradas**, com animação |
 | Porcentagem visível nos cards e nos detalhes | **A porcentagem não aparece para o participante.** Só o selo **Super DaMatch** quando a nota é 95 ou mais |
 
-As perguntas novas são guardadas, mas **não mudam a nota do match** por enquanto. A regra de cálculo continua sendo a decisão pendente do [documento 16](16-decisao-regra-matching.md).
+As perguntas novas são guardadas, mas **não mudam a nota do protótipo demonstrativo** por enquanto. A regra futura do servidor foi definida pelo usuário em 30/10 no [guia 29](29-matching-rule-decisions.md), com público e formação na pontuação. O [documento 16](16-decisao-regra-matching.md) preserva as alternativas anteriores. O cálculo no backend ainda será implementado.
 
 ---
 

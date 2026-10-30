@@ -11,6 +11,8 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 - Retomada em 29/10/2026: main local atualizada por fast-forward até `e8c851b`; nova branch `chore/startup-base-homologation`. Planejamento local preservado; cópia adicional em `backend/target/retomada-20261029/` (ignorada). `AGENTS.md` é local e ignorado, não deve ser versionado.
 - Retomada em 30/10/2026: [PR #23](https://github.com/Diogo746/Da-Match/pull/23) integrado à main `52055a0`. [Workflow #85](https://github.com/Diogo746/Da-Match/actions/runs/40958003237) aprovado no head `0f3cf70`, incluindo lint/testes/build, segurança e Quality Gate frontend; backend/DAST dispensados por seleção de componentes. [Workflow #86 da main](https://github.com/Diogo746/Da-Match/actions/runs/41101543709) concluído com sucesso no SHA `52055a0`, com ambos os gates aprovados. Esse resultado não substitui homologação funcional publicada. Nova branch `docs/startup-publication-contract`, baseada em `52055a0`.
 - Contrato da etapa 1 introduzido no commit `f38ada6`, enviado no [PR #24](https://github.com/Diogo746/Da-Match/pull/24). Validação documental: três exemplos JSON válidos, links relativos conferidos e `git diff --check` aprovado. A entrega altera apenas documentação; o workflow do PR deve respeitar a seleção de componentes, sem alegar novos testes/gates de código quando dispensados. Integrar esse PR antes da etapa 2.
+- Atualização de 30/10: PR #24 integrado na main `852db0a`. Backend de publicação está no [PR #25](https://github.com/Diogo746/Da-Match/pull/25), head `51fe17e`, em rascunho; workflow #91 (`41108151966`) aprovado, incluindo Quality Gate backend. Não está integrado à main; ensaio em cópia PostgreSQL deve preceder implantação da coluna, conforme o PR e a etapa 10. A entrega da publicação possui seu próprio registro de validação.
+- O usuário adiantou a decisão de produto da etapa 6 por questionário, sem solicitar implementação antecipada: 13 respostas consolidadas no [guia 29](29-matching-rule-decisions.md), branch documental `codex/matching-rule-decision`. Pesos e casos de referência definidos; código de matching permanece pendente.
 
 ## Como executar o roteiro
 
@@ -20,11 +22,11 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | --- | --- | --- |
 | 0. Retomada e homologação da base | Concluída localmente e integrada pelo PR #23; CI pós-merge #86 aprovado | Main conferida e fluxos atuais homologados em navegador/H2 |
 | 1. Contrato de publicação | Concluída em 30/10; [guia 28](28-startup-publication-contract.md) | Cadastro + questionário completo exigidos; estados, pendências, HTTP e acesso definidos |
-| 2. Publicação no backend | Pendente; depende da 1 | Estado persistido, autorização, endpoint e testes |
+| 2. Publicação no backend | Implementada/validada no PR #25; integração e ensaio PostgreSQL pré-deploy pendentes | Estado persistido, autorização, endpoint e testes |
 | 3. Publicação no frontend | Pendente; depende da 2 | Publicar/pausar e consultar pendências pela API |
 | 4. Integrantes | Pendente | Regras de contas e interface de gestão |
 | 5. Descoberta real | Pendente | Catálogo de perfis elegíveis pela API |
-| 6. Matching definitivo | Aguarda decisão da equipe/PO | Regra aprovada e cálculo no backend |
+| 6. Matching definitivo | Regra definida pelo usuário em 30/10 no [guia 29](29-matching-rule-decisions.md); implementação pendente | `damatch-mentoria-v1`, após as dependências; atualizar revisão formal do SRS |
 | 7. Salvos persistidos | Pendente; confirmar escopo | Favoritos por conta |
 | 8. Interesses e conexões | Pendente | Interesse e reciprocidade persistidos |
 | 9. Reuniões | Pendente | Agendamento entre conexões |
@@ -129,9 +131,14 @@ Conclusão: catálogo real mostra somente perfis elegíveis e respeita a visibil
 
 ## Etapa 6 — Matching definitivo
 
-- Primeiro resolver a decisão do [guia 16](16-decisao-regra-matching.md) com equipe/PO. O algoritmo demonstrativo não representa aprovação.
-- Implementar cálculo, versão, ordenação e desempate no backend após o contrato aprovado.
-- Participante recebe ordem e selo `superDamatch` (>=95), sem porcentagens ou detalhes numéricos; relatório completo exige autorização administrativa.
+- Questionário concluído a pedido do usuário em 30/10: 13 respostas e especificação normativa no [guia 29](29-matching-rule-decisions.md); histórico das alternativas no [guia 16](16-decisao-regra-matching.md). Versão `damatch-mentoria-v1`, independente do quiz e da demonstração.
+
+- Pesos: necessidades/setor/momento/público/agenda/formação 50/15/10/10/10/5; principal/secundária 70/30; prática 100% e conhecimento 70%. Pelo menos uma necessidade atendida. Sem agenda comum perde 10, não exclui; frequências fixas diferentes excluem salvo flexível. Modalidade/cidade precisam permitir encontro.
+- Uma área em comum rende setor inteiro; mentor geral recebe 7,5; desconhecidos rendem zero sem redistribuição. Um público em comum rende 10. Formação específica adicional ao time rende 5, ignorando OTHER/STUDENT e exigindo áreas específicas nos dois lados.
+- Corte inclusivo 60; selo inclusivo 95; precisão decimal exata, sem arredondar antes de comparar. Desempate: necessidades atendidas, necessidades com prática, agenda comum, UUID estável. Capacidade informativa por enquanto; controle automático fica para gestão das mentorias.
+- Implementar cálculo e relatório com revisões/versão, elegibilidade atual, isolamento de conta/projeto e atualização após edições/pausa. Participante recebe ordem e selo, sem nota nem contribuição numérica em JSON; relatório completo exige autorização administrativa.
+- Usar os casos de referência do guia 29 nos testes do backend, endpoints e integração frontend; preservar sessão/CSRF e separar DEMO/API. Sem indicações acima do corte: lista vazia, sem relaxar regras nem inserir dados fictícios.
+- Incorporar a decisão à próxima revisão formal do SRS; US-16/18/19 devem seguir o guia 29. Definição antecipada não adianta a implementação frente a publicação/frontend/integrantes/descoberta.
 
 Conclusão: casos de referência aprovados conferem com o cálculo e as permissões; nenhuma nota enviada pelo cliente é confiada.
 
@@ -152,6 +159,6 @@ Conclusão de cada entrega: autorização, persistência, fluxo pela interface e
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** conferir checks e integrar o [PR #24](https://github.com/Diogo746/Da-Match/pull/24) do contrato; depois iniciar etapa 2 em nova branch da main atualizada. Implementar enum/default textual, aptidão/pendências, GET/PATCH de status, validação sob bloqueio, conflitos HTTP e testes. Não alterar banco remoto; ensaiar cópia PostgreSQL antes de deploy com coluna nova. Workflow #86 já concluído com sucesso.
-- **Implementação nova nesta sessão (30/10):** nenhuma. Somente contrato/documentação, com duas decisões de produto confirmadas pelo usuário. Branch `docs/startup-publication-contract`, baseada em `52055a0`; backend/frontend de publicação ainda não implementados.
+- **Próxima ação exata:** revisar a documentação da decisão de matching; no trabalho funcional, ensaiar cópia PostgreSQL antes de integrar/deployar o [PR #25](https://github.com/Diogo746/Da-Match/pull/25), depois iniciar a etapa 3 (interface de publicação). Não alterar dados remotos sem autorização. Quando chegar à etapa 6, implementar a regra do guia 29; a decisão de pesos/filtros não precisa ser repetida.
+- **Entrega desta definição (30/10):** somente documentação, branch `codex/matching-rule-decision`, base main `852db0a`. Questionário de 13 perguntas concluído, fórmula e casos de referência registrados, US-16/18/19 alinhadas. Nenhuma implementação de matching, mudança de schema ou deploy nesta entrega. Backend de publicação permanece separado no PR #25.
 - **Ao encerrar a próxima sessão:** atualizar etapa, evidências, branch/head/PR/checks e este ponteiro, além de `AGENTS.md` local.
