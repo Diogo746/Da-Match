@@ -29,14 +29,24 @@ public class ResourceAccess {
     }
 
     public void requireStartupManager(Startup startup) {
+        if (!canManageStartup(startup)) {
+            throw new AccessDeniedException("Acesso negado.");
+        }
+    }
+
+    public void requireStartupMember(Startup startup) {
+        UUID actor = currentStartupUserId();
+        if (startup.getMembros().stream().noneMatch(member -> member.getUsuario().getId().equals(actor))) {
+            throw new AccessDeniedException("Acesso negado.");
+        }
+    }
+
+    public boolean canManageStartup(Startup startup) {
         UsuarioPrincipal principal = requireRole(TipoUsuario.STARTUP);
-        boolean manager = startup.getMembros().stream().anyMatch(member ->
+        return startup.getMembros().stream().anyMatch(member ->
                 member.getUsuario().getId().equals(principal.getId())
                         && (member.getPapelMembro() == PapelMembroStartup.FUNDADOR
                         || member.getPapelMembro() == PapelMembroStartup.REPRESENTANTE));
-        if (!manager) {
-            throw new AccessDeniedException("Acesso negado.");
-        }
     }
 
     private UsuarioPrincipal requireRole(TipoUsuario role) {

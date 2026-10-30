@@ -2,6 +2,7 @@ package br.senac.fullstack.shared.api.error;
 
 import br.senac.fullstack.mentor.application.exception.MentorNaoEncontradoException;
 import br.senac.fullstack.shared.security.SecurityErrors;
+import br.senac.fullstack.startup.application.exception.StartupIncompletaException;
 import br.senac.fullstack.usuario.application.exception.EmailExistenteException;
 import br.senac.fullstack.usuario.application.exception.UsuarioNaoEncontradoException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -61,6 +62,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail badRequest() {
         return SecurityErrors.problem(HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(StartupIncompletaException.class)
+    public ProblemDetail startupIncompleta(StartupIncompletaException exception) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+                "A startup possui pendências para publicação.");
+        problem.setProperty("codigo", "STARTUP_INCOMPLETA");
+        problem.setProperty("pendencias", exception.getPendencias());
+        return problem;
     }
 
     @ExceptionHandler({IllegalStateException.class, EmailExistenteException.class, DataIntegrityViolationException.class})

@@ -10,9 +10,9 @@ import br.senac.fullstack.perfilmatch.infrastructure.persistence.repository.Perf
 import br.senac.fullstack.shared.enums.TipoUsuario;
 import br.senac.fullstack.shared.security.ResourceAccess;
 import br.senac.fullstack.startup.domain.Startup;
+import br.senac.fullstack.startup.application.service.AptidaoPublicacaoStartupService;
 import br.senac.fullstack.startup.infrastructure.persistence.repository.StartupRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -29,22 +29,22 @@ public class PerfilMatchService {
     private final MentorRepository mentors;
     private final PerfilMatchMapper mapper;
     private final ResourceAccess access;
+    private final AptidaoPublicacaoStartupService aptidao;
 
     public PerfilMatchService(PerfilMatchRepository profiles, StartupRepository startups,
-                             MentorRepository mentors, PerfilMatchMapper mapper, ResourceAccess access) {
+                             MentorRepository mentors, PerfilMatchMapper mapper, ResourceAccess access,
+                             AptidaoPublicacaoStartupService aptidao) {
         this.profiles = profiles;
         this.startups = startups;
         this.mentors = mentors;
         this.mapper = mapper;
         this.access = access;
+        this.aptidao = aptidao;
     }
 
     public Optional<PerfilMatchResponse> consultarStartup(UUID id) {
         Startup startup = startup(id);
-        UUID actor = access.currentStartupUserId();
-        if (startup.getMembros().stream().noneMatch(member -> member.getUsuario().getId().equals(actor))) {
-            throw new AccessDeniedException("Acesso negado.");
-        }
+        access.requireStartupMember(startup);
         return profiles.findByStartupId(id).map(profile -> mapper.toResponse(profile, profile.getAvailability()));
     }
 
@@ -52,6 +52,7 @@ public class PerfilMatchService {
         Startup startup = startup(id);
         access.requireStartupManager(startup);
         PerfilMatch input = validated(request, TipoUsuario.STARTUP);
+        aptidao.validarEdicaoPublicada(startup, input);
         PerfilMatch profile = profiles.findByStartupId(id).orElseGet(PerfilMatch::new);
         mapper.update(input, profile);
         profile.setStartup(startup);

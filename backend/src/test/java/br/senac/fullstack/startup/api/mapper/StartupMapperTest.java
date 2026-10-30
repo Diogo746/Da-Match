@@ -6,6 +6,7 @@ import br.senac.fullstack.startup.domain.MembroStartup;
 import br.senac.fullstack.startup.domain.Startup;
 import br.senac.fullstack.startup.domain.enums.PapelMembroStartup;
 import br.senac.fullstack.startup.domain.enums.StatusValidacao;
+import br.senac.fullstack.startup.domain.enums.StatusPerfilStartup;
 import br.senac.fullstack.shared.enums.TipoUsuario;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
 import org.junit.jupiter.api.Test;
@@ -56,6 +57,7 @@ class StartupMapperTest {
         MembroStartupResponse membroResponse = response.membros().getFirst();
 
         assertEquals(startupId, response.id());
+        assertEquals(StatusPerfilStartup.RASCUNHO, response.status());
         assertEquals("Startup de Teste", response.nomeProvisorio());
         assertEquals(Instant.parse("2026-10-19T12:00:00Z"), response.dataCriacao());
         assertEquals(usuarioId, membroResponse.usuarioId());

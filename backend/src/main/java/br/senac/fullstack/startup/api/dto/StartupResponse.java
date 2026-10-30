@@ -1,6 +1,7 @@
 package br.senac.fullstack.startup.api.dto;
 
 import br.senac.fullstack.startup.domain.enums.StatusValidacao;
+import br.senac.fullstack.startup.domain.enums.StatusPerfilStartup;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,6 +16,7 @@ public record StartupResponse(
         String publicoAlvo,
         String modeloDeNegocio,
         StatusValidacao statusValidacao,
+        StatusPerfilStartup status,
         Instant dataCriacao,
         List<MembroStartupResponse> membros
 ) {
