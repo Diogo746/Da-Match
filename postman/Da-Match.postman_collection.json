@@ -288,7 +288,7 @@
     },
     {
       "name": "Startup",
-      "description": "A criação exige visitante e CSRF. Depois do login STARTUP, consulte Minhas startups. A edição exige vínculo FUNDADOR/REPRESENTANTE e CSRF renovado após login. A consulta retorna uma lista, pois uma conta pode ter mais de um vínculo.",
+      "description": "A criação exige visitante e CSRF e inicia em RASCUNHO. Depois do login STARTUP, consulte Minhas startups. Edição e publicação exigem vínculo FUNDADOR/REPRESENTANTE e CSRF renovado após login. Qualquer membro STARTUP consulta estado e pendências. Publicar exige cadastro e questionário v3 completos. Uma conta pode ter mais de um projeto.",
       "item": [
         {
           "name": "Criar startup",
@@ -374,6 +374,39 @@
             "header": [],
             "url": "{{baseUrl}}/api/v1/startups/{{startupId}}"
           },
+          "response": []
+        },
+        {
+          "name": "Consultar publicação e pendências",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/status",
+            "description": "Sessão STARTUP e vínculo atual de qualquer papel. Retorna 200 mesmo sem questionário. Aptidão independe do papel; podeGerenciar só orienta a interface. Não retorna respostas do quiz nem dados de contas."
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Consulta confirmada', () => pm.response.to.have.status(200));",
+            "if (pm.response.code === 200) pm.test('Estado, aptidão e pendências', () => { const body = pm.response.json(); pm.expect(body.startupId).to.eql(pm.collectionVariables.get('startupId')); pm.expect(['RASCUNHO', 'PUBLICADO', 'PAUSADO']).to.include(body.status); pm.expect(body.aptoParaPublicacao).to.be.a('boolean'); pm.expect(body.podeGerenciar).to.be.a('boolean'); pm.expect(body.pendencias).to.be.an('array'); pm.expect(body.aptoParaPublicacao).to.eql(body.pendencias.length === 0); pm.expect(body).not.to.have.property('membros'); pm.expect(body).not.to.have.property('topics'); });"
+          ] } }],
+          "response": []
+        },
+        {
+          "name": "Alterar publicação da startup",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+              { "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/status",
+            "description": "FUNDADOR/REPRESENTANTE, sessão STARTUP e CSRF. Troque status por PUBLICADO para publicar/retomar, PAUSADO para pausar ou RASCUNHO para retirar publicação. PUBLICADO exige cadastro e quiz v3 salvos e válidos; incompleta retorna 409 STARTUP_INCOMPLETA com pendencias sem alterar estado. Demais destinos não exigem quiz. Não repetir PATCH automaticamente após falha incerta; confirmar por GET.",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"PUBLICADO\"\n}", "options": { "raw": { "language": "json" } } }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Alteração confirmada ou pendências', () => pm.expect([200, 409]).to.include(pm.response.code));",
+            "if (pm.response.code === 200) pm.test('Estado confirmado', () => { const body = pm.response.json(); const sent = JSON.parse(pm.request.body.raw); pm.expect(body.status).to.eql(sent.status); pm.expect(body.podeGerenciar).to.eql(true); if (sent.status === 'PUBLICADO') { pm.expect(body.aptoParaPublicacao).to.eql(true); pm.expect(body.pendencias).to.eql([]); } });",
+            "if (pm.response.code === 409) pm.test('Conflito de publicação incompleta', () => { const body = pm.response.json(); pm.expect(body.codigo).to.eql('STARTUP_INCOMPLETA'); pm.expect(body.pendencias).to.be.an('array').that.is.not.empty; });"
+          ] } }],
           "response": []
         },
         {
