@@ -12,6 +12,7 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 - Retomada em 30/10/2026: [PR #23](https://github.com/Diogo746/Da-Match/pull/23) integrado à main `52055a0`. [Workflow #85](https://github.com/Diogo746/Da-Match/actions/runs/40958003237) aprovado no head `0f3cf70`, incluindo lint/testes/build, segurança e Quality Gate frontend; backend/DAST dispensados por seleção de componentes. [Workflow #86 da main](https://github.com/Diogo746/Da-Match/actions/runs/41101543709) concluído com sucesso no SHA `52055a0`, com ambos os gates aprovados. Esse resultado não substitui homologação funcional publicada. Nova branch `docs/startup-publication-contract`, baseada em `52055a0`.
 - Contrato da etapa 1 introduzido no commit `f38ada6`, enviado no [PR #24](https://github.com/Diogo746/Da-Match/pull/24). Validação documental: três exemplos JSON válidos, links relativos conferidos e `git diff --check` aprovado. A entrega altera apenas documentação; o workflow do PR deve respeitar a seleção de componentes, sem alegar novos testes/gates de código quando dispensados. Integrar esse PR antes da etapa 2.
 - Etapa 1 integrada pelo PR #24 na main `852db0a`; workflows #88 do PR (`41104956612`) e #89 da main (`41105568466`) concluídos com sucesso. Etapa 2 iniciada dessa main em `feature/startup-publication-api`; implementação e validação local descritas abaixo. Não houve alteração de banco remoto nem deploy manual.
+- Etapa 2 enviada no [PR #25](https://github.com/Diogo746/Da-Match/pull/25), em rascunho para revisão e ensaio PostgreSQL antes da integração, pois a main dispara deploy automático. Backend no commit `c1331c5`; Postman em `3d2b769`. Conferir os checks do head atual no PR, sem confundi-los com a aprovação da base.
 
 ## Como executar o roteiro
 
@@ -21,7 +22,7 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | --- | --- | --- |
 | 0. Retomada e homologação da base | Concluída localmente e integrada pelo PR #23; CI pós-merge #86 aprovado | Main conferida e fluxos atuais homologados em navegador/H2 |
 | 1. Contrato de publicação | Concluída em 30/10; [guia 28](28-startup-publication-contract.md) | Cadastro + questionário completo exigidos; estados, pendências, HTTP e acesso definidos |
-| 2. Publicação no backend | Implementada e validada localmente; PR/CI a conferir | Estado persistido, autorização, endpoints e testes; PostgreSQL pré-deploy pendente |
+| 2. Publicação no backend | Implementada e validada localmente; [PR #25](https://github.com/Diogo746/Da-Match/pull/25) em revisão, CI no PR | Estado persistido, autorização, endpoints e testes; PostgreSQL pré-deploy pendente |
 | 3. Publicação no frontend | Pendente; depende da 2 | Publicar/pausar e consultar pendências pela API |
 | 4. Integrantes | Pendente | Regras de contas e interface de gestão |
 | 5. Descoberta real | Pendente | Catálogo de perfis elegíveis pela API |
@@ -163,6 +164,6 @@ Conclusão de cada entrega: autorização, persistência, fluxo pela interface e
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** conferir PR/CI da branch `feature/startup-publication-api` e preparar a etapa 3 depois da integração do backend. Antes de integrar/deployar alteração que alcança banco publicado, ensaiar cópia PostgreSQL conforme etapa 10, sem mudar dados remotos sem autorização. Etapa 3 deve consultar estado/pendências da API, preservar múltiplos projetos/permissões e bloquear novas escritas após resultado incerto até GET confirmado.
+- **Próxima ação exata:** conferir checks do head do [PR #25](https://github.com/Diogo746/Da-Match/pull/25), ensaiar cópia PostgreSQL e integrar o backend antes da etapa 3. Antes de integrar/deployar alteração que alcança banco publicado, ensaiar a cópia conforme etapa 10, sem mudar dados remotos sem autorização. Etapa 3 deve consultar estado/pendências da API, preservar múltiplos projetos/permissões e bloquear novas escritas após resultado incerto até GET confirmado.
 - **Implementação nova nesta sessão (30/10):** backend de publicação e artefatos Postman/documentação, base main `852db0a` após PR #24. Etapa 2 validada localmente; interface de publicação ainda pendente. Workflows #88/#89 da base aprovados.
 - **Ao encerrar a próxima sessão:** atualizar etapa, evidências, branch/head/PR/checks e este ponteiro, além de `AGENTS.md` local.
