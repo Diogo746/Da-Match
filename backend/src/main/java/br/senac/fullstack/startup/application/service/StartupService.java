@@ -39,6 +39,7 @@ public class StartupService {
     private final UsuarioService usuarioService;
     private final StartupMapper startupMapper;
     private final ResourceAccess resourceAccess;
+    private final AptidaoPublicacaoStartupService aptidao;
 
     public StartupService(
             StartupRepository startupRepository,
@@ -46,7 +47,8 @@ public class StartupService {
             UsuarioRepository usuarioRepository,
             UsuarioService usuarioService,
             StartupMapper startupMapper,
-            ResourceAccess resourceAccess
+            ResourceAccess resourceAccess,
+            AptidaoPublicacaoStartupService aptidao
     ) {
         this.startupRepository = startupRepository;
         this.membroRepository = membroRepository;
@@ -54,6 +56,7 @@ public class StartupService {
         this.usuarioService = usuarioService;
         this.startupMapper = startupMapper;
         this.resourceAccess = resourceAccess;
+        this.aptidao = aptidao;
     }
 
     @Transactional
@@ -130,6 +133,7 @@ public class StartupService {
         if (request.statusValidacao() != null) {
             startup.setStatusValidacao(request.statusValidacao());
         }
+        aptidao.validarEdicaoPublicada(startup);
         return startupMapper.toResponse(startup);
     }
 
