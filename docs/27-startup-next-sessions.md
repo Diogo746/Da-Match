@@ -11,9 +11,12 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 - Retomada em 29/10/2026: main local atualizada por fast-forward até `e8c851b`; nova branch `chore/startup-base-homologation`. Planejamento local preservado; cópia adicional em `backend/target/retomada-20261029/` (ignorada). `AGENTS.md` é local e ignorado, não deve ser versionado.
 - Retomada em 30/10/2026: [PR #23](https://github.com/Diogo746/Da-Match/pull/23) integrado à main `52055a0`. [Workflow #85](https://github.com/Diogo746/Da-Match/actions/runs/40958003237) aprovado no head `0f3cf70`, incluindo lint/testes/build, segurança e Quality Gate frontend; backend/DAST dispensados por seleção de componentes. [Workflow #86 da main](https://github.com/Diogo746/Da-Match/actions/runs/41101543709) concluído com sucesso no SHA `52055a0`, com ambos os gates aprovados. Esse resultado não substitui homologação funcional publicada. Nova branch `docs/startup-publication-contract`, baseada em `52055a0`.
 - Contrato da etapa 1 introduzido no commit `f38ada6`, enviado no [PR #24](https://github.com/Diogo746/Da-Match/pull/24). Validação documental: três exemplos JSON válidos, links relativos conferidos e `git diff --check` aprovado. A entrega altera apenas documentação; o workflow do PR deve respeitar a seleção de componentes, sem alegar novos testes/gates de código quando dispensados. Integrar esse PR antes da etapa 2.
-- Atualização de 30/10: PR #24 integrado na main `852db0a`. Backend de publicação está no [PR #25](https://github.com/Diogo746/Da-Match/pull/25), head `51fe17e`, em rascunho; workflow #91 (`41108151966`) aprovado, incluindo Quality Gate backend. Não está integrado à main; ensaio em cópia PostgreSQL deve preceder implantação da coluna, conforme o PR e a etapa 10. A entrega da publicação possui seu próprio registro de validação.
+- Etapa 1 integrada pelo PR #24 na main `852db0a`; workflows #88 do PR (`41104956612`) e #89 da main (`41105568466`) concluídos com sucesso. Etapa 2 iniciada dessa main em `feature/startup-publication-api`; implementação e validação local descritas abaixo.
+- Etapa 2 entregue pelo [PR #25](https://github.com/Diogo746/Da-Match/pull/25), head `51fe17e`: backend no commit `c1331c5`, Postman em `3d2b769`; workflow #91 (`41108151966`) aprovado, incluindo Quality Gate backend.
+- Conferência em 31/10: PR #25 integrado à main `2a5d321`; [workflow #94 pós-merge](https://github.com/Diogo746/Da-Match/actions/runs/41113221511) concluído com sucesso. A aprovação da CI não comprova ensaio em cópia PostgreSQL nem homologação funcional publicada; evidências operacionais permanecem na etapa 10.
 - O usuário adiantou a decisão de produto da etapa 6 por questionário, sem solicitar implementação antecipada: 13 respostas consolidadas no [guia 29](29-matching-rule-decisions.md), branch documental `codex/matching-rule-decision`. Pesos e casos de referência definidos; código de matching permanece pendente.
 - Decisão enviada no [PR #26](https://github.com/Diogo746/Da-Match/pull/26), introduzida em `cb9571a`. Validação documental: soma 100, fatores e 14 casos conferidos com decimal exato, links novos e diff aprovados. Conferir checks do head atual; esta entrega não altera aplicação nem comprova implementação do algoritmo.
+- Em 31/10, a main foi incorporada à branch do PR #26 para resolver conflitos somente no roteiro e índice. Preservados os registros da publicação, as 13 decisões e os 14 casos de matching. Verificar a CI do novo head; nenhuma mudança de aplicação adicional à main foi introduzida por essa resolução.
 
 ## Como executar o roteiro
 
@@ -23,7 +26,7 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | --- | --- | --- |
 | 0. Retomada e homologação da base | Concluída localmente e integrada pelo PR #23; CI pós-merge #86 aprovado | Main conferida e fluxos atuais homologados em navegador/H2 |
 | 1. Contrato de publicação | Concluída em 30/10; [guia 28](28-startup-publication-contract.md) | Cadastro + questionário completo exigidos; estados, pendências, HTTP e acesso definidos |
-| 2. Publicação no backend | Implementada/validada no PR #25; integração e ensaio PostgreSQL pré-deploy pendentes | Estado persistido, autorização, endpoint e testes |
+| 2. Publicação no backend | Integrada pelo PR #25 na main `2a5d321`; CI pós-merge #94 aprovada | Estado persistido, autorização, endpoints e testes; evidências operacionais na etapa 10 |
 | 3. Publicação no frontend | Pendente; depende da 2 | Publicar/pausar e consultar pendências pela API |
 | 4. Integrantes | Pendente | Regras de contas e interface de gestão |
 | 5. Descoberta real | Pendente | Catálogo de perfis elegíveis pela API |
@@ -105,6 +108,16 @@ Conclusão: contrato documentado com exemplos de estados/transições, pendênci
 
 Conclusão: API testada e contrato consumível pelo frontend; ensaio em cópia PostgreSQL antes de implantar a coluna.
 
+### Entrega local em 30/10/2026
+
+- `StatusPerfilStartup` textual, inicializador/default SQL `RASCUNHO`; `statusValidacao` independente. `StartupResponse` ganha somente `status`; listagem geral mantém acesso autenticado e não vira descoberta.
+- GET/PATCH `/api/v1/startups/{startupId}/status`, DTO de estado/aptidão/permissão/pendências e conflito específico `409 STARTUP_INCOMPLETA`. Consulta por membro STARTUP; gestão por FUNDADOR/REPRESENTANTE com CSRF. Sem exceção ADMIN e sem ator enviado pelo cliente.
+- Avaliador único reutiliza a validação v3 existente, verifica perfil inteiro e quiz da startup selecionada. Publicar sempre revalida; pausar/rascunho preservam dados sem exigir quiz; salvar não publica. Edição inconsistente de publicado retorna `400` com rollback.
+- Permissão e aptidão avaliadas sob bloqueio pessimista da startup. Dois testes concorrentes confirmam reavaliação após alteração do quiz ou revogação de representante em outra transação.
+- **165 testes backend**, zero falhas/erros/ignorados, Checkstyle e arquitetura aprovados. Log local ignorado: `backend/target/startup-publication-tests.log`. Inclui schema populado sem coluna, nove transições/repetições, isolamento de projetos, papéis, CSRF real, rollback e HTTP `400/401/403/404/409/415`.
+- **19 cenários HTTP reais** pela API em `127.0.0.1:8081`, H2 em arquivo `backend/target/startup-publication-qa.mv.db`: cadastro, login, pendências/conflito, quiz, publicação, edição/rollback, logout/novo login, pausa/retomada/rascunho. Relatório ignorado: `backend/target/startup-publication-http-report.json`; credenciais fictícias geradas apenas em memória, sessões encerradas.
+- Postman atualizado na pasta Startup com consulta e alteração de publicação e validação de `200/409`. Frontend não alterado; revisão de interface e testes dessa integração pertencem à etapa 3. Não alegar homologação publicada ou ensaio PostgreSQL a partir do H2.
+
 ## Etapa 3 — Frontend de publicação
 
 - Mostrar estado confirmado pelo servidor, pendências e ações publicar/pausar/retomar conforme contrato e permissão.
@@ -160,6 +173,7 @@ Conclusão de cada entrega: autorização, persistência, fluxo pela interface e
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** revisar a documentação da decisão de matching; no trabalho funcional, ensaiar cópia PostgreSQL antes de integrar/deployar o [PR #25](https://github.com/Diogo746/Da-Match/pull/25), depois iniciar a etapa 3 (interface de publicação). Não alterar dados remotos sem autorização. Quando chegar à etapa 6, implementar a regra do guia 29; a decisão de pesos/filtros não precisa ser repetida.
-- **Entrega desta definição (30/10):** somente documentação, branch `codex/matching-rule-decision`, base main `852db0a`. Questionário de 13 perguntas concluído, fórmula e casos de referência registrados, US-16/18/19 alinhadas. Nenhuma implementação de matching, mudança de schema ou deploy nesta entrega. Backend de publicação permanece separado no PR #25.
+- **Próxima ação exata:** conferir checks e revisar/integrar o [PR #26](https://github.com/Diogo746/Da-Match/pull/26). No trabalho funcional, conferir evidências do ensaio PostgreSQL e homologação publicada da etapa 10; próxima funcionalidade é a etapa 3 (interface de publicação). Ela deve consultar estado/pendências da API, preservar múltiplos projetos/permissões e bloquear novas escritas após resultado incerto até GET confirmado. Não alterar dados remotos sem autorização. Na etapa 6, implementar o guia 29 sem repetir a decisão de pesos/filtros.
+- **Entrega da publicação (30/10):** backend, Postman e documentação no PR #25, integrado em `2a5d321`; validações locais acima e CI pós-merge #94 aprovada. A interface permanece pendente.
+- **Entrega desta definição (30/10) e resolução (31/10):** somente documentação no PR #26, branch `codex/matching-rule-decision`; 13 respostas, fórmula e 14 casos de referência, US-16/18/19 alinhadas. Main `2a5d321` incorporada à branch para conciliar o roteiro e o índice. Nenhuma implementação de matching, alteração de aplicação além da main, mudança remota de banco ou deploy manual nesta entrega.
 - **Ao encerrar a próxima sessão:** atualizar etapa, evidências, branch/head/PR/checks e este ponteiro, além de `AGENTS.md` local.

@@ -7,6 +7,7 @@ import br.senac.fullstack.startup.api.dto.StartupResponse;
 import br.senac.fullstack.startup.application.service.StartupService;
 import br.senac.fullstack.startup.domain.enums.PapelMembroStartup;
 import br.senac.fullstack.startup.domain.enums.StatusValidacao;
+import br.senac.fullstack.startup.domain.enums.StatusPerfilStartup;
 import br.senac.fullstack.usuario.application.exception.EmailExistenteException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -257,6 +258,7 @@ class StartupControllerTest {
                 "Startups em ideação.",
                 "SaaS",
                 StatusValidacao.APENAS_IDEIA,
+                StatusPerfilStartup.RASCUNHO,
                 Instant.parse("2026-10-19T12:00:00Z"),
                 List.of(membroResponse(UUID.randomUUID()))
         );

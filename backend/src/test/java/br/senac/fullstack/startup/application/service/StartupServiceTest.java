@@ -13,6 +13,7 @@ import br.senac.fullstack.startup.infrastructure.persistence.repository.MembroSt
 import br.senac.fullstack.startup.infrastructure.persistence.repository.StartupRepository;
 import br.senac.fullstack.shared.enums.TipoUsuario;
 import br.senac.fullstack.shared.security.ResourceAccess;
+import br.senac.fullstack.startup.domain.enums.StatusPerfilStartup;
 import br.senac.fullstack.usuario.api.dto.CadastrarUsuarioRequest;
 import br.senac.fullstack.usuario.application.service.UsuarioService;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
@@ -62,6 +63,9 @@ class StartupServiceTest {
 
     @Mock
     private ResourceAccess resourceAccess;
+
+    @Mock
+    private AptidaoPublicacaoStartupService aptidao;
 
     @InjectMocks
     private StartupService startupService;
@@ -398,6 +402,7 @@ class StartupServiceTest {
                 "Público de teste",
                 "SaaS",
                 StatusValidacao.APENAS_IDEIA,
+                StatusPerfilStartup.RASCUNHO,
                 Instant.parse("2026-10-19T12:00:00Z"),
                 List.of()
         );

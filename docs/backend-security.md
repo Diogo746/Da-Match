@@ -17,6 +17,8 @@ Implementação na branch `feature/security-configuration`. Autenticação por s
 | `GET /api/v1/startups`, `/{startupId}`, `/{startupId}/membros` | Autenticado |
 | `PATCH /api/v1/mentores/{mentorId}` e `/{mentorId}/status` | MENTOR titular do recurso, com CSRF |
 | `PATCH /api/v1/startups/{startupId}` | STARTUP com vínculo atual de FUNDADOR/REPRESENTANTE, com CSRF |
+| `GET /api/v1/startups/{startupId}/status` | STARTUP com vínculo atual de qualquer papel; retorna estado, aptidão e pendências, inclusive sem quiz |
+| `PATCH /api/v1/startups/{startupId}/status` | STARTUP com vínculo atual de FUNDADOR/REPRESENTANTE, com CSRF; PUBLICADO exige cadastro e questionário válidos |
 | `GET /api/v1/startups/{startupId}/perfil-match` | STARTUP com vínculo atual de qualquer papel; 204 se ainda sem questionário |
 | `PUT /api/v1/startups/{startupId}/perfil-match` | STARTUP com vínculo atual de FUNDADOR/REPRESENTANTE, com CSRF |
 | `GET/PUT /api/v1/mentores/{mentorId}/perfil-match` | MENTOR titular; PUT exige CSRF; consulta sem questionário retorna 204 |
@@ -89,6 +91,8 @@ Para um deploy antigo que ainda inclua Flyway, `SPRING_FLYWAY_ENABLED=false` e `
 
 O teste `HibernateLegacySchemaTest` inicia um schema fictício já populado, amplia a coluna de biografia, cria tabelas ausentes e confirma que os dados anteriores permanecem, sem histórico de migrations. Usa H2 em modo PostgreSQL; não houve acesso ao Supabase nem ensaio em PostgreSQL real nesta sessão.
 
+A publicação de startup adiciona `Startup.status` textual obrigatório com inicializador Java e default SQL `RASCUNHO`, independente de `statusValidacao`. `HibernateStartupPublicationSchemaTest` confirma a adição em tabela populada e preservação dos dados e vínculos, em H2. Antes de integrar/deployar a coluna no ambiente publicado, ensaiar em cópia PostgreSQL com backup; esta entrega não autoriza alterações de dados remotos.
+
 ## Frontend e Postman
 
 O modo API oferece `/entrar` e `/conta`. A guarda consulta `/auth/me`, o estado da conta fica em memória e a senha do formulário de login é limpa ao enviar. O interceptor trata 401/403 e invalida o CSRF em memória, sem repetir automaticamente operações de escrita. Login/logout renovam CSRF antes de concluir o fluxo. A página de perfil demonstrativo continua separada; `/meu-perfil` no modo API encaminha para a conta.
@@ -96,6 +100,8 @@ O modo API oferece `/entrar` e `/conta`. A guarda consulta `/auth/me`, o estado 
 O cadastro Angular envia as disponibilidades obrigatórias. `/mentor/perfil` carrega o perfil por `GET /api/v1/mentores/me`, sem receber o identificador do ator do navegador, e usa os PATCH existentes para edição e publicação. Campos sociais omitidos são preservados; strings vazias permitem limpá-los. O questionário v3 persistido está documentado no guia 25; descoberta e matching continuam pendentes.
 
 `GET /api/v1/startups/me` exige STARTUP e lista somente os projetos vinculados à conta da sessão. `PATCH /api/v1/startups/{startupId}` exige STARTUP, CSRF e vínculo atual de FUNDADOR/REPRESENTANTE, verificado no serviço sob bloqueio transacional. ADMIN não tem exceção. `/startup/perfil` permite selecionar projetos, consultar e editar os sete campos do perfil; não altera conta ou integrantes. Os GET gerais de startup anteriores preservam o contrato autenticado. Detalhes: [guia 22](22-startup-profile.md).
+
+GET/PATCH de `/api/v1/startups/{startupId}/status` usam o mesmo bloqueio pessimista da startup que as edições, integrantes e questionário. Autorização e aptidão são recalculadas na transação; GET exige membro e PATCH exige gestor atual, sem exceção ADMIN. Publicação incompleta retorna `409` específico com código `STARTUP_INCOMPLETA` e pendências fixas, sem dados do quiz/contas. Edição de perfil publicado avalia o candidato completo e rejeita inconsistência com `400` e rollback. Listagem geral recebe somente o novo `status`, sem pendências, e continua distinta da descoberta futura. Contrato: [guia 28](28-startup-publication-contract.md). A interface será conectada na etapa 3.
 
 O deploy Angular possui `frontend/vercel.ts`: `BACKEND_ORIGIN`, configurada somente no ambiente Vercel, determina os rewrites HTTPS da API e do CSRF. As respostas dessas rotas não devem ser armazenadas em cache nem comprimidas pelo proxy. Com mesma origem, use cookies `Secure; SameSite=Lax` e configure no Render a origem exata do frontend em `APP_SECURITY_CORS_ALLOWED_ORIGINS`. Consulte `docs/20-mentor-integration.md`.
 
