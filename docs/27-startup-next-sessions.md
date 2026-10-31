@@ -20,6 +20,8 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 
 ## Como executar o roteiro
 
+Retomada de 31/10: PR #26 integrado na main `0f901ef`, com [workflow #96](https://github.com/Diogo746/Da-Match/actions/runs/41234510526) concluído com sucesso. Etapa 3 iniciada dessa base na branch `codex/startup-publication-ui`; matching continua definido somente na documentação.
+
 Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não há compromisso de concluir tudo amanhã. Marcar concluído somente com implementação e validação correspondentes. Ao encerrar, atualizar o quadro abaixo, registrar branch/commit/PR/checks e escrever a próxima ação exata. Não repetir entregas já integradas nem tratar decisões de produto pendentes como aprovadas.
 
 | Etapa | Situação | Resultado esperado |
@@ -27,7 +29,7 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | 0. Retomada e homologação da base | Concluída localmente e integrada pelo PR #23; CI pós-merge #86 aprovado | Main conferida e fluxos atuais homologados em navegador/H2 |
 | 1. Contrato de publicação | Concluída em 30/10; [guia 28](28-startup-publication-contract.md) | Cadastro + questionário completo exigidos; estados, pendências, HTTP e acesso definidos |
 | 2. Publicação no backend | Integrada pelo PR #25 na main `2a5d321`; CI pós-merge #94 aprovada | Estado persistido, autorização, endpoints e testes; evidências operacionais na etapa 10 |
-| 3. Publicação no frontend | Pendente; depende da 2 | Publicar/pausar e consultar pendências pela API |
+| 3. Publicação no frontend | Implementada e homologada localmente em 31/10; branch `codex/startup-publication-ui`, aguardando revisão/integração | Publicar/pausar/retomar/voltar a rascunho e consultar pendências pela API |
 | 4. Integrantes | Pendente | Regras de contas e interface de gestão |
 | 5. Descoberta real | Pendente | Catálogo de perfis elegíveis pela API |
 | 6. Matching definitivo | Regra definida pelo usuário em 30/10 no [guia 29](29-matching-rule-decisions.md); implementação pendente | `damatch-mentoria-v1`, após as dependências; atualizar revisão formal do SRS |
@@ -127,6 +129,21 @@ Conclusão: API testada e contrato consumível pelo frontend; ensaio em cópia P
 
 Conclusão: fundador/representante consegue publicar e pausar o projeto elegível, membro consulta, e o estado persiste após novo acesso.
 
+### Entrega e homologação local — 31/10/2026
+
+Interface implementada em `codex/startup-publication-ui`, baseada na main `0f901ef`. Conferir o PR e os checks do head antes de integrar; esta validação não comprova homologação publicada.
+
+- Estado, aptidão, permissão e pendências vêm de GET `/status`. PATCH envia somente o destino; confirma resposta do projeto correto antes de atualizar a tela. Rascunho publica; publicado pausa/volta a rascunho; pausado retoma/volta a rascunho. Publicação exige aptidão, gestão exige vínculo e permissão confirmados. Salvar perfil/quiz não publica.
+- Seleção em `/startup/perfil?projeto=ID`, validada contra `/startups/me`; voltar do questionário, recarga e histórico preservam o projeto. Respostas atrasadas de projeto, conta ou sessão anterior são descartadas, inclusive após sair/entrar na mesma conta. Requisição aguardando CSRF não é enviada se a sessão mudar; erro antigo não encerra uma nova sessão.
+- `409 STARTUP_INCOMPLETA` válido atualiza pendências sem mudar estado. Falha de conexão, timeout, `5xx` ou resposta inválida bloqueia edição/publicação/seleção até GET confirmado do perfil e publicação. Sem repetição automática. Sessão expirada oferece entrada novamente; `403` exige conferir permissões. Leitura aceita textos legados incompletos para correção; cadastro continua estrito e exige confirmação RASCUNHO.
+- **447 testes frontend + 8 de configuração**, **99,13% de linhas / 96,32% de branches**, lint e builds DEMO/API aprovados. Inclui seis testes com Router real, respostas fora de ordem, perda de permissão, sessão, conflito e resultado incerto. Runner local ignorado limita concorrência a dois workers/arquivos sequenciais, sem alterar CI, timeouts ou exclusões. Logs: `frontend/.angular/cache/publication-{tests,lint,build-demo,build-api}.log`.
+- **18 cenários HTTP** pelo proxy Angular → Spring → H2 isolado, com sessão/CSRF: cadastro, pendências, conflito, representante, membro somente leitura e logout. Relatório local ignorado: `backend/target/publication-ui-http-report.json`. Backend e schema não foram alterados nesta etapa; referência da base: 165 testes e CI pós-merge #94, sem alegar nova execução backend.
+- Navegador integrado: cadastro real de conta fictícia → login → três projetos (FUNDADOR/REPRESENTANTE/MEMBRO) → questionário de seis etapas preenchido/salvo na interface → retorno ao projeto → publicar/pausar/retomar/rascunho → recarga → edição de perfil publicado mantendo estado. Projetos adicionais e seus quizzes foram preparados pela API local; quiz do fundador foi preenchido pela interface.
+- API interrompida durante ensaio: alteração sem confirmação preservou estado e bloqueou novas escritas; GET indisponível manteve bloqueio. Após restaurar API, novo login confirmou dados, questionário e publicação persistidos. Sessão da interface encerrada por logout; sessões do preparador também encerradas.
+- Desktop e 360 px, temas claro/escuro e Enter para pausar conferidos; sem rolagem horizontal nos estados inspecionados. Viewport/tema restaurados. Erros de rede durante a interrupção foram intencionais. Capturas locais ignoradas em `frontend/.angular/cache/`: `publication-final-desktop.jpg`, `publication-360-{dark,light}.jpg`, `publication-pending-desktop.jpg` e `publication-uncertain.jpg`.
+
+Ambiente explicitamente local: frontend `127.0.0.1:4201`, API `127.0.0.1:8081`, H2 `backend/target/startup-publication-ui-20261031.mv.db`. Não usar configuração padrão de banco remoto. Sem alteração remota de banco ou deploy manual. Cópia PostgreSQL, zoom real 200%, leitor de tela e homologação publicada continuam na etapa 10.
+
 ## Etapa 4 — Integrantes
 
 - O backend já lista, adiciona e remove integrantes; começar pelos contratos existentes.
@@ -173,7 +190,7 @@ Conclusão de cada entrega: autorização, persistência, fluxo pela interface e
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** conferir checks e revisar/integrar o [PR #26](https://github.com/Diogo746/Da-Match/pull/26). No trabalho funcional, conferir evidências do ensaio PostgreSQL e homologação publicada da etapa 10; próxima funcionalidade é a etapa 3 (interface de publicação). Ela deve consultar estado/pendências da API, preservar múltiplos projetos/permissões e bloquear novas escritas após resultado incerto até GET confirmado. Não alterar dados remotos sem autorização. Na etapa 6, implementar o guia 29 sem repetir a decisão de pesos/filtros.
-- **Entrega da publicação (30/10):** backend, Postman e documentação no PR #25, integrado em `2a5d321`; validações locais acima e CI pós-merge #94 aprovada. A interface permanece pendente.
+- **Próxima ação exata:** revisar checks e integrar a etapa 3 (`codex/startup-publication-ui`); depois iniciar etapa 4 definindo localização/convite de conta existente, tipos de conta permitidos e eventual alteração de papel, a partir dos contratos atuais. Conferir evidências operacionais da etapa 10; não alterar dados remotos sem autorização. Na etapa 6 implementar o guia 29 sem repetir as decisões de matching.
+- **Entrega da publicação:** backend/Postman no PR #25, main `2a5d321`, CI #94 aprovada; interface validada localmente em 31/10 na etapa 3 acima, ainda aguardando revisão/integração.
 - **Entrega desta definição (30/10) e resolução (31/10):** somente documentação no PR #26, branch `codex/matching-rule-decision`; 13 respostas, fórmula e 14 casos de referência, US-16/18/19 alinhadas. Main `2a5d321` incorporada à branch para conciliar o roteiro e o índice. Nenhuma implementação de matching, alteração de aplicação além da main, mudança remota de banco ou deploy manual nesta entrega.
 - **Ao encerrar a próxima sessão:** atualizar etapa, evidências, branch/head/PR/checks e este ponteiro, além de `AGENTS.md` local.

@@ -1,10 +1,10 @@
 # Continuidade da startup e futura reformulação do frontend
 
-Atualizado em 30/10/2026. Este é o ponto de retomada solicitado pelo usuário: primeiro concluir funcionalidades reais; posteriormente reformular **todas as telas do frontend**, com organização consistente. A reformulação visual completa ainda não foi iniciada. A ordem abaixo é recomendada; decisões de produto pendentes não devem ser presumidas como aprovadas. A [revisão da base atual](26-startup-code-review.md) registra os ajustes encontrados antes de continuar startup.
+Atualizado em 31/10/2026. Este é o ponto de retomada solicitado pelo usuário: primeiro concluir funcionalidades reais; posteriormente reformular **todas as telas do frontend**, com organização consistente. A reformulação visual completa ainda não foi iniciada. A ordem abaixo é recomendada; decisões de produto pendentes não devem ser presumidas como aprovadas. A [revisão da base atual](26-startup-code-review.md) registra os ajustes encontrados antes de continuar startup.
 
 ## Como retomar em uma próxima sessão
 
-O [roteiro por etapas do guia 27](27-startup-next-sessions.md) é o ponto de entrada. Conferência em 31/10: PRs #23/#24/#25 integrados, main `2a5d321`, workflow pós-merge #94 aprovado. Homologação local da base concluída no desktop, com 360 px, permissões, múltiplos projetos e falha de conexão. O usuário aprovou exigir cadastro e questionário completo para publicação e permitir voltar a RASCUNHO. Backend de publicação integrado conforme [guia 28](28-startup-publication-contract.md); próxima funcionalidade é conectar a interface na etapa 3. Evidências de PostgreSQL e homologação publicada continuam na etapa 10; não presumir sua execução a partir da CI.
+O [roteiro por etapas do guia 27](27-startup-next-sessions.md) é o ponto de entrada. Conferência em 31/10: PRs #23/#24/#25/#26 integrados, main `0f901ef`, workflows pós-merge #94/#96 aprovados. Homologação local da base concluída no desktop, com 360 px, permissões, múltiplos projetos e falha de conexão. O usuário aprovou exigir cadastro e questionário completo para publicação e permitir voltar a RASCUNHO. Backend de publicação integrado conforme [guia 28](28-startup-publication-contract.md); interface da etapa 3 implementada e validada localmente em `codex/startup-publication-ui`, aguardando revisão/integração. Próximo trabalho funcional: gestão de integrantes (etapa 4 do guia 27). Evidências de PostgreSQL e homologação publicada continuam na etapa 10; não presumir sua execução a partir da CI.
 
 1. Ler `AGENTS.md`, este documento e os contratos dos guias [20](20-mentor-integration.md), [21](21-startup-integration.md) e [22](22-startup-profile.md).
 2. Conferir branch, alterações locais e estado remoto de PR/CI antes de implementar. Preservar trabalho existente; documentos antigos e referências a branches podem estar desatualizados.
@@ -29,7 +29,7 @@ O [roteiro por etapas do guia 27](27-startup-next-sessions.md) é o ponto de ent
 | --- | --- |
 | 0. Homologar ajustes integrados da revisão | Homologação local concluída em 29/10; integrada pelo PR #23 em 30/10, workflows #85/#86 aprovados. Evidências e limitações no [guia 27](27-startup-next-sessions.md). |
 | 1. Homologar questionário v3 | Fluxos locais e mobile 360 px inspecionados no escopo do guia 27. Schema PostgreSQL e validação operacional completa permanecem na etapa 10 desse roteiro. |
-| 2. Publicação da startup | Backend integrado pelo PR #25 em `2a5d321`, conforme [guia 28](28-startup-publication-contract.md): cadastro + questionário completo obrigatórios, RASCUNHO/PUBLICADO/PAUSADO, retorno a rascunho, pendências e edição válida sem mudar estado. 165 testes backend/Checkstyle e 19 cenários HTTP locais aprovados; CI pós-merge #94 aprovada. Próxima etapa 3: interface. Evidências operacionais permanecem na etapa 10. |
+| 2. Publicação da startup | Backend integrado pelo PR #25 em `2a5d321`, conforme [guia 28](28-startup-publication-contract.md): cadastro + questionário completo obrigatórios, RASCUNHO/PUBLICADO/PAUSADO, retorno a rascunho, pendências e edição válida sem mudar estado. 165 testes backend/Checkstyle e 19 cenários HTTP locais aprovados; CI pós-merge #94 aprovada. Interface implementada/validada localmente em 31/10 na branch `codex/startup-publication-ui`: ações, pendências, seleção por URL, isolamento de sessão e confirmação após falha; 447 testes + 8 de configuração, 99,13% de linhas, lint/builds DEMO/API e navegador desktop/360 px aprovados. Aguardando revisão/integração; evidências no guia 27. Evidências operacionais permanecem na etapa 10. |
 | 3. Gestão de integrantes | Interface para listar, adicionar e remover usando as rotas existentes. Definir localização/convite de contas existentes e alteração de papéis antes de criar esses fluxos. Preservar fundador obrigatório, ausência de duplicidade, autorização de gestão e tratamento de vínculos legados. |
 | 4. Descoberta real | API de catálogo e detalhes com filtros/paginação, somente perfis elegíveis. Definir DTO de descoberta e quais dados de gestão/contato ficam privados. Trocar dados fictícios por API sem mistura silenciosa de modos. |
 | 5. Matching real | Regra `damatch-mentoria-v1` definida pelo usuário em 30/10, após 13 respostas no [guia 29](29-matching-rule-decisions.md). Corte 60; selo 95; pesos, filtros, casos especiais e desempate consolidados. Implementar no backend após dependências e atualizar revisão formal do SRS. Participante recebe ordem/selo, sem números; relatório restrito à equipe. O protótipo `damatch-rules-v2` continua experimental e não executa automaticamente a nova regra. |
@@ -57,7 +57,7 @@ Investidores, administração completa e desativação de perfis pertencem à ev
 | Questionário/revisão | Seis etapas em três fases: momento, setor, objetivos, público/formação/capacidade, encontro e agenda. Contrato v3 no guia 25. Preservar prioridades, pares de agenda, revisão e cancelamento; conta da pessoa separada de cada projeto. API: `/mentor/questionario` e `/startup/perfil/{startupId}/questionario`; DEMO permanece separado. |
 | Cards e detalhes | Conteúdo legível, rótulos além de cor, salvos e selo Super DaMatch; sem porcentagem ou detalhes numéricos por decisão do PO. Separar informação pública de gestão e contato. Dialog acessível com foco inicial, Escape e retorno ao acionador. |
 | Como funciona `/como-funciona` | Explicar o fluxo realmente disponível, uso da pontuação e limites da demonstração; atualizar quando interesses, conexões e reuniões existirem. |
-| Telas futuras | Integrantes, pendências de publicação, interesses, conexões e reuniões só devem exibir ações operacionais quando APIs correspondentes existirem. |
+| Telas futuras | Integrantes, interesses, conexões e reuniões só devem exibir ações operacionais quando APIs correspondentes existirem. |
 
 ## Dados e regras que afetam o design
 
@@ -96,7 +96,7 @@ A lista inicial de cidades permanece reduzida às oito opções do protótipo, c
 | Resultado sem confirmação | Não anunciar falha definitiva nem sucesso. Bloquear repetição de escrita e oferecer consulta para confirmar. |
 | Lista vazia | Diferenciar sem vínculo, sem resultados, sem recomendações e sem itens salvos. |
 | Edição não salva | Salvar/cancelar explícitos; prever aviso ao sair/trocar contexto na reformulação. |
-| Perfil incompleto/pausado | Explicar por que não aparece na descoberta e qual ação está disponível, quando publicação estiver implementada. |
+| Perfil incompleto/pausado | Explicar por que não aparece na descoberta e qual ação está disponível; publicação já possui interface validada localmente na etapa 3. |
 
 ## Direção visual e critérios de qualidade
 

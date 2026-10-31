@@ -134,7 +134,7 @@ it("não transforma a confirmação de API em perfil demonstrativo", async () =>
 const startupDetails = { nomeProvisorio: "Ideia Fictícia", pitchCurto: "Uma rede para ideias.",
   problemaCentral: "Pouco acesso a orientação.", solucaoProposta: "Conectar pessoas e experiência.",
   publicoAlvo: "Projetos em ideação", modeloDeNegocio: "Assinatura", statusValidacao: "APENAS_IDEIA" };
-const startupResponse = { ...startupDetails, id: "startup-confirmada", dataCriacao: "2026-10-22T12:00:00Z",
+const startupResponse = { ...startupDetails, id: "startup-confirmada", status: "RASCUNHO", dataCriacao: "2026-10-22T12:00:00Z",
   membros: [{ id: "vinculo-confirmado", usuarioId: "fundador-confirmado", nomeUsuario: "Pessoa Fundadora", papelMembro: "FUNDADOR", dataEntrada: "2026-10-22" }] };
 function selectStartup() {
   page.querySelector<HTMLInputElement>("#register-kind-STARTUP")!.click(); fixture.detectChanges();

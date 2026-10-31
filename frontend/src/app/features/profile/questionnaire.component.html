@@ -1,7 +1,8 @@
-<a class="back-link" [routerLink]="kind === 'MENTOR' ? '/mentor/perfil' : '/startup/perfil'">← Voltar ao perfil</a>
+<a class="back-link" [routerLink]="kind === 'MENTOR' ? '/mentor/perfil' : '/startup/perfil'"
+  [queryParams]="kind === 'STARTUP' ? { projeto: startupProjectId() } : null">← Voltar ao perfil</a>
 <section aria-labelledby="questionnaire-title" [attr.aria-busy]="loading() || busy()">
   <h1 id="questionnaire-title">Questionário do perfil</h1>
-  <p>Suas respostas ficam salvas para este {{ kind === 'MENTOR' ? 'perfil de mentor' : 'projeto' }}. As indicações reais estarão disponíveis após a definição das regras de matching.</p>
+  <p>Suas respostas ficam salvas para este {{ kind === 'MENTOR' ? 'perfil de mentor' : 'projeto' }}. As indicações reais serão disponibilizadas em uma próxima etapa.</p>
   @if (kind === 'MENTOR') { <p>A agenda preenchida aqui também atualiza a disponibilidade do seu perfil. Receber novas startups e publicar o perfil são escolhas separadas.</p> }
   @if (error()) { <p role="alert">{{ error() }}</p> }
   @if (message()) { <output>{{ message() }}</output> }

@@ -12,20 +12,59 @@
         {{ editing() ? 'Descartar edição e recarregar' : 'Recarregar dados' }}
       </button>
     </div>
-    @if (profiles().length > 1) {
+    @if (profiles().length > 1 || (profiles().length === 1 && !profile())) {
       <label class="field-label" for="startup-selection">Selecione sua startup</label>
       <select class="form-input" id="startup-selection" [value]="selectedId()"
         [disabled]="loading() || busy() || editing() || uncertain()" (change)="select($any($event.target).value)">
-        @for (startup of profiles(); track startup.id) { <option [value]="startup.id">{{ startup.nomeProvisorio }}</option> }
+        @for (startup of profiles(); track startup.id) {
+          <option [value]="startup.id" [selected]="startup.id === selectedId()">{{ startup.nomeProvisorio }}</option>
+        }
       </select>
     }
     @if (profile(); as startup) {
       <article class="startup-card" [attr.aria-busy]="busy()">
         <h2>{{ startup.nomeProvisorio }}</h2>
-        @if (!editing()) { <a class="button button-secondary" [routerLink]="['/startup/perfil', startup.id, 'questionario']">Abrir questionário deste projeto</a> }
+        <section class="publication-panel" aria-labelledby="startup-publication-title" [attr.aria-busy]="publicationLoading()">
+          <h3 id="startup-publication-title">Publicação do perfil</h3>
+          <p class="publication-status">Estado confirmado: <strong>{{ publicationLabels[startup.status] }}</strong></p>
+          @if (publicationLoading()) { <output class="field-help">Consultando pendências e permissão de publicação…</output> }
+          @if (publication(); as current) {
+            @if (current.aptoParaPublicacao) {
+              <p class="field-help">Cadastro e questionário completos. Este projeto atende aos requisitos de publicação.</p>
+            } @else {
+              <p class="field-help">Para publicar, complete os dados do projeto e salve seu questionário.</p>
+              <ul class="publication-pending" aria-label="Pendências para publicação">
+                @for (pending of current.pendencias; track pending.campo) {
+                  <li><strong>{{ pendingLabel(pending.campo) }}:</strong> {{ pending.mensagem }}</li>
+                }
+              </ul>
+            }
+            @if (canEdit()) {
+              <div class="actions publication-actions">
+                @if (current.status !== 'PUBLICADO') {
+                  <button type="button" class="button button-primary" [disabled]="publicationBlocked() || !current.aptoParaPublicacao"
+                    (click)="changeStatus('PUBLICADO')">{{ current.status === 'PAUSADO' ? 'Retomar publicação' : 'Publicar startup' }}</button>
+                } @else {
+                  <button type="button" class="button button-secondary" [disabled]="publicationBlocked()"
+                    (click)="changeStatus('PAUSADO')">Pausar publicação</button>
+                }
+                @if (current.status !== 'RASCUNHO') {
+                  <button type="button" class="button button-secondary" [disabled]="publicationBlocked()"
+                    (click)="changeStatus('RASCUNHO')">Voltar a rascunho</button>
+                }
+              </div>
+              @if (editing()) { <p class="field-help">Salve ou cancele a edição antes de mudar a publicação.</p> }
+            }
+          }
+          @if (busy()) { <output class="field-help">Aguardando confirmação da alteração…</output> }
+          @if (uncertain()) { <p class="field-help">Recarregue os dados para confirmar o resultado antes de editar ou alterar a publicação.</p> }
+        </section>
+        @if (!editing() && !busy() && !loading() && !uncertain()) {
+          <a class="button button-secondary" [routerLink]="['/startup/perfil', startup.id, 'questionario']">Abrir questionário deste projeto</a>
+        }
         @if (editing()) {
           <form [formGroup]="form" (ngSubmit)="save()" novalidate>
-            <fieldset [disabled]="busy() || loading() || uncertain()">
+            <fieldset [disabled]="busy() || loading() || publicationLoading() || uncertain() || !canEdit()">
               <legend class="sr-only">Editar os dados da startup</legend>
               @for (field of fields; track field.key) {
                 <label class="field-label" [for]="'edit-startup-' + field.key">{{ field.label }} <span>Obrigatório</span></label>
@@ -63,13 +102,18 @@
             <dt>Momento da ideia</dt><dd>{{ statusLabels[startup.statusValidacao] }}</dd>
           </dl>
           @if (canEdit()) {
-            <button type="button" class="button button-primary edit-button" [disabled]="loading() || busy() || uncertain()" (click)="edit()">Editar startup</button>
+            <button type="button" class="button button-primary edit-button" [disabled]="loading() || publicationLoading() || busy() || uncertain()" (click)="edit()">Editar startup</button>
           } @else { <p class="field-help">Você pode consultar este projeto. A edição é permitida a fundadores e representantes.</p> }
         }
       </article>
-      <p class="field-help">O momento da ideia descreve seu projeto. O questionário fica salvo para esta startup. Publicação do perfil e recomendações reais serão disponibilizadas em próximas etapas.</p>
+      <p class="field-help">O momento da ideia e o estado de publicação são informações diferentes. Salvar o perfil ou o questionário não publica a startup. Recomendações reais serão disponibilizadas em uma próxima etapa.</p>
     } @else if (loaded() && !loading() && !error()) {
       <p class="notice">Sua conta ainda não possui vínculo com uma startup. Se você já tem um projeto cadastrado, confira o vínculo com a pessoa responsável.</p>
     }
+  } @else if (!state.user()) {
+    <p class="notice">Entre novamente na sua conta de startup para consultar o projeto e confirmar os dados.</p>
+    <a class="button button-secondary" routerLink="/entrar">Entrar novamente</a>
+  } @else {
+    <p class="notice">Esta área está disponível para contas de startup. Consulte sua conta para acessar o perfil correspondente.</p>
   }
 </section>

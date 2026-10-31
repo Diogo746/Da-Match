@@ -81,6 +81,8 @@ export class QuestionnaireComponent implements OnInit {
     });
   }
 
+  startupProjectId(): string { return this.route.snapshot.paramMap.get("startupId") ?? ""; }
+
   async load(): Promise<void> {
     const user = this.state.user();
     if (user?.tipoUsuario !== this.kind || this.loading() || this.busy()) return;

@@ -43,7 +43,7 @@ describe("Contrato HTTP do onboarding de startup", () => {
     problemaCentral: "Poucas conexões.", solucaoProposta: "Uma rede de apoio.",
     publicoAlvo: "Projetos iniciantes", modeloDeNegocio: "Assinatura", statusValidacao: "PESQUISA_MERCADO",
   };
-  const startup = { ...details, nomeProvisorio: "Ideia Fictícia", id: "startup-test", dataCriacao: "2026-10-22T12:00:00Z",
+  const startup = { ...details, nomeProvisorio: "Ideia Fictícia", id: "startup-test", status: "RASCUNHO", dataCriacao: "2026-10-22T12:00:00Z",
     membros: [{ id: "member-test", usuarioId: "user-test", nomeUsuario: "Maria Teste", papelMembro: "FUNDADOR", dataEntrada: "2026-10-22" }] };
   function startStartup(request: RegistrationRequest = { ...input, startup: details }) {
     return firstValueFrom(gateway.register("STARTUP", request)).then(value => ({ value, error: undefined }),
@@ -73,7 +73,8 @@ describe("Contrato HTTP do onboarding de startup", () => {
     http.expectNone(() => true);
   });
 
-  it.each([null, {}, { ...startup, membros: [] },
+  it.each([null, {}, { ...startup, membros: [] }, { ...startup, status: "PUBLICADO" }, { ...startup, status: undefined },
+    { ...startup, pitchCurto: " " }, { ...startup, problemaCentral: "x".repeat(5001) },
     { ...startup, membros: [{ ...startup.membros[0], papelMembro: "MEMBRO" }] },
     { ...startup, membros: [startup.membros[0], { ...startup.membros[0], id: "other-member" }] },
   ])("does not confirm malformed or unexpected onboarding results: %#", async body => {

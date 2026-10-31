@@ -35,6 +35,7 @@ export interface StartupMember {
 
 export interface StartupProfile extends StartupRegistrationDetails {
   id: string;
+  status: StartupPublicationStatus;
   dataCriacao: string;
   membros: StartupMember[];
 }
@@ -59,10 +60,16 @@ export function normalizeStartupDetails(value: StartupRegistrationDetails): Star
 }
 
 export function readStartupProfile(value: unknown): StartupProfile {
-  if (!value || typeof value !== "object" || !validStartupDetails(value)) throw new Error("Resposta de startup inválida.");
+  if (!value || typeof value !== "object") throw new Error("Resposta de startup inválida.");
   const data = value as unknown as Record<string, unknown>;
+  // Legacy text can require correction; only readiness from the status endpoint authorizes publication.
+  if (!STARTUP_FIELDS.every(field => typeof data[field.key] === "string") ||
+      !["APENAS_IDEIA", "PESQUISA_MERCADO"].includes(String(data["statusValidacao"]))) {
+    throw new Error("Resposta de startup inválida.");
+  }
   if (typeof data["id"] !== "string" || !data["id"] || typeof data["dataCriacao"] !== "string" ||
-      !Number.isFinite(Date.parse(data["dataCriacao"])) || !Array.isArray(data["membros"]) || !data["membros"].length) {
+      !Number.isFinite(Date.parse(data["dataCriacao"])) || !isStartupPublicationStatus(data["status"]) ||
+      !Array.isArray(data["membros"]) || !data["membros"].length) {
     throw new Error("Resposta de startup inválida.");
   }
   const membros: StartupMember[] = data["membros"].map((value: unknown) => {
@@ -74,5 +81,13 @@ export function readStartupProfile(value: unknown): StartupProfile {
       nomeUsuario: member["nomeUsuario"] as string, papelMembro: member["papelMembro"] as StartupMemberRole,
       dataEntrada: member["dataEntrada"] as string };
   });
-  return { ...normalizeStartupDetails(value), id: data["id"], dataCriacao: data["dataCriacao"], membros };
+  return { ...normalizeStartupDetails(value as StartupRegistrationDetails), id: data["id"], status: data["status"], dataCriacao: data["dataCriacao"], membros };
+}
+export const STARTUP_PUBLICATION_LABELS = {
+  RASCUNHO: "Rascunho", PUBLICADO: "Publicado", PAUSADO: "Pausado",
+} as const;
+export type StartupPublicationStatus = keyof typeof STARTUP_PUBLICATION_LABELS;
+
+export function isStartupPublicationStatus(value: unknown): value is StartupPublicationStatus {
+  return typeof value === "string" && Object.hasOwn(STARTUP_PUBLICATION_LABELS, value);
 }

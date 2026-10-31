@@ -1,6 +1,6 @@
 # Contrato de publicação da startup
 
-Definido na etapa 1 em 30/10/2026 e integrado pelo PR #24 na main `852db0a`. **Backend da etapa 2 integrado pelo [PR #25](https://github.com/Diogo746/Da-Match/pull/25) em `2a5d321`; a interface de publicação será feita na etapa 3.** Integração conferida em 31/10, com workflow pós-merge #94 aprovado. As rotas abaixo estão implementadas na main; evidências de ensaio PostgreSQL e homologação funcional publicada permanecem na etapa 10 do roteiro e não são comprovadas pela CI. As validações locais descritas não alteraram banco remoto.
+Definido na etapa 1 em 30/10/2026 e integrado pelo PR #24 na main `852db0a`. **Backend da etapa 2 integrado pelo [PR #25](https://github.com/Diogo746/Da-Match/pull/25) em `2a5d321`; interface da etapa 3 implementada e validada localmente em 31/10 na branch `codex/startup-publication-ui`, aguardando revisão/integração.** Integração conferida em 31/10, com workflow pós-merge #94 aprovado. As rotas abaixo estão implementadas na main; evidências de ensaio PostgreSQL e homologação funcional publicada permanecem na etapa 10 do roteiro e não são comprovadas pela CI. As validações locais descritas não alteraram banco remoto.
 
 ## Decisões e alcance
 
@@ -164,7 +164,9 @@ Testes obrigatórios da implementação:
 - HTTP `400/401/403/404/409/415`, corpo de conflito específico e DTOs sem segredos/entidades.
 - Frontend: estados, permissões, troca de conta/projeto, resposta antiga, `409`, resultado incerto/GET de confirmação, recarga e novo login; desktop/mobile e teclado.
 
-A pasta Startup do Postman inclui os GET/PATCH implementados, com sessão/CSRF e verificações de resposta confirmada ou conflito. O frontend continua sem ações de publicação, conforme a etapa 3. Evidências da etapa 2 e checks remotos ficam no [guia 27](27-startup-next-sessions.md).
+A pasta Startup do Postman inclui os GET/PATCH implementados, com sessão/CSRF e verificações de resposta confirmada ou conflito. A interface da etapa 3 foi implementada e homologada localmente em 31/10 na branch `codex/startup-publication-ui`, aguardando revisão/integração. Evidências e checks ficam no [guia 27](27-startup-next-sessions.md).
+
+No modo API, `/startup/perfil?projeto=ID` valida a seleção pela consulta da sessão e preserva o projeto ao voltar do questionário ou recarregar. Estado/aptidão/permissão vêm da API; resposta sem status válido não recebe um valor presumido. Textos legados incompletos podem ser consultados/corrigidos, sem enfraquecer a confirmação do cadastro. Edição e publicação compartilham bloqueio de resultado incerto até leitura confirmada; respostas de sessão/projeto anterior são descartadas.
 
 ### Validação local da etapa 2 — 30/10/2026
 

@@ -56,7 +56,7 @@ it("restores a real mentor questionnaire, edits it through the wizard, saves wit
   const founder = { id: "startup-user", nome: "Pessoa Fundadora", email: "startup@example.test", tipoUsuario: "STARTUP" };
   const startup = { id: "startup-test", nomeProvisorio: "Projeto fictício", pitchCurto: "Resumo", problemaCentral: "Problema",
     solucaoProposta: "Solução", publicoAlvo: "Público", modeloDeNegocio: "Modelo", statusValidacao: "APENAS_IDEIA",
-    dataCriacao: "2026-10-26T12:00:00Z", membros: [{ id: "member-test", usuarioId: founder.id,
+    status: "RASCUNHO", dataCriacao: "2026-10-26T12:00:00Z", membros: [{ id: "member-test", usuarioId: founder.id,
       nomeUsuario: founder.nome, papelMembro: "FUNDADOR", dataEntrada: "2026-10-26" }] };
   const changing = router.navigateByUrl("/startup/perfil/startup-test/questionario");
   (await request("/api/v1/auth/me")).flush(founder);
