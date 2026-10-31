@@ -1,6 +1,6 @@
 # Contrato de publicação da startup
 
-Definido na etapa 1 em 30/10/2026 e integrado pelo PR #24 na main `852db0a`. **Backend implementado na etapa 2, [PR #25](https://github.com/Diogo746/Da-Match/pull/25), branch `feature/startup-publication-api`; a interface de publicação será feita na etapa 3.** As rotas abaixo estão disponíveis nessa implementação local. Integração à main e implantação dependem do PR e das verificações correspondentes. Nenhum banco remoto foi alterado.
+Definido na etapa 1 em 30/10/2026 e integrado pelo PR #24 na main `852db0a`. **Backend da etapa 2 integrado pelo [PR #25](https://github.com/Diogo746/Da-Match/pull/25) em `2a5d321`; a interface de publicação será feita na etapa 3.** Integração conferida em 31/10, com workflow pós-merge #94 aprovado. As rotas abaixo estão implementadas na main; evidências de ensaio PostgreSQL e homologação funcional publicada permanecem na etapa 10 do roteiro e não são comprovadas pela CI. As validações locais descritas não alteraram banco remoto.
 
 ## Decisões e alcance
 

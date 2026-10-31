@@ -44,7 +44,7 @@ O formulário v3 é reutilizado com validação completa, revisão e edição/ca
 
 ## O que continua pendente
 
-A escolha da regra de matching continua aberta no [guia 16](16-decisao-regra-matching.md). Esta entrega não adota silenciosamente uma fórmula experimental, nem cria endpoints de recomendação ou relatório administrativo sem cálculo aprovado. A decisão do PO está preservada: participante receberá ordem/`superDamatch` (≥95), sem porcentagem ou detalhamento numérico; dados administrativos precisarão de autorização própria. Descoberta, publicação/pausa da startup, conexões e reuniões continuam pendentes.
+A regra de mentoria foi definida pelo usuário em 30/10 no [guia 29](29-matching-rule-decisions.md), com histórico no [guia 16](16-decisao-regra-matching.md). Sua implementação no backend e o relatório administrativo permanecem pendentes. A decisão de visibilidade está preservada: participante recebe ordem/`superDamatch` (≥95), sem porcentagem ou detalhamento numérico; dados administrativos precisam de autorização própria. Esta definição documental não altera o protótipo nem implementa descoberta, conexões ou reuniões. Publicação de startup é uma entrega separada do roteiro.
 
 O [guia de continuidade](23-continuity-and-frontend-redesign.md) passa a indicar publicação/pausa da startup como próxima funcionalidade, depois da integração/homologação deste questionário. A reformulação visual completa permanece futura.
 

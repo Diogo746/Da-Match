@@ -48,3 +48,4 @@ Project Charter (Visão & Dores)
 - [Revisão da base e ajustes antes de concluir startup](26-startup-code-review.md).
 - [Roteiro por etapas para as próximas sessões](27-startup-next-sessions.md).
 - [Publicação da startup — contrato e backend; interface na etapa 3](28-startup-publication-contract.md).
+- [Regra de mentoria damatch-mentoria-v1 — 13 decisões, fórmula e casos de referência](29-matching-rule-decisions.md).

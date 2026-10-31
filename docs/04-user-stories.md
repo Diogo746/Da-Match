@@ -303,7 +303,7 @@
 
 ## 🎯 Épico 4: Matching e recomendações (MATCH)
 
-> Regra de cálculo: proposta **match-1.0** do SRS (seção 7). Pontuação de 0 a 100, corte em 60, até 20 recomendações, empate pelo identificador. A pontuação indica compatibilidade, não garantia de mentoria ou investimento.
+> Mentoria: regra **damatch-mentoria-v1**, definida pelo usuário em 30/10/2026 no [guia 29](29-matching-rule-decisions.md). Nota interna de 0 a 100, corte inclusivo 60, até 20 indicações após ordenação; participante recebe somente ordem e selo Super DaMatch a partir de 95. O SRS anterior deve ser atualizado na próxima revisão formal. Investimento continua em entrega própria; não aplicar esta regra automaticamente a investidores. A pontuação não é probabilidade estatística nem garantia de mentoria.
 
 ### 🔹 `US-16`: Receber recomendações de mentoria
 * **Como** startup que busca mentoria (ou mentor procurando startups),
@@ -311,18 +311,34 @@
 * **Para que** eu comece pelas conexões com mais chance de fazer sentido.
 
 > **Critérios de aceitação:**
-> * **Cenário 1 (Exemplo de referência do SRS):**
->   * **Dado** um par com setor e estágio compatíveis, 1 de 2 necessidades atendidas, disponibilidade em comum, formato remoto em comum e sem preferência de modelo de negócio,
+> * **Cenário 1 (Prioridade da ajuda):**
+>   * **Dado** um par elegível com duas necessidades da startup, somente a principal atendida com prática e todos os demais critérios completos,
 >   * **Quando** a recomendação é calculada,
->   * **Então** a pontuação exibida é **88,2** (75 de 85 pontos aplicáveis).
+>   * **Então** a nota interna é **85**; caso só a secundária seja atendida com prática, é **65**. Ambos aparecem sem selo e sem nota no JSON do participante.
 > * **Cenário 2 (Corte):**
->   * **Dado** candidatos com pontuação bruta 59,96 e 60,
+>   * **Dado** candidatos elegíveis com notas internas exatas 59,5 e 60,
 >   * **Quando** a lista é montada,
->   * **Então** o de 59,96 fica de fora e o de 60 aparece.
+>   * **Então** o de 59,5 fica de fora e o de 60 aparece, sem arredondamento prévio e sem reduzir o corte para preencher a lista.
 > * **Cenário 3 (Perfil inelegível):**
 >   * **Dado** um mentor sem formato de encontro em comum comigo,
 >   * **Quando** a lista é calculada,
 >   * **Então** ele é excluído antes da pontuação.
+> * **Cenário 4 (Agenda sem interseção):**
+>   * **Dado** um par elegível, com duas necessidades atendidas com prática e demais critérios completos, mas sem dia/período em comum,
+>   * **Quando** consulto as indicações,
+>   * **Então** sua nota interna é **90**, aparece sem selo e orienta que os horários precisam ser combinados; não cria reserva nem reunião.
+> * **Cenário 5 (Frequência):**
+>   * **Dado** frequências fixas diferentes,
+>   * **Quando** o par é avaliado,
+>   * **Então** é excluído; frequências iguais ou alguma `FLEXIBLE` passam por esse filtro.
+> * **Cenário 6 (Empates):**
+>   * **Dado** candidatos com a mesma nota,
+>   * **Quando** a lista é ordenada,
+>   * **Então** prevalecem, nesta ordem, mais necessidades atendidas, mais dessas necessidades com prática, agenda em comum e UUID textual crescente do candidato; consultas iguais mantêm a ordem.
+> * **Cenário 7 (Capacidade e elegibilidade):**
+>   * **Dado** um mentor publicado, apto e recebendo novas startups,
+>   * **Quando** o par é avaliado,
+>   * **Então** a capacidade declarada não consome nem bloqueia vagas automaticamente; pausar, retirar publicação, invalidar requisitos ou deixar de receber startups retira a elegibilidade.
 * *Prioridade:* P1 · *Rastreabilidade:* RF16, RN11, RN15–RN17, CA13, CA32.
 
 ---
@@ -363,10 +379,18 @@
 >   * **Dado** que não preenchi um dado obrigatório para o meu objetivo,
 >   * **Quando** peço recomendações,
 >   * **Então** o sistema avisa o que falta e não trata o dado ausente como compatível.
+> * **Cenário 3b (Resposta válida em descoberta):**
+>   * **Dado** um questionário completo com setor `DISCOVERING` ou público `UNKNOWN`,
+>   * **Quando** o par é avaliado,
+>   * **Então** o critério desconhecido recebe zero, sem invalidar o quiz, redistribuir pesos ou normalizar para 100; a indicação depende do corte normal.
 > * **Cenário 4 (Uso interno):**
->   * **Dado** que sou da equipe do DaMatch,
+>   * **Dado** que sou da equipe do DaMatch e possuo autorização administrativa para o relatório,
 >   * **Quando** consulto os dados de matching,
 >   * **Então** vejo a nota, a contribuição de cada critério e a versão do cálculo, para estudar e ajustar a regra.
+> * **Cenário 5 (Fronteira do selo):**
+>   * **Dado** pares elegíveis com notas internas 95 e 95,5,
+>   * **Quando** aparecem nas indicações,
+>   * **Então** ambos recebem o selo sem expor a nota; mentor de atuação geral, mesmo com todos os demais critérios completos, chega a 92,5 e não recebe selo.
 * *Prioridade:* P1 · *Rastreabilidade:* RF18, RN16, RN19, CA13, CA14, CA15.
 * *Decisão do PO (25/10/2026):* a porcentagem e a explicação por critério ficam só com a equipe; o participante vê apenas a ordem e o selo Super DaMatch. Isso altera a RF18 do SRS v1.0 e precisa entrar na próxima revisão do documento de requisitos. Ver [documento 24](24-questionario-v3.md).
 
@@ -382,11 +406,19 @@
 >   * **Dado** que já recebi recomendações,
 >   * **Quando** altero meu setor, objetivo ou faixa e consulto de novo,
 >   * **Então** o resultado usa os dados atuais e mostra a data e a versão do cálculo.
+> * **Cenário 2 (Pausa e revisão de agenda):**
+>   * **Dado** uma indicação anterior,
+>   * **Quando** um dos perfis pausa ou deixa de atender os requisitos, ou o mentor altera a agenda compartilhada/pergunta de recebimento,
+>   * **Então** a próxima consulta reflete a elegibilidade e os dados atuais, sem reutilizar resultado de outra revisão; data e versão não expõem contribuições numéricas ao participante.
+> * **Cenário 3 (Múltiplos projetos):**
+>   * **Dado** uma conta vinculada a mais de uma startup,
+>   * **Quando** seleciona outro projeto autorizado,
+>   * **Então** o cálculo usa o questionário desse projeto e respostas antigas de outro projeto/conta não substituem o contexto atual.
 * *Prioridade:* P1 · *Rastreabilidade:* RF19, RN14, RN15, CA16.
 
 ---
 
-> ⚠️ **Ponto de atenção para o time:** o protótipo do frontend (`matching.engine.ts`, regra `damatch-rules-v1`) usa pesos diferentes da proposta match-1.0 do SRS. É preciso decidir qual regra vale antes de implementar o cálculo no backend.
+> **Referência atual:** implementar mentoria conforme o [guia 29](29-matching-rule-decisions.md), após as dependências do roteiro. O protótipo `damatch-rules-v2` é experimental e preserva uma regra anterior; não usá-lo como cálculo confiável no modo API. As 13 respostas estão registradas; falta implementar e incorporar a decisão na próxima revisão formal do SRS.
 
 ---
 

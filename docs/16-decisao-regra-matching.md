@@ -1,6 +1,8 @@
-# 16 — Decisão pendente: qual regra de matching usar
+# 16 — Decisão da regra de matching e histórico das propostas
 
-**Responsável:** Christopher (Product Owner) · **Data:** 17/10/2026 · **Situação:** aguardando decisão do time
+**Propostas originais:** 17/10/2026, Christopher (Product Owner). **Situação atual:** regra de mentoria definida pelo usuário em 30/10/2026, em 13 respostas, no [guia 29 — damatch-mentoria-v1](29-matching-rule-decisions.md). Implementação ainda pendente na etapa 6.
+
+O guia 29 é a especificação atual do servidor. As comparações e recomendações abaixo registram propostas históricas e não prevalecem sobre essa decisão. A atribuição de autoria das propostas ao PO não significa atribuir a ele as respostas dadas pelo usuário nesta conversa. A próxima revisão formal do SRS deve incorporar a regra consolidada; o protótipo continua experimental.
 
 ## 1. O problema
 
@@ -74,10 +76,10 @@ O setor "ainda descobrindo" precisa de uma decisão própria: ou o SRS passa a a
 
 | Campo | Valor |
 | --- | --- |
-| Opção escolhida | _a definir na reunião do time_ |
-| Data | |
-| Participantes | |
-| Próximo passo | Atualizar o SRS (seção 7) e os cenários da US-16 com a regra escolhida |
+| Regra escolhida | `damatch-mentoria-v1`, conforme [guia 29](29-matching-rule-decisions.md), construída pelas 13 respostas; não corresponde integralmente às antigas opções A–D. |
+| Data | 30/10/2026 |
+| Participante da decisão | Usuário nesta conversa; sem atribuir aprovação separada do PO/time. |
+| Próximo passo | Implementar na etapa 6 após as dependências, e incorporar na próxima revisão formal do SRS; US-16/18/19 atualizadas para esta decisão. |
 
 ## Atualização do protótipo — v0.5.0
 
@@ -105,3 +107,7 @@ Corte: abaixo de 30 o perfil não aparece. A vantagem é usar as perguntas novas
 ### Decisão do PO: porcentagem só para a equipe
 
 Seja qual for a regra escolhida, o participante **não vê a porcentagem** nem a explicação por critério. Ele vê as indicações em ordem e o selo **Super DaMatch** quando a nota for 95 ou mais. A nota completa fica guardada para a equipe estudar e ajustar o match. Essa decisão muda a RF18 do SRS e a US-18 já foi atualizada.
+
+## Definição guiada — 30/10/2026
+
+O usuário concluiu as 13 respostas do [guia 29](29-matching-rule-decisions.md). Pesos: necessidades 50, setor 15, momento 10, público 10, agenda 10 e formação 5. Necessidades divididas 70/30; prática recebe 100% e conhecimento 70% por assunto. Ao menos uma necessidade precisa ser atendida; falta de agenda perde 10 pontos sem excluir. Frequências fixas diferentes excluem, salvo flexível; modalidade/cidade devem permitir encontro. Setor geral recebe metade, desconhecidos recebem zero sem normalização, público pontua com uma interseção, formação premia área específica adicional ao time. Corte inclusivo 60; selo inclusivo 95. Empate: mais necessidades atendidas, mais delas com prática, agenda comum, UUID estável. Capacidade somente informativa nesta primeira versão. Fórmula, exceções, privacidade e casos de referência estão consolidados no guia 29; implementação permanece futura.
