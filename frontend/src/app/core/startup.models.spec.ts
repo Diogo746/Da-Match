@@ -7,7 +7,7 @@ const details: StartupRegistrationDetails = {
   publicoAlvo: "Projetos iniciantes", modeloDeNegocio: "Hipótese de assinatura", statusValidacao: "APENAS_IDEIA",
 };
 const member = { id: "member-test", usuarioId: "user-test", nomeUsuario: "Pessoa Fictícia", papelMembro: "FUNDADOR", dataEntrada: "2026-10-22" };
-const profile = { ...details, id: "startup-test", dataCriacao: "2026-10-22T12:00:00Z", membros: [member] };
+const profile = { ...details, id: "startup-test", status: "RASCUNHO", dataCriacao: "2026-10-22T12:00:00Z", membros: [member] };
 
 it("validates each text boundary and normalizes only declared startup fields", () => {
   expect(validStartupDetails(details)).toBe(true);
@@ -33,8 +33,17 @@ it("reads confirmed startups without propagating credentials or unexpected prope
 });
 
 it.each([null, {}, { ...profile, id: "" }, { ...profile, dataCriacao: "invalid" },
+  { ...profile, status: undefined }, { ...profile, status: "INVALID" }, { ...profile, status: null },
   { ...profile, membros: [] }, { ...profile, membros: null }, { ...profile, membros: [null] },
   { ...profile, membros: [{ ...member, usuarioId: "" }] }, { ...profile, membros: [{ ...member, papelMembro: "ADMIN" }] },
 ])("rejects incomplete confirmation data: %#", value => {
   expect(() => readStartupProfile(value)).toThrow();
+});
+
+it("allows legacy text to be displayed and corrected without declaring readiness or weakening registration", () => {
+  const legacy = { ...profile, pitchCurto: "  ", problemaCentral: "x".repeat(5001) };
+  expect(validStartupDetails(legacy)).toBe(false);
+  expect(readStartupProfile(legacy)).toMatchObject({ pitchCurto: "", problemaCentral: legacy.problemaCentral, status: "RASCUNHO" });
+  expect(() => readStartupProfile({ ...profile, pitchCurto: null })).toThrow();
+  expect(() => readStartupProfile({ ...profile, statusValidacao: "unknown" })).toThrow();
 });

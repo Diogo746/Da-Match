@@ -23,7 +23,7 @@ it("completa onboarding de startup, login por sessão e logout com renovação d
   const account = { id: "founder-test", nome: "Pessoa Fundadora", email: "founder@example.test", tipoUsuario: "STARTUP" };
   const details = { nomeProvisorio: "Ideia Fictícia", pitchCurto: "Uma rede de apoio.", problemaCentral: "Poucas conexões.",
     solucaoProposta: "Aproximar pessoas e ideias.", publicoAlvo: "Projetos iniciais", modeloDeNegocio: "Assinatura", statusValidacao: "PESQUISA_MERCADO" };
-  const startup = { ...details, id: "startup-test", dataCriacao: "2026-10-22T12:00:00Z",
+  const startup = { ...details, id: "startup-test", status: "RASCUNHO", dataCriacao: "2026-10-22T12:00:00Z",
     membros: [{ id: "member-test", usuarioId: account.id, nomeUsuario: account.nome, papelMembro: "FUNDADOR", dataEntrada: "2026-10-22" }] };
   async function request(url: string): Promise<TestRequest> {
     let found: TestRequest | undefined;
@@ -69,7 +69,15 @@ it("completa onboarding de startup, login por sessão e logout com renovação d
   const opening = router.navigateByUrl("/startup/perfil");
   (await request("/api/v1/auth/me")).flush(account);
   await opening; await refresh();
-  (await request("/api/v1/startups/me")).flush([startup]); await refresh();
+  (await request("/api/v1/startups/me")).flush([startup]);
+  const publication = { startupId: startup.id, status: "RASCUNHO", aptoParaPublicacao: false, podeGerenciar: true,
+    pendencias: [{ codigo: "QUESTIONARIO_AUSENTE", campo: "perfilMatch", mensagem: "Preencha e salve o questionário desta startup." }] };
+  (await request("/api/v1/startups/startup-test/status")).flush(publication); await refresh();
+  await vi.waitFor(() => {
+    fixture.detectChanges();
+    const edit = [...page.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent?.includes("Editar startup"));
+    expect(edit?.disabled).toBe(false);
+  });
   expect(page.textContent).toContain(details.nomeProvisorio);
   [...page.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent?.includes("Editar startup"))!.click();
   fixture.detectChanges(); enter("edit-startup-nomeProvisorio", "Ideia Atualizada"); submit();
@@ -79,10 +87,12 @@ it("completa onboarding de startup, login por sessão e logout com renovação d
   expect(update.request.withCredentials).toBe(true);
   expect(update.request.body).toEqual({ ...details, nomeProvisorio: "Ideia Atualizada" });
   const updated = { ...startup, nomeProvisorio: "Ideia Atualizada" };
-  update.flush(updated); await refresh();
-  expect(page.textContent).toContain("Dados da startup salvos com sucesso");
+  update.flush(updated);
+  (await request("/api/v1/startups/startup-test/status")).flush(publication); await refresh();
+  await vi.waitFor(() => { fixture.detectChanges(); expect(page.textContent).toContain("Dados da startup salvos com sucesso"); });
   [...page.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent?.includes("Recarregar dados"))!.click();
-  (await request("/api/v1/startups/me")).flush([updated]); await refresh();
+  (await request("/api/v1/startups/me")).flush([updated]);
+  (await request("/api/v1/startups/startup-test/status")).flush(publication); await refresh();
   expect(page.textContent).toContain("Ideia Atualizada");
   const accountPage = router.navigateByUrl("/conta");
   (await request("/api/v1/auth/me")).flush(account); await accountPage; await refresh();

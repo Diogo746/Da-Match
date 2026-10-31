@@ -83,6 +83,29 @@ it("never sends API credentials or CSRF to unrelated absolute URLs", async () =>
   await result;
 });
 
+it.each([401, 403])("does not apply a previous session's late %s to the current account", async status => {
+  state.setUser(account);
+  const result = firstValueFrom(TestBed.inject(HttpClient).patch("/api/v1/startups/project/status", { status: "PUBLICADO" }))
+    .catch(error => error);
+  csrf();
+  const request = http.expectOne(base + "/api/v1/startups/project/status");
+  const nextAccount = { ...account, id: "another-user" }; state.setUser(nextAccount);
+  request.flush({}, { status, statusText: "Denied" });
+  expect((await result).status).toBe(status);
+  expect(state.user()).toEqual(nextAccount); expect(state.notice()).toBe("");
+});
+
+it("does not send a queued write with a new session after waiting for CSRF", async () => {
+  state.setUser(account);
+  const result = firstValueFrom(TestBed.inject(HttpClient).patch("/api/v1/startups/project/status", { status: "PUBLICADO" }))
+    .catch(error => error);
+  state.setUser(null); state.setUser(account);
+  csrf();
+  expect(await result).toBeInstanceOf(Error);
+  http.expectNone(base + "/api/v1/startups/project/status");
+  expect(state.user()).toEqual(account);
+});
+
 it("reuses an explicitly supplied CSRF header from registration", async () => {
   const result = firstValueFrom(TestBed.inject(HttpClient).post("/api/v1/mentores", {},
     { headers: { "X-XSRF-TOKEN": "explicit" } }));

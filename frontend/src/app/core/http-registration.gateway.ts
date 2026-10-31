@@ -4,7 +4,7 @@ import { Observable, TimeoutError, catchError, defer, map, switchMap, throwError
 import { ProfileKind } from "./profile.models";
 import { RegistrationError, RegistrationGateway, RegistrationReceipt, RegistrationRequest, normalizeRegistration } from "./registration.gateway";
 import { readMentorProfile, validAvailability } from "./mentor.models";
-import { readStartupProfile } from "./startup.models";
+import { readStartupProfile, validStartupDetails } from "./startup.models";
 
 const REQUEST_TIMEOUT_MS = 15000;
 
@@ -54,8 +54,10 @@ export class HttpRegistrationGateway extends RegistrationGateway {
           if (response.status !== 201) throw new RegistrationError("UNCONFIRMED");
           if (kind === "STARTUP") {
             try {
+              if (!validStartupDetails(response.body)) throw new Error("Dados do cadastro inválidos.");
               const startup = readStartupProfile(response.body);
-              if (startup.membros.length !== 1 || startup.membros[0].papelMembro !== "FUNDADOR") throw new Error("Vínculo de fundador inválido.");
+              if (startup.status !== "RASCUNHO" || startup.membros.length !== 1 ||
+                  startup.membros[0].papelMembro !== "FUNDADOR") throw new Error("Cadastro de startup inválido.");
               return { nome: startup.membros[0].nomeUsuario, email, tipoUsuario: "STARTUP", mode: "API", startup };
             } catch { throw new RegistrationError("UNCONFIRMED"); }
           }
