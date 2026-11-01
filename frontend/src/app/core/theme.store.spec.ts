@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TestBed } from "@angular/core/testing";
-import { THEME_STORAGE_KEY, ThemeStore } from "./theme.store";
+import { PALETTE_STORAGE_KEY, THEME_STORAGE_KEY, ThemeStore } from "./theme.store";
 
 beforeEach(() => {
   TestBed.resetTestingModule();
@@ -13,6 +13,7 @@ afterEach(() => {
   TestBed.resetTestingModule();
   localStorage.clear();
   document.documentElement.removeAttribute("data-theme");
+  document.documentElement.removeAttribute("data-palette");
   document.documentElement.style.removeProperty("color-scheme");
 });
 
@@ -61,5 +62,27 @@ describe("Preferência de tema", () => {
     restored.toggle();
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
     expect(document.documentElement.dataset["theme"]).toBe("light");
+  });
+
+  it("usa a paleta azul por padrão e aplica no documento", () => {
+    const theme = TestBed.inject(ThemeStore);
+    expect(theme.palette()).toBe("azul");
+    expect(document.documentElement.dataset["palette"]).toBe("azul");
+  });
+
+  it("troca e persiste a paleta sem alterar claro/escuro", () => {
+    const theme = TestBed.inject(ThemeStore);
+    theme.toggle();
+    theme.setPalette("verde");
+    expect(document.documentElement.dataset["palette"]).toBe("verde");
+    expect(theme.mode()).toBe("dark");
+    expect(localStorage.getItem(PALETTE_STORAGE_KEY)).toBe("verde");
+    TestBed.resetTestingModule();
+    expect(TestBed.inject(ThemeStore).palette()).toBe("verde");
+  });
+
+  it("ignora paleta salva inválida", () => {
+    localStorage.setItem(PALETTE_STORAGE_KEY, "laranja");
+    expect(TestBed.inject(ThemeStore).palette()).toBe("azul");
   });
 });
