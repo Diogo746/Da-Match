@@ -49,6 +49,13 @@
         >Ecossistema de inovação<span>Recife, Pernambuco</span></span
       >
       <div class="topbar-actions">
+        <div class="palette-picker" role="group" aria-label="Paleta de cores">
+          @for (p of theme.palettes; track p.id) {
+            <button class="palette-swatch" type="button" [attr.data-swatch]="p.id"
+              [attr.aria-pressed]="theme.palette() === p.id" [attr.aria-label]="'Paleta ' + p.label"
+              [title]="p.label" (click)="theme.setPalette(p.id)"></button>
+          }
+        </div>
         <button class="theme-toggle" type="button" [attr.aria-pressed]="theme.isDark()"
           [attr.aria-label]="theme.isDark() ? 'Ativar modo claro' : 'Ativar modo escuro'"
           (click)="theme.toggle()"><app-icon [name]="theme.isDark() ? 'sun' : 'moon'" />
