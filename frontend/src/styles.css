@@ -1,4 +1,5 @@
 @import "./app/shared/theme.css";
+@import "./app/shared/palettes.css";
 @import "./app/shared/profile-tones.css";
 @import "./app/features/profile/profile-choices.css";
 @import "./app/shared/motion.css";
