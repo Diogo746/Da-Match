@@ -1,0 +1,261 @@
+/* Paletas alternativas. A paleta azul (padrão) continua em theme.css.
+   Escolha feita pelo atributo <html data-palette="roxo|verde"> + data-theme="light|dark". */
+
+/* ===================== ROXO ===================== */
+html[data-palette="roxo"]:not([data-theme="dark"]) {
+  --navy: #29244A;
+  --on-navy: #FFFFFF;
+  --bg: #F7F5FF;
+  --surface: #FFFFFF;
+  --surface-overlay: #FFFFFFED;
+  --surface-alt: #EFEDFA;
+  --surface-soft: #F7F5FF;
+  --surface-hover: #DCD7FF;
+  --surface-tint: #EFEDFA;
+  --text-primary: #29244A;
+  --muted: #625D78;
+  --text-soft: #514B70;
+  --placeholder: #6E6887;
+  --teal: #6657C8;
+  --accent-ink: #5142AE;
+  --focus: #6657C8;
+  --border: #DDD9ED;
+  --border-soft: #EAE7F5;
+  --field-border: #8B83B0;
+  --border-hover: #6657C8;
+  --action-bg: #6657C8;
+  --action-text: #FFFFFF;
+  --action-hover: #5142AE;
+  --button-soft-bg: #DCD7FF;
+  --button-soft-text: #29244A;
+  --button-soft-hover: #CCC5FF;
+  --selected-bg: #DCD7FF;
+  --saved-bg: #29244A;
+  --saved-text: #FFFFFF;
+  --badge-bg: #DCD7FF;
+  --badge-text: #40357F;
+  --tag-bg: #F0EEFA;
+  --tag-text: #5142AE;
+  --track: #E5E1F0;
+  --track-fill: #6657C8;
+  --hero-bg: #F0EDFF;
+  --help-bg: #EFEDFA;
+  --help-icon-bg: #DCD7FF;
+  --preview-cover-start: #E4DFFF;
+  --preview-cover-end: #C8F0E8;
+  --success-bg: #E3F7F1;
+  --success-text: #176B5B;
+  --error-bg: #fff4f1;
+  --error-border: #ba7168;
+  --error-text: #963d3d;
+  --attention-text: #496659;
+  --shadow-soft: #1433420d;
+  --shadow-card: #1137490d;
+  --dialog-shadow: #082d4960;
+  --backdrop: #082c44a6;
+  --cover-ring: #ffffff85;
+  --cover-ring-soft: #ffffff35;
+  --lumen-bubble-bg: #fff;
+  --lumen-bubble-border: #cddfd2;
+  --lumen-bubble-text: #34564b;
+  --lumen-halo-rest: .22;
+  --lumen-halo-peak: .8;
+  --lumen-core: #f2ffe8;
+  --lumen-core-rest: .12;
+  --lumen-core-peak: .78;
+  --lumen-halo-inner: #dbffe8e6;
+  --lumen-halo-outer: #85d9c780;
+  --lumen-halo-shadow: #85d9c780;
+  --lumen-halo-blur: 5px;
+  --lumen-core-shadow: #d3f1e199;
+}
+
+html[data-palette="roxo"][data-theme="dark"] {
+  --navy: #17152B;
+  --on-navy: #F4F2FF;
+  --bg: #17152B;
+  --surface: #282442;
+  --surface-overlay: #302B4DEE;
+  --surface-alt: #282442;
+  --surface-soft: #211E38;
+  --surface-hover: #393254;
+  --surface-tint: #302B4A;
+  --text-primary: #F4F2FF;
+  --muted: #C1BCD9;
+  --text-soft: #D8D3ED;
+  --placeholder: #A8A2C4;
+  --teal: #65DCC5;
+  --accent-ink: #85E7D4;
+  --focus: #65DCC5;
+  --border: #484260;
+  --border-soft: #393451;
+  --field-border: #8982A6;
+  --border-hover: #65DCC5;
+  --action-bg: #65DCC5;
+  --action-text: #17152B;
+  --action-hover: #85E7D4;
+  --button-soft-bg: #493F79;
+  --button-soft-text: #F0EDFF;
+  --button-soft-hover: #5A4E91;
+  --selected-bg: #493F79;
+  --saved-bg: #65DCC5;
+  --saved-text: #17152B;
+  --badge-bg: #493F79;
+  --badge-text: #E4DFFF;
+  --tag-bg: #302B4A;
+  --tag-text: #D8D3ED;
+  --track: #393451;
+  --track-fill: #65DCC5;
+  --hero-bg: #282442;
+  --help-bg: #25213E;
+  --help-icon-bg: #493F79;
+  --preview-cover-start: #493F79;
+  --preview-cover-end: #24564F;
+  --success-bg: #1F443E;
+  --success-text: #A8F0DF;
+  --error-bg: #402724;
+  --error-border: #bc796e;
+  --error-text: #ffc1b7;
+  --attention-text: #bfd4cc;
+  --shadow-soft: #00000024;
+  --shadow-card: #00000030;
+  --dialog-shadow: #00000099;
+  --backdrop: #030c13cf;
+  --cover-ring: #d9f4e528;
+  --cover-ring-soft: #d9f4e512;
+  --lumen-bubble-bg: #1b393d;
+  --lumen-bubble-border: #527575;
+  --lumen-bubble-text: #dfede6;
+  --lumen-halo-rest: .42;
+  --lumen-halo-peak: 1;
+  --lumen-core-rest: .25;
+  --lumen-core-peak: 1;
+  --lumen-halo-inner: #b6f0d4ff;
+  --lumen-halo-outer: #85d9c7b3;
+  --lumen-halo-shadow: #85d9c7b3;
+  --lumen-halo-blur: 8px;
+  --lumen-core-shadow: #d3f1e1cc;
+}
+
+/* ===================== VERDE ===================== */
+/* Variáveis não citadas aqui (erro, sombras, lumen…) herdam de theme.css. */
+html[data-palette="verde"]:not([data-theme="dark"]) {
+  --navy: #E9ECE5;
+  --on-navy: #222831;
+  --bg: #F4F4F2;
+  --surface: #FFFFFF;
+  --surface-overlay: #FFFFFFED;
+  --surface-alt: #E9ECE5;
+  --surface-soft: #F4F4F2;
+  --surface-hover: #E5F4B5;
+  --surface-tint: #E5F4B5;
+  --text-primary: #222831;
+  --muted: #59615A;
+  --text-soft: #465044;
+  --placeholder: #626B61;
+  --teal: #3A4D2E;
+  --accent-ink: #3A4D2E;
+  --focus: #688A42;
+  --border: #D9DED5;
+  --border-soft: #E7EAE4;
+  --field-border: #7C8775;
+  --border-hover: #688A42;
+  --action-bg: #3A4D2E;
+  --action-text: #FFFFFF;
+  --action-hover: #293A20;
+  --button-soft-bg: #E5F4B5;
+  --button-soft-text: #293A20;
+  --button-soft-hover: #D6E99A;
+  --selected-bg: #E5F4B5;
+  --saved-bg: #222831;
+  --saved-text: #FFFFFF;
+  --badge-bg: #E5F4B5;
+  --badge-text: #293A20;
+  --tag-bg: #F0F1EC;
+  --tag-text: #3A4D2E;
+  --track: #E1E5DC;
+  --track-fill: #688A42;
+  --hero-bg: #F0F1EC;
+  --help-bg: #E9ECE5;
+  --help-icon-bg: #E5F4B5;
+  --preview-cover-start: #E9ECE5;
+  --preview-cover-end: #DCE8C8;
+}
+
+html[data-palette="verde"][data-theme="dark"] {
+  --navy: #202622;
+  --on-navy: #F4F4F2;
+  --bg: #171B1A;
+  --surface: #252C29;
+  --surface-overlay: #252C29EE;
+  --surface-alt: #202622;
+  --surface-soft: #1D2420;
+  --surface-hover: #343D32;
+  --surface-tint: #293528;
+  --text-primary: #F4F4F2;
+  --muted: #C0C8BE;
+  --text-soft: #D0D7CC;
+  --placeholder: #AAB5A6;
+  --teal: #C7F464;
+  --accent-ink: #C7F464;
+  --focus: #C7F464;
+  --border: #414B41;
+  --border-soft: #343D35;
+  --field-border: #84917E;
+  --border-hover: #A8CA68;
+  --action-bg: #C7F464;
+  --action-text: #171B1A;
+  --action-hover: #D7FF82;
+  --button-soft-bg: #3A4D2E;
+  --button-soft-text: #E5F4B5;
+  --button-soft-hover: #4A6039;
+  --selected-bg: #3A4D2E;
+  --saved-bg: #C7F464;
+  --saved-text: #171B1A;
+  --badge-bg: #3A4D2E;
+  --badge-text: #E5F4B5;
+  --tag-bg: #29312B;
+  --tag-text: #D7E9C2;
+  --track: #343D35;
+  --track-fill: #C7F464;
+  --hero-bg: #202922;
+  --help-bg: #252F24;
+  --help-icon-bg: #3A4D2E;
+  --preview-cover-start: #34452C;
+  --preview-cover-end: #263522;
+}
+
+/* ===================== ACENTO DO MENU LATERAL =====================
+   Nos temas claros do azul e do roxo o menu lateral é escuro, mas --teal foi escolhido para fundos claros.
+   Estas cores claras mantêm logo e detalhes legíveis. As demais combinações usam --teal direto. */
+html[data-palette="azul"]:not([data-theme="dark"]) { --sidebar-accent: #9adebf; }
+html[data-palette="roxo"]:not([data-theme="dark"]) { --sidebar-accent: #65DCC5; }
+
+/* ===================== SELETOR DE PALETA ===================== */
+.palette-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--field-border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.palette-swatch {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--field-border);
+  cursor: pointer;
+}
+.palette-swatch[data-swatch="azul"]  { background: linear-gradient(135deg, #0b3044 50%, #85d9c7 50%); }
+.palette-swatch[data-swatch="roxo"]  { background: linear-gradient(135deg, #6657C8 50%, #65DCC5 50%); }
+.palette-swatch[data-swatch="verde"] { background: linear-gradient(135deg, #3A4D2E 50%, #C7F464 50%); }
+.palette-swatch:hover { box-shadow: 0 0 0 2px var(--border-hover); }
+.palette-swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--text-primary); }
+@media (max-width: 480px) {
+  .palette-picker { padding: 5px 6px; gap: 4px; }
+  .palette-swatch { width: 20px; height: 20px; }
+}
