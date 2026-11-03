@@ -7,12 +7,8 @@
   grid-template-columns: 232px minmax(0, 1fr);
 }
 .sidebar {
-  background: var(--navy);
+ background: var(--navy);
   color: var(--on-navy);
-  /* Cores do menu lateral derivadas da paleta ativa. O fundo (--navy) é escuro em umas paletas e claro em outras,
-     então o texto secundário parte de --on-navy em vez de --muted (que foi pensado para fundos claros). */
-  --side-muted: color-mix(in srgb, var(--on-navy) 74%, var(--navy));
-  --side-accent: var(--sidebar-accent, var(--teal));
   padding: 36px 22px 24px;
   display: flex;
   flex-direction: column;
@@ -35,7 +31,7 @@
 }
 
 .brand-dot {
-  color: var(--side-accent);
+  color: var(--teal);
 }
 
 .brand-mark {
@@ -52,7 +48,7 @@
   position: absolute;
   width: 24px;
   height: 27px;
-  border: 3px solid var(--side-accent);
+  border: 3px solid var(--teal);
   border-radius: 6px 12px 12px 6px;
   top: 0;
   left: 0;
@@ -67,7 +63,7 @@
 .sidebar-label {
   font-size: 10px;
   letter-spacing: 1.8px;
-  color: var(--side-muted);
+  color: var(--muted);
   margin: 48px 12px 16px;
   font-weight: 700;
 }
@@ -151,7 +147,7 @@
   display: block;
   width: 100%;
   font-size: 10px;
-  color: var(--side-muted);
+  color: var(--muted);
   margin: 2px 0 0 13px;
 }
 
@@ -159,7 +155,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--side-accent);
+  background: var(--teal);
 }
 .main-layout {
   min-width: 0;
@@ -203,7 +199,7 @@
 .demo-pill > span {
   width: 6px;
   height: 6px;
-  background: var(--teal);
+  background: #85d9c7;
   border-radius: 50%;
 }
 main {
