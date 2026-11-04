@@ -18,6 +18,7 @@ class HibernateStartupPublicationSchemaTest {
 
     @Test
     void addsRequiredTextualDefaultToPopulatedStartupAndPreservesFounderAndValidation() {
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM convite_startup", Integer.class)).isZero();
         assertThat(jdbc.queryForObject("SELECT status FROM startup", String.class)).isEqualTo("RASCUNHO");
         assertThat(jdbc.queryForObject("SELECT nome_provisorio FROM startup", String.class)).isEqualTo("Projeto legado");
         assertThat(jdbc.queryForObject("SELECT status_validacao FROM startup", String.class)).isEqualTo("PESQUISA_MERCADO");

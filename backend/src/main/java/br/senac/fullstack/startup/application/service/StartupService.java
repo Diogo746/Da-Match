@@ -1,6 +1,5 @@
 package br.senac.fullstack.startup.application.service;
 
-import br.senac.fullstack.startup.api.dto.AdicionarMembroStartupRequest;
 import br.senac.fullstack.startup.api.dto.AtualizarStartupRequest;
 import br.senac.fullstack.startup.api.dto.CriarStartupRequest;
 import br.senac.fullstack.startup.api.dto.MembroStartupResponse;
@@ -15,7 +14,6 @@ import br.senac.fullstack.shared.enums.TipoUsuario;
 import br.senac.fullstack.shared.security.ResourceAccess;
 import br.senac.fullstack.usuario.application.service.UsuarioService;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
-import br.senac.fullstack.usuario.infrastructure.persistence.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +33,6 @@ public class StartupService {
 
     private final StartupRepository startupRepository;
     private final MembroStartupRepository membroRepository;
-    private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
     private final StartupMapper startupMapper;
     private final ResourceAccess resourceAccess;
@@ -44,7 +41,6 @@ public class StartupService {
     public StartupService(
             StartupRepository startupRepository,
             MembroStartupRepository membroRepository,
-            UsuarioRepository usuarioRepository,
             UsuarioService usuarioService,
             StartupMapper startupMapper,
             ResourceAccess resourceAccess,
@@ -52,7 +48,6 @@ public class StartupService {
     ) {
         this.startupRepository = startupRepository;
         this.membroRepository = membroRepository;
-        this.usuarioRepository = usuarioRepository;
         this.usuarioService = usuarioService;
         this.startupMapper = startupMapper;
         this.resourceAccess = resourceAccess;
@@ -87,14 +82,14 @@ public class StartupService {
 
     @Transactional
     public List<StartupResponse> listarStartups() {
-        return startupRepository.findAll().stream()
-                .map(startupMapper::toResponse)
-                .toList();
+        return listarMinhasStartups();
     }
 
     @Transactional
     public StartupResponse buscarStartupPorId(UUID startupId) {
-        return startupMapper.toResponse(buscarStartup(startupId));
+        Startup startup = buscarStartup(startupId);
+        resourceAccess.requireStartupMember(startup);
+        return startupMapper.toResponse(startup);
     }
 
     @Transactional
@@ -138,29 +133,10 @@ public class StartupService {
     }
 
     @Transactional
-    public MembroStartupResponse adicionarMembro(
-            UUID startupId,
-            AdicionarMembroStartupRequest request
-    ) {
-        if (request == null || request.usuarioId() == null || request.papelMembro() == null) {
-            throw new IllegalArgumentException("Usuário e papel do membro são obrigatórios.");
-        }
-
-        Startup startup = buscarStartup(startupId);
-        resourceAccess.requireStartupManager(startup);
-        Usuario usuario = buscarUsuario(request.usuarioId());
-
-        if (possuiMembro(startup, usuario.getId())) {
-            throw new IllegalStateException("O usuário já pertence a esta startup.");
-        }
-
-        MembroStartup membro = adicionarMembroInterno(startup, usuario, request.papelMembro());
-        return startupMapper.toResponse(membro);
-    }
-
-    @Transactional
     public List<MembroStartupResponse> listarMembros(UUID startupId) {
-        return buscarStartup(startupId).getMembros().stream()
+        Startup startup = buscarStartup(startupId);
+        resourceAccess.requireStartupMember(startup);
+        return startup.getMembros().stream()
                 .map(startupMapper::toResponse)
                 .toList();
     }
@@ -212,16 +188,6 @@ public class StartupService {
 
         return startupRepository.findById(startupId)
                 .orElseThrow(() -> new NoSuchElementException("Startup não encontrada."));
-    }
-
-    private Usuario buscarUsuario(UUID usuarioId) {
-        return usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado."));
-    }
-
-    private boolean possuiMembro(Startup startup, UUID usuarioId) {
-        return startup.getMembros().stream()
-                .anyMatch(membro -> membro.getUsuario().getId().equals(usuarioId));
     }
 
     private void validarRequestCriacao(CriarStartupRequest request) {

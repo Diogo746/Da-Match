@@ -1,7 +1,6 @@
 package br.senac.fullstack.startup.api.controller;
 
 import br.senac.fullstack.shared.security.SecurityConfig;
-import br.senac.fullstack.startup.api.dto.AdicionarMembroStartupRequest;
 import br.senac.fullstack.startup.api.dto.MembroStartupResponse;
 import br.senac.fullstack.startup.api.dto.StartupResponse;
 import br.senac.fullstack.startup.application.service.StartupService;
@@ -10,7 +9,6 @@ import br.senac.fullstack.startup.domain.enums.StatusValidacao;
 import br.senac.fullstack.startup.domain.enums.StatusPerfilStartup;
 import br.senac.fullstack.usuario.application.exception.EmailExistenteException;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,9 +24,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -101,7 +97,6 @@ class StartupControllerTest {
         UUID startupId = UUID.randomUUID();
         UUID usuarioId = UUID.randomUUID();
         MembroStartupResponse membro = membroResponse(usuarioId);
-        when(startupService.adicionarMembro(eq(startupId), any())).thenReturn(membro);
         when(startupService.listarMembros(startupId)).thenReturn(List.of(membro));
 
         mockMvc.perform(post("/api/v1/startups/{startupId}/membros", startupId)
@@ -113,17 +108,14 @@ class StartupControllerTest {
                                   "papelMembro": "MEMBRO"
                                 }
                                 """.formatted(usuarioId)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.usuarioId").value(usuarioId.toString()));
+                .andExpect(status().isGone())
+                .andExpect(jsonPath("$.codigo").value("CONVITE_OBRIGATORIO"));
 
         mockMvc.perform(get("/api/v1/startups/{startupId}/membros", startupId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].usuarioId").value(usuarioId.toString()));
 
-        ArgumentCaptor<AdicionarMembroStartupRequest> requestCaptor =
-                ArgumentCaptor.forClass(AdicionarMembroStartupRequest.class);
-        verify(startupService).adicionarMembro(eq(startupId), requestCaptor.capture());
-        assertEquals(PapelMembroStartup.MEMBRO, requestCaptor.getValue().papelMembro());
+
     }
 
     @Test
@@ -186,15 +178,13 @@ class StartupControllerTest {
                         .content(criarStartupJson()))
                 .andExpect(status().isBadRequest());
 
-        when(startupService.adicionarMembro(eq(startupId), any()))
-                .thenThrow(new IllegalStateException("Membro duplicado."));
 
         mockMvc.perform(post("/api/v1/startups/{startupId}/membros", startupId)
                         .with(SecurityMockMvcRequestPostProcessors.user("test").roles("STARTUP"))
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(adicionarMembroJson(usuarioId)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isGone());
 
         doThrow(new EmailExistenteException("Email existente"))
                 .when(startupService).criarStartup(any());

@@ -6,6 +6,8 @@ import br.senac.fullstack.startup.api.dto.CriarStartupRequest;
 import br.senac.fullstack.startup.api.dto.MembroStartupResponse;
 import br.senac.fullstack.startup.api.dto.StartupResponse;
 import br.senac.fullstack.startup.application.service.StartupService;
+import br.senac.fullstack.startup.application.exception.ConviteStartupException;
+import br.senac.fullstack.startup.application.exception.ConviteStartupException.Codigo;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -70,8 +72,7 @@ public class StartupController {
             @PathVariable("startupId") UUID startupId,
             @RequestBody @Valid AdicionarMembroStartupRequest request
     ) {
-        MembroStartupResponse membroAdicionado = startupService.adicionarMembro(startupId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(membroAdicionado);
+        throw new ConviteStartupException(Codigo.CONVITE_OBRIGATORIO);
     }
 
     @GetMapping("/{startupId}/membros")
