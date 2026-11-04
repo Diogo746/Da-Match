@@ -20,6 +20,10 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 
 ## Como executar o roteiro
 
+Retomada de 04/11: main atualizada por fast-forward até `de71fa5`. [PR #27](https://github.com/Diogo746/Da-Match/pull/27) integrado em `a847958`, com [workflow #98](https://github.com/Diogo746/Da-Match/actions/runs/41239498394) aprovado. [PR #28](https://github.com/Diogo746/Da-Match/pull/28) integrado em `de71fa5`: nova paleta nos temas claro/escuro e ajustes da navegação em `shared/theme.css` e `app.component.css`, sem mudança de backend/contratos. [Workflow #100](https://github.com/Diogo746/Da-Match/actions/runs/41697332569) concluído com sucesso, incluindo ambos os gates e job de deploy. CI não substitui homologação funcional publicada. Branch da etapa seguinte: `codex/startup-team-contract`, baseada nessa main; cores preservadas.
+
+Etapa 4 iniciada pela definição do contrato no [guia 30](30-startup-team-invitations.md), após quatro respostas do usuário: contas STARTUP existentes, convite no sistema com aceite, papéis MEMBRO/REPRESENTANTE sem alteração de papéis existentes e validade de 7 dias. Somente documentação nesta entrega; persistência/rotas/interface de convites ainda não implementadas. JWT mantendo CSRF foi registrado como decisão futura de autenticação, sem reordenar estas etapas ou iniciar migração de hospedagem.
+
 Retomada de 31/10: PR #26 integrado na main `0f901ef`, com [workflow #96](https://github.com/Diogo746/Da-Match/actions/runs/41234510526) concluído com sucesso. Etapa 3 iniciada dessa base na branch `codex/startup-publication-ui`; matching continua definido somente na documentação.
 
 Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não há compromisso de concluir tudo amanhã. Marcar concluído somente com implementação e validação correspondentes. Ao encerrar, atualizar o quadro abaixo, registrar branch/commit/PR/checks e escrever a próxima ação exata. Não repetir entregas já integradas nem tratar decisões de produto pendentes como aprovadas.
@@ -29,8 +33,8 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | 0. Retomada e homologação da base | Concluída localmente e integrada pelo PR #23; CI pós-merge #86 aprovado | Main conferida e fluxos atuais homologados em navegador/H2 |
 | 1. Contrato de publicação | Concluída em 30/10; [guia 28](28-startup-publication-contract.md) | Cadastro + questionário completo exigidos; estados, pendências, HTTP e acesso definidos |
 | 2. Publicação no backend | Integrada pelo PR #25 na main `2a5d321`; CI pós-merge #94 aprovada | Estado persistido, autorização, endpoints e testes; evidências operacionais na etapa 10 |
-| 3. Publicação no frontend | Implementada e homologada localmente em 31/10; branch `codex/startup-publication-ui`, aguardando revisão/integração | Publicar/pausar/retomar/voltar a rascunho e consultar pendências pela API |
-| 4. Integrantes | Pendente | Regras de contas e interface de gestão |
+| 3. Publicação no frontend | Integrada pelo PR #27 em `a847958`; CI pós-merge #98 aprovada | Publicar/pausar/retomar/voltar a rascunho e consultar pendências pela API |
+| 4. Integrantes | Contrato definido no guia 30 em 04/11; backend/frontend pendentes | Regras de contas e interface de gestão |
 | 5. Descoberta real | Pendente | Catálogo de perfis elegíveis pela API |
 | 6. Matching definitivo | Regra definida pelo usuário em 30/10 no [guia 29](29-matching-rule-decisions.md); implementação pendente | `damatch-mentoria-v1`, após as dependências; atualizar revisão formal do SRS |
 | 7. Salvos persistidos | Pendente; confirmar escopo | Favoritos por conta |
@@ -131,7 +135,7 @@ Conclusão: fundador/representante consegue publicar e pausar o projeto elegíve
 
 ### Entrega e homologação local — 31/10/2026
 
-Interface implementada em `codex/startup-publication-ui`, baseada na main `0f901ef`. Conferir o PR e os checks do head antes de integrar; esta validação não comprova homologação publicada.
+Interface implementada em `codex/startup-publication-ui`, baseada na main `0f901ef`; integrada pelo PR #27 em `a847958`, com CI #98 aprovada, conferida em 04/11. Esta validação não comprova homologação publicada.
 
 - Estado, aptidão, permissão e pendências vêm de GET `/status`. PATCH envia somente o destino; confirma resposta do projeto correto antes de atualizar a tela. Rascunho publica; publicado pausa/volta a rascunho; pausado retoma/volta a rascunho. Publicação exige aptidão, gestão exige vínculo e permissão confirmados. Salvar perfil/quiz não publica.
 - Seleção em `/startup/perfil?projeto=ID`, validada contra `/startups/me`; voltar do questionário, recarga e histórico preservam o projeto. Respostas atrasadas de projeto, conta ou sessão anterior são descartadas, inclusive após sair/entrar na mesma conta. Requisição aguardando CSRF não é enviada se a sessão mudar; erro antigo não encerra uma nova sessão.
@@ -146,9 +150,10 @@ Ambiente explicitamente local: frontend `127.0.0.1:4201`, API `127.0.0.1:8081`, 
 
 ## Etapa 4 — Integrantes
 
-- O backend já lista, adiciona e remove integrantes; começar pelos contratos existentes.
-- Definir como localizar/convidar conta existente, quais tipos de conta podem integrar startups e se alteração de papel fará parte da entrega. Hoje a associação admite MENTOR/ADMIN, mas `/startups/me` e questionário exigem STARTUP; resolver essa diferença antes da interface.
-- Implementar interface e eventuais ajustes autorizados, preservando ausência de duplicidade, fundador obrigatório e autorização de gestão.
+- Contrato definido em 04/11 no [guia 30](30-startup-team-invitations.md), após quatro respostas do usuário: destinatário STARTUP já cadastrado, identificado por e-mail exato; convite dentro do sistema com aceite; MEMBRO/REPRESENTANTE, sem alterar papéis existentes; validade de 7 dias.
+- O backend atual inclui diretamente por UUID e admite MENTOR/ADMIN. A implementação deverá descontinuar esse caminho HTTP sem aceite, preservar vínculos legados e criar o fluxo de convite. Não apresentar a inclusão atual como implementação da decisão nova.
+- Próxima implementação: persistência e ciclo de convites, autorização e concorrência, atualização do Postman/matriz de acesso e testes; ensaio em cópia PostgreSQL antes de integrar o novo schema. Depois conectar equipe/convites na interface, preservando seleção, sessão/CSRF, invariantes e a nova paleta da equipe.
+- Esta entrega é somente contratual; convites recebidos, aceite, recusa, cancelamento e vencimento ainda não estão disponíveis na aplicação. Não repetir as quatro decisões já respondidas.
 
 Conclusão: gestão funcional e testada, sem ações fictícias de convite ou troca de papel.
 
@@ -190,7 +195,8 @@ Conclusão de cada entrega: autorização, persistência, fluxo pela interface e
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** revisar checks e integrar a etapa 3 (`codex/startup-publication-ui`); depois iniciar etapa 4 definindo localização/convite de conta existente, tipos de conta permitidos e eventual alteração de papel, a partir dos contratos atuais. Conferir evidências operacionais da etapa 10; não alterar dados remotos sem autorização. Na etapa 6 implementar o guia 29 sem repetir as decisões de matching.
-- **Entrega da publicação:** backend/Postman no PR #25, main `2a5d321`, CI #94 aprovada; interface validada localmente em 31/10 na etapa 3 acima, ainda aguardando revisão/integração.
+- **Próxima ação exata:** seguir a etapa 4 pelo contrato do guia 30: implementar backend de convites/aceite e testes, descontinuando inclusão direta sem consentimento; atualizar Postman e preparar ensaio PostgreSQL legado antes da integração que dispara deploy. Depois conectar a interface de equipe/convites. Não repetir decisões de integrantes ou matching, nem antecipar JWT/Vercel. Conferir os checks do PR contratual e evidências operacionais da etapa 10; não alterar dados remotos sem autorização.
+- **Entrega da publicação:** backend/Postman no PR #25, main `2a5d321`, CI #94 aprovada; interface validada em 31/10 e integrada pelo PR #27 em `a847958`, CI pós-merge #98 aprovada.
 - **Entrega desta definição (30/10) e resolução (31/10):** somente documentação no PR #26, branch `codex/matching-rule-decision`; 13 respostas, fórmula e 14 casos de referência, US-16/18/19 alinhadas. Main `2a5d321` incorporada à branch para conciliar o roteiro e o índice. Nenhuma implementação de matching, alteração de aplicação além da main, mudança remota de banco ou deploy manual nesta entrega.
+- **Entrega de 04/11:** contrato de integrantes no guia 30 e continuidade atualizada, branch `codex/startup-team-contract`, base `de71fa5`. Sem mudanças de aplicação, schema ou banco remoto; verificar checks do PR documental, sem alegar novos testes/gates de aplicação quando dispensados.
 - **Ao encerrar a próxima sessão:** atualizar etapa, evidências, branch/head/PR/checks e este ponteiro, além de `AGENTS.md` local.
