@@ -2,6 +2,8 @@
 
 Implementação na branch `feature/security-configuration`. Autenticação por sessão no servidor, sem JWT, HTTP Basic ou formulário HTML do Spring. O banco mantém hashes BCrypt compatíveis com as contas existentes.
 
+Backend de convites implementado na branch `codex/startup-team-api`, aguardando integração. Contrato no [guia 30](30-startup-team-invitations.md), evidências e limitações no [guia 31](31-startup-team-api-validation.md). Sessão/CSRF atual preservados; JWT com CSRF é uma decisão futura, sem implementação nesta etapa.
+
 ## Matriz de acesso
 
 | Método e rota | Acesso |
@@ -14,7 +16,7 @@ Implementação na branch `feature/security-configuration`. Autenticação por s
 | `GET /api/v1/mentores/me` | MENTOR; consulta somente o perfil associado à sessão |
 | `GET /api/v1/startups/me` | STARTUP; consulta somente projetos vinculados à conta da sessão |
 | `POST /api/v1/auth/logout` | Autenticado, com CSRF; retorna 204 |
-| `GET /api/v1/startups`, `/{startupId}`, `/{startupId}/membros` | Autenticado |
+| `GET /api/v1/startups`, `/{startupId}`, `/{startupId}/membros` | STARTUP com vínculo atual; listagem somente dos próprios projetos |
 | `PATCH /api/v1/mentores/{mentorId}` e `/{mentorId}/status` | MENTOR titular do recurso, com CSRF |
 | `PATCH /api/v1/startups/{startupId}` | STARTUP com vínculo atual de FUNDADOR/REPRESENTANTE, com CSRF |
 | `GET /api/v1/startups/{startupId}/status` | STARTUP com vínculo atual de qualquer papel; retorna estado, aptidão e pendências, inclusive sem quiz |
@@ -22,13 +24,20 @@ Implementação na branch `feature/security-configuration`. Autenticação por s
 | `GET /api/v1/startups/{startupId}/perfil-match` | STARTUP com vínculo atual de qualquer papel; 204 se ainda sem questionário |
 | `PUT /api/v1/startups/{startupId}/perfil-match` | STARTUP com vínculo atual de FUNDADOR/REPRESENTANTE, com CSRF |
 | `GET/PUT /api/v1/mentores/{mentorId}/perfil-match` | MENTOR titular; PUT exige CSRF; consulta sem questionário retorna 204 |
-| `POST /api/v1/startups/{startupId}/membros` e `DELETE .../membros/{usuarioId}` | STARTUP com vínculo de FUNDADOR ou REPRESENTANTE nessa startup, com CSRF |
+| `POST /api/v1/startups/{startupId}/membros` | STARTUP + CSRF; inclusão direta encerrada com `410 CONVITE_OBRIGATORIO` |
+| `DELETE /api/v1/startups/{startupId}/membros/{usuarioId}` | STARTUP com vínculo atual FUNDADOR/REPRESENTANTE + CSRF |
+| `POST/GET /api/v1/startups/{startupId}/convites` | STARTUP gestor atual; POST exige CSRF, cria convite sem vínculo |
+| `GET /api/v1/startups/convites/me` | STARTUP destinatário, histórico da própria conta |
+| `GET /api/v1/startups/convites/{conviteId}` | STARTUP destinatário ou gestor atual do projeto |
+| `GET /api/v1/startups/{startupId}/convites/solicitacoes/{solicitacaoId}` | STARTUP gestor atual e emissor da solicitação |
+| `PATCH /api/v1/startups/convites/{conviteId}/aceite` ou `/recusa` | STARTUP destinatário + CSRF; aceite revalida emissor e cria vínculo |
+| `PATCH /api/v1/startups/{startupId}/convites/{conviteId}/cancelamento` | STARTUP gestor atual + CSRF |
 | `GET /actuator/health` e subrotas de health | ADMIN |
 | `GET /api/v1/hello` | Público fora de `prod`; bloqueado em `prod` |
 | Preflight `OPTIONS` | Sem autenticação; CORS valida origem, método e headers |
 | Demais rotas, inclusive `info` e `metrics` | Negadas |
 
-ADMIN não contorna a propriedade dos recursos. Não existem operações administrativas de edição autorizadas nesta entrega. Listagem de startups é acessível a qualquer conta autenticada; as respostas não incluem senhas nem e-mails de integrantes.
+ADMIN não contorna a propriedade dos recursos. Não existem operações administrativas de edição autorizadas nesta entrega. No backend da etapa 4, a listagem de startups é restrita aos projetos da própria conta STARTUP; não é catálogo de descoberta. As respostas não incluem senhas nem e-mails de integrantes. Consulta por ID/equipe também exige vínculo, evitando contornar o aceite de convite pelas rotas antigas.
 
 Os cadastros continuam sendo onboarding público: o corpo cria uma nova conta com papel definido pelo serviço. Um usuário já autenticado recebe 403 nesses endpoints; não existe criação de outra startup por conta existente. Um futuro caso de uso desse tipo deverá obter o fundador do contexto de segurança.
 
