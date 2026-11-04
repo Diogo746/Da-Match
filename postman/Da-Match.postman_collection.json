@@ -30,6 +30,26 @@
       "key": "csrfToken",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "conviteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "conviteSolicitacaoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "conviteEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "convitePapel",
+      "value": "MEMBRO",
+      "type": "string"
     }
   ],
   "item": [
@@ -335,7 +355,8 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}/api/v1/startups"
+            "url": "{{baseUrl}}/api/v1/startups",
+            "description": "Exige conta STARTUP e vínculo atual. Listagem retorna somente os projetos da própria conta; não é catálogo de descoberta."
           },
           "response": []
         },
@@ -347,10 +368,18 @@
             "url": "{{baseUrl}}/api/v1/startups/me",
             "description": "Exige sessão STARTUP. Retorna somente startups vinculadas ao usuário da sessão; não aceita identificador do ator. Lista vazia quando não há vínculo. Se houver várias, selecione o startupId correto antes de editar."
           },
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-            "pm.test('Consulta autenticada', () => pm.response.to.have.status(200));",
-            "if (pm.response.code === 200) { const startups = pm.response.json(); pm.test('Resposta em lista', () => pm.expect(startups).to.be.an('array')); if (Array.isArray(startups) && startups.length === 1) pm.collectionVariables.set('startupId', startups[0].id); }"
-          ] } }],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta autenticada', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) { const startups = pm.response.json(); pm.test('Resposta em lista', () => pm.expect(startups).to.be.an('array')); if (Array.isArray(startups) && startups.length === 1) pm.collectionVariables.set('startupId', startups[0].id); }"
+                ]
+              }
+            }
+          ],
           "response": []
         },
         {
@@ -358,12 +387,26 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json; charset=utf-8" },
-              { "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
             ],
             "url": "{{baseUrl}}/api/v1/startups/{{startupId}}",
             "description": "Exige sessão STARTUP vinculada como FUNDADOR/REPRESENTANTE e CSRF. Campos omitidos ou nulos são preservados. Texto enviado não pode ser vazio. Retorna 200; dados inválidos 400, sem permissão/CSRF 403 e startup inexistente 404. Não altera conta, integrantes nem data de criação.",
-            "body": { "mode": "raw", "raw": "{\n  \"nomeProvisorio\": \"Ideia atualizada\",\n  \"pitchCurto\": \"Resumo atualizado do projeto.\",\n  \"statusValidacao\": \"PESQUISA_MERCADO\"\n}", "options": { "raw": { "language": "json" } } }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nomeProvisorio\": \"Ideia atualizada\",\n  \"pitchCurto\": \"Resumo atualizado do projeto.\",\n  \"statusValidacao\": \"PESQUISA_MERCADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
           },
           "response": []
         },
@@ -372,7 +415,8 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}"
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}",
+            "description": "Exige conta STARTUP e vínculo atual. Listagem retorna somente os projetos da própria conta; não é catálogo de descoberta."
           },
           "response": []
         },
@@ -384,10 +428,18 @@
             "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/status",
             "description": "Sessão STARTUP e vínculo atual de qualquer papel. Retorna 200 mesmo sem questionário. Aptidão independe do papel; podeGerenciar só orienta a interface. Não retorna respostas do quiz nem dados de contas."
           },
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-            "pm.test('Consulta confirmada', () => pm.response.to.have.status(200));",
-            "if (pm.response.code === 200) pm.test('Estado, aptidão e pendências', () => { const body = pm.response.json(); pm.expect(body.startupId).to.eql(pm.collectionVariables.get('startupId')); pm.expect(['RASCUNHO', 'PUBLICADO', 'PAUSADO']).to.include(body.status); pm.expect(body.aptoParaPublicacao).to.be.a('boolean'); pm.expect(body.podeGerenciar).to.be.a('boolean'); pm.expect(body.pendencias).to.be.an('array'); pm.expect(body.aptoParaPublicacao).to.eql(body.pendencias.length === 0); pm.expect(body).not.to.have.property('membros'); pm.expect(body).not.to.have.property('topics'); });"
-          ] } }],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta confirmada', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) pm.test('Estado, aptidão e pendências', () => { const body = pm.response.json(); pm.expect(body.startupId).to.eql(pm.collectionVariables.get('startupId')); pm.expect(['RASCUNHO', 'PUBLICADO', 'PAUSADO']).to.include(body.status); pm.expect(body.aptoParaPublicacao).to.be.a('boolean'); pm.expect(body.podeGerenciar).to.be.a('boolean'); pm.expect(body.pendencias).to.be.an('array'); pm.expect(body.aptoParaPublicacao).to.eql(body.pendencias.length === 0); pm.expect(body).not.to.have.property('membros'); pm.expect(body).not.to.have.property('topics'); });"
+                ]
+              }
+            }
+          ],
           "response": []
         },
         {
@@ -395,22 +447,44 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json; charset=utf-8" },
-              { "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
             ],
             "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/status",
             "description": "FUNDADOR/REPRESENTANTE, sessão STARTUP e CSRF. Troque status por PUBLICADO para publicar/retomar, PAUSADO para pausar ou RASCUNHO para retirar publicação. PUBLICADO exige cadastro e quiz v3 salvos e válidos; incompleta retorna 409 STARTUP_INCOMPLETA com pendencias sem alterar estado. Demais destinos não exigem quiz. Não repetir PATCH automaticamente após falha incerta; confirmar por GET.",
-            "body": { "mode": "raw", "raw": "{\n  \"status\": \"PUBLICADO\"\n}", "options": { "raw": { "language": "json" } } }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PUBLICADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
           },
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-            "pm.test('Alteração confirmada ou pendências', () => pm.expect([200, 409]).to.include(pm.response.code));",
-            "if (pm.response.code === 200) pm.test('Estado confirmado', () => { const body = pm.response.json(); const sent = JSON.parse(pm.request.body.raw); pm.expect(body.status).to.eql(sent.status); pm.expect(body.podeGerenciar).to.eql(true); if (sent.status === 'PUBLICADO') { pm.expect(body.aptoParaPublicacao).to.eql(true); pm.expect(body.pendencias).to.eql([]); } });",
-            "if (pm.response.code === 409) pm.test('Conflito de publicação incompleta', () => { const body = pm.response.json(); pm.expect(body.codigo).to.eql('STARTUP_INCOMPLETA'); pm.expect(body.pendencias).to.be.an('array').that.is.not.empty; });"
-          ] } }],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Alteração confirmada ou pendências', () => pm.expect([200, 409]).to.include(pm.response.code));",
+                  "if (pm.response.code === 200) pm.test('Estado confirmado', () => { const body = pm.response.json(); const sent = JSON.parse(pm.request.body.raw); pm.expect(body.status).to.eql(sent.status); pm.expect(body.podeGerenciar).to.eql(true); if (sent.status === 'PUBLICADO') { pm.expect(body.aptoParaPublicacao).to.eql(true); pm.expect(body.pendencias).to.eql([]); } });",
+                  "if (pm.response.code === 409) pm.test('Conflito de publicação incompleta', () => { const body = pm.response.json(); pm.expect(body.codigo).to.eql('STARTUP_INCOMPLETA'); pm.expect(body.pendencias).to.be.an('array').that.is.not.empty; });"
+                ]
+              }
+            }
+          ],
           "response": []
         },
         {
-          "name": "Adicionar membro",
+          "name": "DESCONTINUADO — Inclusão direta (410)",
           "request": {
             "method": "POST",
             "header": [
@@ -433,16 +507,28 @@
               }
             },
             "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/membros",
-            "description": "O usuário precisa já existir. Informe em membroUsuarioId o UUID de uma conta de teste já cadastrada."
+            "description": "Não cria mais vínculos. Uma chamada válida com STARTUP/CSRF retorna 410 CONVITE_OBRIGATORIO. Use convites e aceite na conta destinatária."
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Inclusão direta descontinuada\", () => { pm.response.to.have.status(410); pm.expect(pm.response.json().codigo).to.eql(\"CONVITE_OBRIGATORIO\"); });"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Listar membros",
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/membros"
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/membros",
+            "description": "Exige conta STARTUP e vínculo atual. Listagem retorna somente os projetos da própria conta; não é catálogo de descoberta."
           },
           "response": []
         },
@@ -616,6 +702,310 @@
             "description": "Rota proposta para listar mentores. Ainda não existe MentorController nem caso de uso de listagem; o backend atual responderá 404."
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "Integrantes — Convites com aceite",
+      "description": "Backend implementado na etapa 4. Sem envio de e-mail. Use contas fictícias já existentes, ambiente local e sessões distintas para gestor/destinatário. Não execute as ações alternativas como uma sequência automática. Em resposta incerta, confirmar por GET; nunca gerar outra solicitação ou repetir escrita automaticamente.",
+      "item": [
+        {
+          "name": "Emitir convite (gestor)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/convites",
+            "description": "Entre como FUNDADOR/REPRESENTANTE e obtenha CSRF. Informe o e-mail exato de outra conta STARTUP existente. Emite convite; não adiciona integrante. solicitacaoId é preservado para recuperar resposta perdida; esvazie a variável somente para iniciar uma NOVA solicitação.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"solicitacaoId\": \"{{conviteSolicitacaoId}}\",\n  \"email\": \"{{conviteEmail}}\",\n  \"papelMembro\": \"{{convitePapel}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get(\"conviteSolicitacaoId\")) {",
+                  "  pm.environment.set(\"conviteSolicitacaoId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+                  "  pm.environment.unset(\"conviteId\");",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Sem dados privados extras\", () => { [\"email\", \"senha\", \"hash\", \"token\", \"questionario\"].forEach(key => pm.expect(body).not.to.have.property(key)); });",
+                  "  pm.test(\"Convite confirmado\", () => { pm.expect(body.id).to.be.a(\"string\"); pm.expect([\"PENDENTE\", \"ACEITO\", \"RECUSADO\", \"CANCELADO\", \"EXPIRADO\"]).to.include(body.status); });",
+                  "  pm.environment.set(\"conviteId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recuperar emissão por solicitação (gestor emissor)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/convites/solicitacoes/{{conviteSolicitacaoId}}",
+            "description": "GET de confirmação após resposta perdida. Exige gestor atual que emitiu. Um 404 não permite gerar outra chave automaticamente; eventual repetição explícita mantém o mesmo ID/conteúdo."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Sem dados privados extras\", () => { [\"email\", \"senha\", \"hash\", \"token\", \"questionario\"].forEach(key => pm.expect(body).not.to.have.property(key)); });",
+                  "  pm.test(\"Convite confirmado\", () => { pm.expect(body.id).to.be.a(\"string\"); pm.expect([\"PENDENTE\", \"ACEITO\", \"RECUSADO\", \"CANCELADO\", \"EXPIRADO\"]).to.include(body.status); });",
+                  "  pm.environment.set(\"conviteId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar convites do projeto (gestor)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/convites?pagina=0&tamanho=20",
+            "description": "Histórico paginado, incluindo vencimento efetivo, somente para gestor atual."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Sem dados privados extras\", () => { [\"email\", \"senha\", \"hash\", \"token\", \"questionario\"].forEach(key => pm.expect(body).not.to.have.property(key)); });",
+                  "  pm.test(\"Página de convites\", () => { pm.expect(body.itens).to.be.an(\"array\"); pm.expect(body.tamanho).to.be.within(1, 50); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Meus convites recebidos (destinatário)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups/convites/me?pagina=0&tamanho=20",
+            "description": "Saia da conta gestora e entre na conta destinatária. Lista somente os convites recebidos pela conta da sessão, sem identificador de ator."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Sem dados privados extras\", () => { [\"email\", \"senha\", \"hash\", \"token\", \"questionario\"].forEach(key => pm.expect(body).not.to.have.property(key)); });",
+                  "  pm.test(\"Página de convites\", () => { pm.expect(body.itens).to.be.an(\"array\"); pm.expect(body.tamanho).to.be.within(1, 50); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar convite por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups/convites/{{conviteId}}",
+            "description": "Destinatário ou gestor atual; útil para confirmar aceite/recusa/cancelamento sem depender de uma página de histórico."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Sem dados privados extras\", () => { [\"email\", \"senha\", \"hash\", \"token\", \"questionario\"].forEach(key => pm.expect(body).not.to.have.property(key)); });",
+                  "  pm.test(\"Convite confirmado\", () => { pm.expect(body.id).to.be.a(\"string\"); pm.expect([\"PENDENTE\", \"ACEITO\", \"RECUSADO\", \"CANCELADO\", \"EXPIRADO\"]).to.include(body.status); });",
+                  "  pm.environment.set(\"conviteId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aceitar convite (destinatário)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/startups/convites/{{conviteId}}/aceite",
+            "description": "Entre como destinatário e obtenha novo CSRF. Confirme projeto/papel por GET antes desta ação. Cria o vínculo na mesma transação; após sucesso, consultar Minhas startups. Não publica o perfil. Não repetir automaticamente se a resposta se perder.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Sem dados privados extras\", () => { [\"email\", \"senha\", \"hash\", \"token\", \"questionario\"].forEach(key => pm.expect(body).not.to.have.property(key)); });",
+                  "  pm.test(\"Convite confirmado\", () => { pm.expect(body.id).to.be.a(\"string\"); pm.expect([\"PENDENTE\", \"ACEITO\", \"RECUSADO\", \"CANCELADO\", \"EXPIRADO\"]).to.include(body.status); });",
+                  "  pm.environment.set(\"conviteId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recusar convite (destinatário)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/startups/convites/{{conviteId}}/recusa",
+            "description": "Ação alternativa ao aceite, somente pelo destinatário. Não executar a coleção inteira em sequência: selecione conscientemente o convite/ação e a conta correta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Sem dados privados extras\", () => { [\"email\", \"senha\", \"hash\", \"token\", \"questionario\"].forEach(key => pm.expect(body).not.to.have.property(key)); });",
+                  "  pm.test(\"Convite confirmado\", () => { pm.expect(body.id).to.be.a(\"string\"); pm.expect([\"PENDENTE\", \"ACEITO\", \"RECUSADO\", \"CANCELADO\", \"EXPIRADO\"]).to.include(body.status); });",
+                  "  pm.environment.set(\"conviteId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancelar convite (gestor)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/convites/{{conviteId}}/cancelamento",
+            "description": "Gestor atual do projeto pode cancelar convite pendente. Após novo login, obtenha outro CSRF. Não troca papel e não reabre convite finalizado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Sem dados privados extras\", () => { [\"email\", \"senha\", \"hash\", \"token\", \"questionario\"].forEach(key => pm.expect(body).not.to.have.property(key)); });",
+                  "  pm.test(\"Convite confirmado\", () => { pm.expect(body.id).to.be.a(\"string\"); pm.expect([\"PENDENTE\", \"ACEITO\", \"RECUSADO\", \"CANCELADO\", \"EXPIRADO\"]).to.include(body.status); });",
+                  "  pm.environment.set(\"conviteId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
         }
       ]
     }
