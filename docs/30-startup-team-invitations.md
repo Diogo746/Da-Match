@@ -1,6 +1,6 @@
 # Integrantes da startup e convites com aceite — etapa 4
 
-Contrato preparado em 04/11/2026, após as respostas do usuário na retomada da main `de71fa5`. Esta entrega define o próximo trabalho da etapa 4; **as rotas de convite abaixo são propostas, ainda não implementadas**. A etapa 4 funcional continua pendente. Autenticação atual por sessão e CSRF; a futura decisão JWT com CSRF não será implementada nesta entrega.
+Contrato preparado em 04/11/2026, após as respostas do usuário na retomada da main `de71fa5`. Contrato integrado pelo PR #29 na main `33e8671`, CI pós-merge #102 aprovada. **Backend implementado na branch `codex/startup-team-api`, ainda aguardando revisão/integração; interface pendente.** Evidências no [guia 31](31-startup-team-api-validation.md). A etapa 4 funcional completa continua pendente. Autenticação atual por sessão e CSRF; a futura decisão JWT com CSRF não será implementada nesta entrega.
 
 ## Decisões do usuário
 
@@ -13,7 +13,7 @@ Não foi solicitada migração dos vínculos legados, criação de contas sem pr
 
 ## Base existente e mudança necessária
 
-Hoje `POST /api/v1/startups/{startupId}/membros` recebe `usuarioId` e `papelMembro`, cria imediatamente o vínculo e retorna `201 MembroStartupResponse`. Não verifica o tipo da conta destinatária. A consulta própria e o questionário, porém, exigem papel de conta `STARTUP`.
+Antes desta implementação, `POST /api/v1/startups/{startupId}/membros` recebe `usuarioId` e `papelMembro`, criava imediatamente o vínculo e retornava `201 MembroStartupResponse`, sem verificar o tipo da conta destinatária. A consulta própria e o questionário, porém, exigem papel de conta `STARTUP`.
 
 A nova inclusão deve ocorrer **somente no aceite autenticado**. Na implementação, a rota antiga de inclusão direta deve deixar de criar vínculos: uma chamada válida, com sessão STARTUP e CSRF, receberá `410 Gone`, orientando usar convites. Atualizar testes, matriz de segurança e Postman nessa mesma entrega; não manter um caminho alternativo que contorne o aceite. O cadastro público continua criando o vínculo inicial FUNDADOR na mesma transação, sem precisar de convite.
 
@@ -50,11 +50,11 @@ Não convidar a própria conta nem quem já integra o projeto (`409`). Impedir d
 
 No aceite, revalidar o tipo STARTUP do destinatário, ausência de vínculo, prazo e estado. Revalidar também que quem emitiu o convite ainda possui vínculo FUNDADOR/REPRESENTANTE. Convite emitido por gestor que perdeu permissão não concede acesso: retornar `409 CONVITE_INDISPONIVEL`; um gestor atual poderá cancelá-lo e emitir outro. Não confiar em permissões existentes apenas na emissão.
 
-## API proposta — indisponível até implementação
+## API implementada na branch do backend — ainda não integrada à main
 
 Todos os endpoints exigem sessão STARTUP. POST/PATCH/DELETE exigem o CSRF atual, obtido em `/csrf`. Sem parâmetros de identidade do ator.
 
-| Método e rota proposta | Permissão | Resposta de sucesso |
+| Método e rota | Permissão | Resposta de sucesso |
 | --- | --- | --- |
 | `POST /api/v1/startups/{startupId}/convites` | FUNDADOR/REPRESENTANTE atual | `201 ConviteStartupResponse` |
 | `GET /api/v1/startups/{startupId}/convites` | FUNDADOR/REPRESENTANTE atual | `200 PaginaConvitesStartupResponse` |
@@ -93,7 +93,7 @@ Listas recebem `pagina` (padrão 0) e `tamanho` (padrão 20, máximo 50); negati
 - `410`: convite vencido ao tentar uma ação, ou rota antiga de inclusão direta descontinuada. Repetição de estado final já confirmado segue a idempotência descrita acima.
 - `415`: tipo de conteúdo incompatível nas rotas com corpo JSON.
 
-Erro de conflito usa ProblemDetail com código estável, por exemplo `CONVITE_PENDENTE`, `JA_INTEGRANTE`, `CONVITE_INDISPONIVEL`, `CONVITE_FINALIZADO`. Vencimento usa `CONVITE_EXPIRADO`; rota antiga usa `CONVITE_OBRIGATORIO`. A implementação deve definir os exemplos finais e alinhar frontend/Postman antes de conectar as ações.
+Erro de conflito usa ProblemDetail com código estável, por exemplo `CONVITE_PENDENTE`, `JA_INTEGRANTE`, `CONVITE_INDISPONIVEL`, `CONVITE_FINALIZADO`. Vencimento usa `CONVITE_EXPIRADO`; rota antiga usa `CONVITE_OBRIGATORIO`. Destinatário inexistente ou de outro tipo retorna `404 DESTINATARIO_INDISPONIVEL` com a mesma mensagem genérica. Postman atualizado; frontend ainda será conectado. Ações PATCH usam JSON `{}` ou corpo vazio com Content-Type application/json e rejeitam campos de negócio.
 
 ## Persistência, concorrência e remoção
 
@@ -103,7 +103,7 @@ Serializar emissão, aceite, cancelamento e inclusão/remoção de vínculos pel
 
 A remoção existente preserva pelo menos um integrante e pelo menos um fundador. Esta entrega não muda essa regra, não implementa transferência de fundação e não cria alteração de papel por remover/reinserir FUNDADOR. Integrantes anteriores não são reclassificados.
 
-Hibernate continua responsável pelo schema, sem Flyway. A implementação adicionará tabela de convites; antes de integração que dispare deploy, ensaiar em cópia PostgreSQL com dados e vínculos legados, preservando os registros existentes. H2 e um PostgreSQL vazio não substituem esse ensaio. Não alterar banco remoto nesta entrega documental.
+Hibernate continua responsável pelo schema, sem Flyway. A implementação adiciona a tabela `convite_startup`; antes de integração que dispare deploy, ensaiar em cópia PostgreSQL com dados e vínculos legados, preservando os registros existentes. H2 e um PostgreSQL vazio não substituem esse ensaio. Ensaio local PostgreSQL com cópia populada e dados fictícios descrito no guia 31; sem alteração de banco remoto.
 
 ## Interface e separação DEMO/API
 
@@ -125,3 +125,5 @@ Hibernate continua responsável pelo schema, sem Flyway. A implementação adici
 Etapa 4 somente estará concluída depois da implementação e validação do fluxo: emitir convite → destinatário entra e consulta → aceita → novo vínculo aparece → permissões do papel são respeitadas → remoção/revogação impede novo acesso. Incluir recusa, cancelamento, vencimento exato, reenvio com novo UUID, conta/tipo incorretos, duplicidade, CSRF, novo login e concorrência. Incluir regressões do único fundador, publicação e seleção de projetos.
 
 Não antecipar descoberta/matching nem migração JWT/Vercel ao implementar integrantes. A sequência principal permanece no [guia 27](27-startup-next-sessions.md); decisão de matching no [guia 29](29-matching-rule-decisions.md).
+
+Consulta legada de perfil/listagem também foi restringida nesta implementação: GET por ID exige vínculo atual STARTUP e GET geral retorna somente projetos da própria conta. Isso impede contornar a privacidade anterior ao aceite pela API antiga; descoberta permanece futura.

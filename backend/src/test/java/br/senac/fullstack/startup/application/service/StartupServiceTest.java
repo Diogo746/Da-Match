@@ -1,6 +1,5 @@
 package br.senac.fullstack.startup.application.service;
 
-import br.senac.fullstack.startup.api.dto.AdicionarMembroStartupRequest;
 import br.senac.fullstack.startup.api.dto.CriarStartupRequest;
 import br.senac.fullstack.startup.api.dto.MembroStartupResponse;
 import br.senac.fullstack.startup.api.dto.StartupResponse;
@@ -17,7 +16,6 @@ import br.senac.fullstack.startup.domain.enums.StatusPerfilStartup;
 import br.senac.fullstack.usuario.api.dto.CadastrarUsuarioRequest;
 import br.senac.fullstack.usuario.application.service.UsuarioService;
 import br.senac.fullstack.usuario.domain.entity.Usuario;
-import br.senac.fullstack.usuario.infrastructure.persistence.repository.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -38,9 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,8 +48,6 @@ class StartupServiceTest {
     @Mock
     private MembroStartupRepository membroRepository;
 
-    @Mock
-    private UsuarioRepository usuarioRepository;
 
     @Mock
     private UsuarioService usuarioService;
@@ -117,7 +111,9 @@ class StartupServiceTest {
         Startup segunda = startup(UUID.randomUUID());
         StartupResponse primeiraResponse = startupResponse(primeira.getId());
         StartupResponse segundaResponse = startupResponse(segunda.getId());
-        when(startupRepository.findAll()).thenReturn(List.of(primeira, segunda));
+        UUID ator = UUID.randomUUID();
+        when(resourceAccess.currentStartupUserId()).thenReturn(ator);
+        when(startupRepository.findByMembroUsuarioId(ator)).thenReturn(List.of(primeira, segunda));
         when(startupMapper.toResponse(primeira)).thenReturn(primeiraResponse);
         when(startupMapper.toResponse(segunda)).thenReturn(segundaResponse);
 
@@ -143,88 +139,6 @@ class StartupServiceTest {
         when(startupRepository.findById(startupId)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> startupService.buscarStartupPorId(startupId));
-    }
-
-    @Test
-    void deveAdicionarMembroExistente() {
-        UUID startupId = UUID.randomUUID();
-        UUID usuarioId = UUID.randomUUID();
-        Startup startup = startup(startupId);
-        Usuario usuario = usuario(usuarioId, "Novo Membro");
-        MembroStartupResponse response = membroResponse(usuarioId, PapelMembroStartup.REPRESENTANTE);
-        when(startupRepository.findById(startupId)).thenReturn(Optional.of(startup));
-        when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(usuario));
-        when(membroRepository.save(any(MembroStartup.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-        when(startupMapper.toResponse(any(MembroStartup.class))).thenReturn(response);
-
-        MembroStartupResponse membroAdicionado = startupService.adicionarMembro(
-                startupId,
-                new AdicionarMembroStartupRequest(usuarioId, PapelMembroStartup.REPRESENTANTE)
-        );
-
-        assertSame(response, membroAdicionado);
-        assertEquals(1, startup.getMembros().size());
-        assertEquals(usuario, startup.getMembros().getFirst().getUsuario());
-        assertEquals(PapelMembroStartup.REPRESENTANTE, startup.getMembros().getFirst().getPapelMembro());
-    }
-
-    @Test
-    void deveRejeitarDadosInvalidosAoAdicionarMembro() {
-        UUID startupId = UUID.randomUUID();
-        UUID usuarioId = UUID.randomUUID();
-        AdicionarMembroStartupRequest membroSemUsuario =
-                new AdicionarMembroStartupRequest(null, PapelMembroStartup.MEMBRO);
-        AdicionarMembroStartupRequest membroSemPapel =
-                new AdicionarMembroStartupRequest(usuarioId, null);
-
-        assertThrows(IllegalArgumentException.class, () -> startupService.adicionarMembro(startupId, null));
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> startupService.adicionarMembro(startupId, membroSemUsuario)
-        );
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> startupService.adicionarMembro(startupId, membroSemPapel)
-        );
-        verifyNoInteractions(startupRepository, usuarioRepository, membroRepository);
-    }
-
-    @Test
-    void deveRejeitarMembroDuplicadoEUsuarioOuStartupInexistentes() {
-        UUID startupId = UUID.randomUUID();
-        UUID usuarioId = UUID.randomUUID();
-        Startup startup = startup(startupId);
-        startup.getMembros().add(membro(startup, usuarioId, PapelMembroStartup.MEMBRO));
-        when(startupRepository.findById(startupId)).thenReturn(Optional.of(startup));
-        when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(usuario(usuarioId, "Membro")));
-        AdicionarMembroStartupRequest membroDuplicado =
-                new AdicionarMembroStartupRequest(usuarioId, PapelMembroStartup.MEMBRO);
-
-        assertThrows(
-                IllegalStateException.class,
-                () -> startupService.adicionarMembro(startupId, membroDuplicado)
-        );
-        verify(membroRepository, never()).save(any());
-
-        UUID startupInexistenteId = UUID.randomUUID();
-        UUID usuarioDaStartupInexistenteId = UUID.randomUUID();
-        AdicionarMembroStartupRequest membroDaStartupInexistente =
-                new AdicionarMembroStartupRequest(usuarioDaStartupInexistenteId, PapelMembroStartup.MEMBRO);
-        when(startupRepository.findById(startupInexistenteId)).thenReturn(Optional.empty());
-        assertThrows(
-                NoSuchElementException.class,
-                () -> startupService.adicionarMembro(startupInexistenteId, membroDaStartupInexistente)
-        );
-
-        UUID usuarioInexistenteId = UUID.randomUUID();
-        AdicionarMembroStartupRequest membroInexistente =
-                new AdicionarMembroStartupRequest(usuarioInexistenteId, PapelMembroStartup.MEMBRO);
-        when(usuarioRepository.findById(usuarioInexistenteId)).thenReturn(Optional.empty());
-        assertThrows(
-                NoSuchElementException.class,
-                () -> startupService.adicionarMembro(startupId, membroInexistente)
-        );
     }
 
     @Test

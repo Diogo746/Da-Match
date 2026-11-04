@@ -89,6 +89,16 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.PATCH, "/api/v1/mentores/*", "/api/v1/mentores/*/status")
                             .hasRole(TipoUsuario.MENTOR.name())
                             .requestMatchers(HttpMethod.GET, "/api/v1/startups/me").hasRole(TipoUsuario.STARTUP.name())
+                            .requestMatchers(HttpMethod.GET, "/api/v1/startups/*/convites",
+                                    "/api/v1/startups/convites/me", "/api/v1/startups/convites/*",
+                                    "/api/v1/startups/*/convites/solicitacoes/*", "/api/v1/startups/*/membros")
+                            .hasRole(TipoUsuario.STARTUP.name())
+                            .requestMatchers(HttpMethod.POST, "/api/v1/startups/*/convites")
+                            .hasRole(TipoUsuario.STARTUP.name())
+                            .requestMatchers(HttpMethod.PATCH, "/api/v1/startups/convites/*/aceite",
+                                    "/api/v1/startups/convites/*/recusa",
+                                    "/api/v1/startups/*/convites/*/cancelamento")
+                            .hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.GET, "/api/v1/startups/*/status")
                             .hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.PATCH, "/api/v1/startups/*/status")
@@ -98,8 +108,8 @@ public class SecurityConfig {
                             .hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.DELETE, "/api/v1/startups/*/membros/*")
                             .hasRole(TipoUsuario.STARTUP.name())
-                            .requestMatchers(HttpMethod.GET, "/api/v1/startups", "/api/v1/startups/*",
-                                    "/api/v1/startups/*/membros").authenticated()
+                            .requestMatchers(HttpMethod.GET, "/api/v1/startups", "/api/v1/startups/*")
+                            .hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**")
                             .hasRole(TipoUsuario.ADMIN.name());
                     if (!production) {

@@ -3,6 +3,7 @@ package br.senac.fullstack.shared.api.error;
 import br.senac.fullstack.mentor.application.exception.MentorNaoEncontradoException;
 import br.senac.fullstack.shared.security.SecurityErrors;
 import br.senac.fullstack.startup.application.exception.StartupIncompletaException;
+import br.senac.fullstack.startup.application.exception.ConviteStartupException;
 import br.senac.fullstack.usuario.application.exception.EmailExistenteException;
 import br.senac.fullstack.usuario.application.exception.UsuarioNaoEncontradoException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -70,6 +71,24 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 "A startup possui pendências para publicação.");
         problem.setProperty("codigo", "STARTUP_INCOMPLETA");
         problem.setProperty("pendencias", exception.getPendencias());
+        return problem;
+    }
+
+    @ExceptionHandler(ConviteStartupException.class)
+    public ProblemDetail convite(ConviteStartupException exception) {
+        HttpStatus status = switch (exception.getCodigo()) {
+            case CONVITE_EXPIRADO, CONVITE_OBRIGATORIO -> HttpStatus.GONE;
+            case DESTINATARIO_INDISPONIVEL -> HttpStatus.NOT_FOUND;
+            default -> HttpStatus.CONFLICT;
+        };
+        String detail = switch (exception.getCodigo()) {
+            case CONVITE_EXPIRADO -> "O convite venceu. Solicite um novo convite.";
+            case CONVITE_OBRIGATORIO -> "A inclusão de integrantes exige convite e aceite.";
+            case DESTINATARIO_INDISPONIVEL -> "Não foi possível convidar essa conta.";
+            default -> "Não foi possível concluir esta ação de convite. Recarregue os dados.";
+        };
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
+        problem.setProperty("codigo", exception.getCodigo().name());
         return problem;
     }
 

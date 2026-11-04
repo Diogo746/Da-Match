@@ -302,15 +302,25 @@ class SecurityIntegrationTest {
                 account(TipoUsuario.ADMIN))) {
             MockHttpSession session = login(denied);
             mvc.perform(post(path).session(session).with(csrf()).contentType(MediaType.APPLICATION_JSON)
-                            .content(memberJson(target))).andExpect(status().isForbidden());
+                            .content(memberJson(target))).andExpect(denied.getTipoUsuario() == TipoUsuario.STARTUP
+                            ? status().isGone() : status().isForbidden());
             mvc.perform(delete(path + "/" + member.getId()).session(session).with(csrf()))
                     .andExpect(status().isForbidden());
         }
         MockHttpSession managerSession = login(representative);
         mvc.perform(post(path).session(managerSession).with(csrf()).contentType(MediaType.APPLICATION_JSON)
-                        .content(memberJson(target))).andExpect(status().isCreated());
+                        .content(memberJson(target))).andExpect(status().isGone());
+        var invitation = mvc.perform(post("/api/v1/startups/" + startup.getId() + "/convites")
+                        .session(managerSession).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"solicitacaoId\":\"" + UUID.randomUUID() + "\",\"email\":\""
+                                + target.getEmail() + "\",\"papelMembro\":\"MEMBRO\"}"))
+                .andExpect(status().isCreated()).andReturn();
+        String invitationId = mapper.readTree(invitation.getResponse().getContentAsString()).get("id").asText();
+        mvc.perform(patch("/api/v1/startups/convites/" + invitationId + "/aceite")
+                        .session(login(target)).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isOk());
         mvc.perform(post(path).session(managerSession).with(csrf()).contentType(MediaType.APPLICATION_JSON)
-                        .content(memberJson(target))).andExpect(status().isConflict());
+                        .content(memberJson(target))).andExpect(status().isGone());
         mvc.perform(delete(path + "/" + founder.getId()).session(managerSession).with(csrf()))
                 .andExpect(status().isConflict());
         mvc.perform(delete(path + "/" + target.getId()).session(managerSession).with(csrf()))
