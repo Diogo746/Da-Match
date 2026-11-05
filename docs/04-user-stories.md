@@ -225,7 +225,7 @@
 
 ## 🎯 Épico 3: Descoberta de perfis (DESCOBERTA)
 
-> Primeira versão definida pelo usuário em 05/11/2026 no [guia 33](33-discovery-contract.md), contrato integrado pelo PR #32. Backend implementado/validado localmente em `codex/discovery-api`, aguardando revisão/integração; interface pendente, evidências no [guia 34](34-discovery-api-validation.md). Acesso STARTUP/MENTOR autenticado na direção RN12; somente publicados com cadastro/quiz v3 completos, mentor aceitando novas startups. Startup expõe nome/resumo e campos gerais; equipe, contato, agenda e textos privados completos ficam fora. Investidores futuros; catálogo não executa matching do guia 29.
+> Primeira versão definida pelo usuário em 05/11/2026 no [guia 33](33-discovery-contract.md), contrato integrado pelo PR #32. Backend integrado pelo PR #33/main `5b2207e`, CI #113 aprovada; interface real validada localmente em `codex/discovery-ui`, aguardando revisão/integração. Evidências nos guias [34](34-discovery-api-validation.md) e [35](35-discovery-ui-validation.md). Acesso STARTUP/MENTOR autenticado na direção RN12; somente publicados com cadastro/quiz v3 completos, mentor aceitando novas startups. Startup expõe nome/resumo e campos gerais; equipe, contato, agenda e textos privados completos ficam fora. Investidores futuros; catálogo não executa matching do guia 29.
 
 ### 🔹 `US-12`: Pesquisar startups
 * **Como** mentor ou investidor,

@@ -55,3 +55,4 @@ Project Charter (Visão & Dores)
 - [Equipe e convites — interface, recuperação e validação local](32-startup-team-ui-validation.md).
 - [Descoberta real — acesso, elegibilidade, privacidade e contrato proposto](33-discovery-contract.md).
 - [Descoberta real — backend, PostgreSQL e evidências de validação](34-discovery-api-validation.md).
+- [Descoberta real — tela principal API, isolamento DEMO e validação no navegador](35-discovery-ui-validation.md).
