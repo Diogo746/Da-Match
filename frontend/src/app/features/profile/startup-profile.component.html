@@ -61,6 +61,7 @@
         </section>
         @if (!editing() && !busy() && !loading() && !uncertain()) {
           <a class="button button-secondary" [routerLink]="['/startup/perfil', startup.id, 'questionario']">Abrir questionário deste projeto</a>
+          <a class="button button-secondary" [routerLink]="['/startup/perfil', startup.id, 'equipe']">Equipe e convites</a>
         }
         @if (editing()) {
           <form [formGroup]="form" (ngSubmit)="save()" novalidate>
