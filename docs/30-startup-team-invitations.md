@@ -1,6 +1,6 @@
 # Integrantes da startup e convites com aceite — etapa 4
 
-Contrato preparado em 04/11/2026, após as respostas do usuário na retomada da main `de71fa5`. Contrato integrado pelo PR #29 na main `33e8671`, CI pós-merge #102 aprovada. **Backend implementado na branch `codex/startup-team-api`, ainda aguardando revisão/integração; interface pendente.** Evidências no [guia 31](31-startup-team-api-validation.md). A etapa 4 funcional completa continua pendente. Autenticação atual por sessão e CSRF; a futura decisão JWT com CSRF não será implementada nesta entrega.
+Contrato preparado em 04/11/2026, após as respostas do usuário na retomada da main `de71fa5`. Contrato integrado pelo PR #29 na main `33e8671`, CI pós-merge #102 aprovada. **Backend integrado pelo PR #30 em `fc600c7`, CI #105 aprovada. Interface implementada/validada localmente em `codex/startup-team-ui`, aguardando revisão/integração.** Evidências nos guias [31](31-startup-team-api-validation.md) e [32](32-startup-team-ui-validation.md). Autenticação atual por sessão e CSRF; a futura decisão JWT com CSRF não será implementada nesta entrega.
 
 ## Decisões do usuário
 
@@ -50,7 +50,7 @@ Não convidar a própria conta nem quem já integra o projeto (`409`). Impedir d
 
 No aceite, revalidar o tipo STARTUP do destinatário, ausência de vínculo, prazo e estado. Revalidar também que quem emitiu o convite ainda possui vínculo FUNDADOR/REPRESENTANTE. Convite emitido por gestor que perdeu permissão não concede acesso: retornar `409 CONVITE_INDISPONIVEL`; um gestor atual poderá cancelá-lo e emitir outro. Não confiar em permissões existentes apenas na emissão.
 
-## API implementada na branch do backend — ainda não integrada à main
+## API integrada à main pelo PR #30
 
 Todos os endpoints exigem sessão STARTUP. POST/PATCH/DELETE exigem o CSRF atual, obtido em `/csrf`. Sem parâmetros de identidade do ator.
 
