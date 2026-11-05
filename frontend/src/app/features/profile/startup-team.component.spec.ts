@@ -66,7 +66,7 @@ it.each(["REPRESENTANTE", "MEMBRO"] as const)("enforces team permissions for %s"
   startups.mine.mockReturnValue(of([{ ...project, membros: [{ ...founder, papelMembro: role }] }]));
   const { component, element } = await create();
   expect(component.canManage()).toBe(role === "REPRESENTANTE");
-  expect(teams.list.mock.calls.length).toBe(role === "REPRESENTANTE" ? 1 : 0);
+  expect(teams.list.mock.calls).toHaveLength(role === "REPRESENTANTE" ? 1 : 0);
   if (role === "MEMBRO") {
     expect(element.querySelector("form")).toBeNull(); fill(component); await component.send();
     component.requestRemoval(founder); component.requestAction(invite, "cancel"); await component.confirm();

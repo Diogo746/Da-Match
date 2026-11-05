@@ -149,12 +149,7 @@ export class StartupTeamComponent implements OnInit {
     let result: StartupInvitation | undefined;
     let queried = false;
     try {
-      if (operation.kind === "create") {
-        result = await firstValueFrom(this.teams.recover(operation.project, operation.request.solicitacaoId));
-        if (result.papelMembro !== operation.request.papelMembro) throw new Error("Papel divergente.");
-      } else if (operation.kind !== "remove") {
-        result = await firstValueFrom(this.teams.invitation(operation.invitation.id, operation.invitation.startupId));
-      }
+      result = await this.lookupOperation(operation);
       queried = true;
       if (!this.current(context)) return;
       if (!await this.refresh(context, 0)) return;
@@ -175,6 +170,16 @@ export class StartupTeamComponent implements OnInit {
     const operation = this.pending();
     if (!this.retryAllowed() || operation?.kind !== "create" || this.busy() || this.loading() || !this.canManage()) return;
     await this.execute(operation);
+  }
+
+  private async lookupOperation(operation: TeamOperation): Promise<StartupInvitation | undefined> {
+    if (operation.kind === "remove") return undefined;
+    if (operation.kind === "create") {
+      const result = await firstValueFrom(this.teams.recover(operation.project, operation.request.solicitacaoId));
+      if (result.papelMembro !== operation.request.papelMembro) throw new Error("Papel divergente.");
+      return result;
+    }
+    return firstValueFrom(this.teams.invitation(operation.invitation.id, operation.invitation.startupId));
   }
 
   private async execute(operation: TeamOperation): Promise<void> {
