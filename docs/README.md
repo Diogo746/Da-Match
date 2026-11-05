@@ -54,3 +54,4 @@ Project Charter (Visão & Dores)
 - [Integrantes — backend, PostgreSQL local e evidências de validação](31-startup-team-api-validation.md).
 - [Equipe e convites — interface, recuperação e validação local](32-startup-team-ui-validation.md).
 - [Descoberta real — acesso, elegibilidade, privacidade e contrato proposto](33-discovery-contract.md).
+- [Descoberta real — backend, PostgreSQL e evidências de validação](34-discovery-api-validation.md).

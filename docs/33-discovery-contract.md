@@ -1,6 +1,6 @@
 # Descoberta real — contrato da primeira versão
 
-Decisões confirmadas pelo usuário em 05/11/2026, após revisão da main `dc66ec7` (PR #31 integrado). [Workflow #108 pós-merge](https://github.com/Diogo746/Da-Match/actions/runs/42064283961) concluído com sucesso, incluindo testes, ambos os Quality Gates, ZAP e job de deploy; não substitui homologação funcional publicada. Este documento define a etapa 5 do [roteiro](27-startup-next-sessions.md). **Contrato preparado; endpoints e interface real ainda não implementados.** Revisar/integrar esta definição antes da implementação em uma nova branch.
+Decisões confirmadas pelo usuário em 05/11/2026. Contrato integrado pelo [PR #32](https://github.com/Diogo746/Da-Match/pull/32) na main `c34edc6`, CI pós-merge #110 aprovada. Este documento define a etapa 5 do [roteiro](27-startup-next-sessions.md). **Backend implementado/validado localmente em `codex/discovery-api`, aguardando CI/revisão/integração; interface real pendente.** Evidências e limite de volume no [guia 34](34-discovery-api-validation.md); CI não substitui homologação funcional publicada.
 
 ## Decisões e escopo
 
@@ -42,7 +42,7 @@ Não exigir assunto, setor, público, frequência ou horário em comum entre lei
 
 Pausar, retirar publicação, invalidar requisitos ou mudar `accepting` deve afetar a próxima leitura. O detalhe de um item que deixou de ser elegível retorna o mesmo 404 de um item inexistente, sem estado privado/pendências. Não prometer remoção instantânea de texto já renderizado sem nova consulta ou uma infraestrutura de notificações.
 
-## API proposta — não disponível nesta entrega documental
+## API implementada na branch `codex/discovery-api` — ainda não integrada à main
 
 Todas as rotas são GET com sessão. Escritas de outros fluxos continuam exigindo CSRF por JSON de `/csrf`; a descoberta não altera o mecanismo atual, cookies HttpOnly ou CORS. Não migrar para JWT nesta etapa.
 
@@ -164,7 +164,7 @@ O contrato não exige nova tabela/coluna nem mudanças remotas de banco. Se a im
 | Concorrência/estado | Item pausado/inelegível depois da listagem deixa de ser retornado no detalhe; leitura não altera perfil; respostas antigas não atravessam conta/página/filtro/detalhe. |
 | Fluxo real | Publicar perfil completo → outro papel pesquisa → abre detalhe seguro → autor pausa/fecha recebimento → consulta deixa de disponibilizar; novo login/recarga e falhas. Navegador → proxy → Spring → PostgreSQL → interface. |
 
-1. **Esta entrega:** contrato, decisões e continuidade; conferir exemplos JSON, links, consistência de códigos e diff. Sem apresentar rotas propostas como disponíveis no Postman.
-2. **Após integração do contrato:** backend de descoberta, testes de autorização/validade/paginação, consultas PostgreSQL, Postman e matriz de segurança; Maven/Checkstyle/arquitetura e gate do SHA enviado.
+1. **Contrato integrado:** PR #32/main `c34edc6`, com decisões, exemplos e continuidade. Definição preservada neste guia.
+2. **Backend local:** implementação, testes e PostgreSQL descritos no guia 34; Postman/matriz de segurança atualizados. Conferir CI/gate do head antes de revisar/integrar, sem tratar a branch como produção.
 3. **Após integração do backend:** interface API, testes de sessão/URL/respostas antigas, lint/cobertura/builds DEMO/API e homologação funcional local. Conferir gate e CI do head, depois revisão/integração.
 4. Validar publicado/acessibilidade/rate limit na etapa operacional. Só então considerar descoberta entregue e avançar para a implementação do matching do guia 29, sem repetir suas decisões.
