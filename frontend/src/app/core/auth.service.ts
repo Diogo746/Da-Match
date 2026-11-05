@@ -41,7 +41,7 @@ export class AuthService {
 
   me(): Observable<CurrentUser> {
     return this.api(() => this.http.get<unknown>("/api/v1/auth/me").pipe(
-      map(readUser), tap((user) => this.state.setUser(user)),
+      map(readUser), tap((user) => this.state.confirmUser(user)),
     ));
   }
 

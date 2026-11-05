@@ -19,6 +19,7 @@ import { AuthStateStore } from "../../core/auth-state.store";
       }
       @if (user.tipoUsuario === 'STARTUP') {
         <a class="button button-primary" routerLink="/startup/perfil">Abrir minha startup</a>
+        <a class="button button-secondary" routerLink="/startup/convites">Convites recebidos</a>
       }
     }
     @if (state.notice()) { <p role="alert">{{ state.notice() }}</p> }

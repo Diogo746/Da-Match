@@ -51,4 +51,5 @@ Project Charter (Visão & Dores)
 - [Regra de mentoria damatch-mentoria-v1 — 13 decisões, fórmula e casos de referência](29-matching-rule-decisions.md).
 
 - [Integrantes — contrato de convites com aceite e validade de 7 dias](30-startup-team-invitations.md).
-- [Integrantes — backend, PostgreSQL local e evidências de validação; interface pendente](31-startup-team-api-validation.md).
+- [Integrantes — backend, PostgreSQL local e evidências de validação](31-startup-team-api-validation.md).
+- [Equipe e convites — interface, recuperação e validação local](32-startup-team-ui-validation.md).

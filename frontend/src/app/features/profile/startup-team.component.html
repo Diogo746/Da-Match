@@ -1,0 +1,119 @@
+<section class="team-page" aria-labelledby="team-title">
+  <p class="eyebrow">{{ inbox ? 'SUA CONTA' : 'SEU PROJETO' }}</p>
+  <h1 id="team-title">{{ inbox ? 'Convites recebidos' : 'Equipe da startup' }}</h1>
+  <p class="intro">{{ inbox ? 'Confira quem convidou você e escolha se quer participar do projeto.' : 'Consulte integrantes e convide pessoas para construir o projeto com você.' }}</p>
+  <nav aria-label="Navegação da equipe" class="links">
+    <a routerLink="/conta">Minha conta</a>
+    <a routerLink="/startup/perfil" [queryParams]="inbox ? {} : { projeto: projectId() }">{{ inbox ? 'Minhas startups' : 'Voltar ao projeto' }}</a>
+    @if (!inbox) { <a routerLink="/startup/convites">Convites recebidos</a> }
+  </nav>
+  @if (active()) {
+    @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+    @if (message()) { <output class="notice success">{{ message() }}</output> }
+    @if (loading() || busy()) { <output class="notice">{{ busy() ? 'Aguardando confirmação…' : 'Carregando dados…' }}</output> }
+    <div class="actions">
+      <button type="button" class="button button-secondary" [disabled]="loading() || busy()" (click)="load()">Recarregar dados</button>
+    </div>
+    @if (pending()) {
+      <section class="notice recovery" aria-labelledby="recovery-title">
+        <h2 id="recovery-title">Resultado a confirmar</h2>
+        <p>Novas alterações estão bloqueadas até a consulta desta operação. Recarregar a lista não confirma o resultado.</p>
+        <button type="button" class="button button-primary" [disabled]="loading() || busy()" (click)="recover()">Consultar resultado da operação</button>
+        @if (retryAllowed()) {
+          <button type="button" class="button button-secondary" [disabled]="loading() || busy() || !canManage()" (click)="retryCreate()">Reenviar o mesmo convite</button>
+        }
+      </section>
+    }
+    @if (confirmation(); as operation) {
+      <section class="notice confirmation" aria-labelledby="confirmation-title">
+        <h2 id="confirmation-title">Confirmar ação</h2>
+        <output>{{ confirmationText(operation) }}</output>
+        <div class="actions">
+          <button type="button" class="button button-primary" [disabled]="blocked()" (click)="confirm()">Confirmar</button>
+          <button type="button" class="button button-secondary" [disabled]="busy()" (click)="cancelConfirmation()">Voltar sem alterar</button>
+        </div>
+      </section>
+    }
+    @if (!inbox && profile(); as project) {
+      <section class="team-card" aria-labelledby="members-title">
+        <p class="eyebrow">{{ project.nomeProvisorio }}</p>
+        <h2 id="members-title">Integrantes</h2>
+        <ul class="card-list" aria-label="Integrantes atuais">
+          @for (member of project.membros; track member.id) {
+            <li>
+              <div><strong>{{ member.nomeUsuario }}</strong><p>{{ roleLabels[member.papelMembro] }}{{ member.usuarioId === auth.user()?.id ? ' · Você' : '' }}</p></div>
+              @if (canManage()) {
+                <button type="button" class="button button-secondary" [disabled]="blocked() || protectedFounder(member) || !!confirmation()"
+                  [attr.aria-label]="'Remover ' + member.nomeUsuario" (click)="requestRemoval(member)">Remover</button>
+                @if (protectedFounder(member)) { <span class="help">O projeto precisa manter um fundador.</span> }
+              }
+            </li>
+          }
+        </ul>
+        @if (!canManage()) { <p class="help">Você pode consultar a equipe. Apenas fundadores e representantes gerenciam integrantes e convites.</p> }
+      </section>
+      @if (canManage()) {
+        <section class="team-card" aria-labelledby="invite-title">
+          <h2 id="invite-title">Convidar integrante</h2>
+          <p class="help" id="invite-help">A pessoa precisa ter uma conta de startup cadastrada. O convite fica disponível no sistema por 7 dias; o vínculo só é criado depois do aceite.</p>
+          <form [formGroup]="form" (ngSubmit)="send()" novalidate>
+            <fieldset [disabled]="blocked() || !!confirmation()">
+              <legend class="sr-only">Novo convite para {{ project.nomeProvisorio }}</legend>
+              <label for="invite-email">E-mail exato da conta <span>Obrigatório</span></label>
+              <input id="invite-email" type="email" autocomplete="off" class="form-input" formControlName="email" maxlength="254" required
+                [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid"
+                [attr.aria-describedby]="form.controls.email.touched && form.controls.email.invalid ? 'invite-help invite-email-error' : 'invite-help'" />
+              @if (form.controls.email.touched && form.controls.email.invalid) { <p id="invite-email-error" class="error">Informe um e-mail válido de até 254 caracteres.</p> }
+              <label for="invite-role">Papel no projeto <span>Obrigatório</span></label>
+              <select id="invite-role" class="form-input" formControlName="papelMembro" aria-describedby="invite-role-help">
+                <option value="MEMBRO">Membro</option><option value="REPRESENTANTE">Representante</option>
+              </select>
+              <p class="help" id="invite-role-help">Membro consulta. Representante também edita, publica e gerencia a equipe.</p>
+              <button type="submit" class="button button-primary">Enviar convite</button>
+            </fieldset>
+          </form>
+        </section>
+      }
+    }
+    @if (page(); as invitations) {
+      <section class="team-card" aria-labelledby="invitations-title">
+        <h2 id="invitations-title">{{ inbox ? 'Seus convites' : 'Convites enviados' }}</h2>
+        <p class="help">Datas e horários em America/Sao_Paulo. O servidor confere o prazo no momento da ação.</p>
+        <ul class="card-list invitations" aria-label="Convites">
+          @for (invitation of invitations.itens; track invitation.id) {
+            <li>
+              <h3>{{ inbox ? invitation.nomeStartup : invitation.nomeDestinatario }}</h3>
+              <p>Convidado(a): {{ invitation.nomeDestinatario }} · {{ roleLabels[invitation.papelMembro] }}</p>
+              <p>Enviado por {{ invitation.nomeConvidante }}</p>
+              <p><strong>{{ statusLabels[invitation.status] }}</strong> · Criado em {{ date(invitation.criadoEm) }}</p>
+              <p>Vencimento: <time [attr.datetime]="invitation.expiraEm">{{ date(invitation.expiraEm) }}</time></p>
+              @if (invitation.status === 'PENDENTE') {
+                <div class="actions">
+                  @if (inbox) {
+                    <button type="button" class="button button-primary" [disabled]="blocked() || !!confirmation()" (click)="requestAction(invitation, 'accept')">Aceitar convite</button>
+                    <button type="button" class="button button-secondary" [disabled]="blocked() || !!confirmation()" (click)="requestAction(invitation, 'refuse')">Recusar convite</button>
+                  } @else {
+                    <button type="button" class="button button-secondary" [disabled]="blocked() || !!confirmation()" (click)="requestAction(invitation, 'cancel')">Cancelar convite</button>
+                  }
+                </div>
+              }
+              @if (inbox && invitation.status === 'ACEITO' && canOpen(invitation.startupId) && !blocked()) {
+                <a routerLink="/startup/perfil" [queryParams]="{ projeto: invitation.startupId }">Abrir projeto</a>
+              }
+            </li>
+          } @empty { <li>Nenhum convite nesta página.</li> }
+        </ul>
+        @if (invitations.totalPaginas > 1 || invitations.pagina > 0) {
+          <nav class="pagination" aria-label="Páginas de convites">
+            <button type="button" class="button button-secondary" [disabled]="blocked() || invitations.pagina === 0" (click)="changePage(invitations.pagina - 1)">Anterior</button>
+            <p>Página {{ invitations.pagina + 1 }} de {{ invitations.totalPaginas }} · {{ invitations.totalItens }} convites</p>
+            <button type="button" class="button button-secondary" [disabled]="blocked() || invitations.pagina + 1 >= invitations.totalPaginas" (click)="changePage(invitations.pagina + 1)">Próxima</button>
+          </nav>
+        }
+      </section>
+    }
+  } @else {
+    <p class="notice">Entre em uma conta de startup para consultar a equipe e seus convites.</p>
+    <a class="button button-primary" routerLink="/entrar">Entrar novamente</a>
+  }
+</section>

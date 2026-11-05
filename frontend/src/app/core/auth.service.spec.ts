@@ -211,3 +211,10 @@ it("redirects an expired startup session to login", async () => {
   http.expectOne(base + "/api/v1/auth/me").flush({}, { status: 401, statusText: "Unauthorized" });
   expect(TestBed.inject(Router).serializeUrl(await result as never)).toBe("/entrar");
 });
+
+it("confirms an unchanged account without resetting operation context on each guard navigation", async () => {
+  const state = TestBed.inject(AuthStateStore); state.setUser(account); const revision = state.revision();
+  const result = firstValueFrom(TestBed.inject(AuthService).me());
+  http.expectOne(base + "/api/v1/auth/me").flush(account); await result;
+  expect(state.revision()).toBe(revision);
+});

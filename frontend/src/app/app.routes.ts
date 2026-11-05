@@ -23,6 +23,8 @@ export const routes: Routes = [
   { path: "mentor/perfil", loadComponent: () => import("./features/profile/mentor-profile.component").then(module => module.MentorProfileComponent), canActivate: [mentorGuard], title: "Perfil de mentor | DaMatch" },
   { path: "mentor/questionario", loadComponent: () => import("./features/profile/questionnaire.component").then(module => module.QuestionnaireComponent), canActivate: [mentorGuard], data: { kind: "MENTOR" }, title: "Questionário | DaMatch" },
   { path: "startup/perfil/:startupId/questionario", loadComponent: () => import("./features/profile/questionnaire.component").then(module => module.QuestionnaireComponent), canActivate: [startupGuard], data: { kind: "STARTUP" }, title: "Questionário | DaMatch" },
+  { path: "startup/perfil/:startupId/equipe", loadComponent: () => import("./features/profile/startup-team.component").then(module => module.StartupTeamComponent), canActivate: [startupGuard], title: "Equipe | DaMatch" },
+  { path: "startup/convites", loadComponent: () => import("./features/profile/startup-team.component").then(module => module.StartupTeamComponent), canActivate: [startupGuard], data: { inbox: true }, title: "Convites recebidos | DaMatch" },
   { path: "startup/perfil", loadComponent: () => import("./features/profile/startup-profile.component").then(module => module.StartupProfileComponent), canActivate: [startupGuard], title: "Minha startup | DaMatch" },
   {
     path: "como-funciona",
