@@ -20,6 +20,8 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 
 ## Como executar o roteiro
 
+Retomada da interface em 05/11: PR #33 integrado na main `5b2207e`; [CI #113](https://github.com/Diogo746/Da-Match/actions/runs/42079760834) success. Branch `codex/discovery-ui` conecta a tela principal no modo API aos perfis do banco, sem fallback fictício, preservando DEMO. Validação e limites no [guia 35](35-discovery-ui-validation.md): 606 testes + oito de configuração, lint/builds, navegador desktop/360 px e PostgreSQL local, sem alteração de schema/backend ou banco remoto. Conferir CI/gate e revisar/integrar a interface; depois etapa 6 conforme guia 29.
+
 Retomada da API de descoberta em 05/11: contrato PR #32 integrado na main `c34edc6`; [workflow #110](https://github.com/Diogo746/Da-Match/actions/runs/42067501541) success. Backend implementado/validado localmente em `codex/discovery-api`, conforme [guia 34](34-discovery-api-validation.md): 257 testes/Checkstyle/arquitetura, 49 verificações HTTP/PostgreSQL e ensaio com 500 perfis fictícios. Sem schema novo, frontend alterado ou banco remoto acessado. Conferir CI/gate do head antes da integração; depois conectar a tela principal à API.
 
 Retomada posterior em 05/11: PR #31 integrado à main `dc66ec7`; [workflow #108](https://github.com/Diogo746/Da-Match/actions/runs/42064283961) success, incluindo ambos os gates, ZAP e job de deploy. Etapa 4 integrada; homologação publicada continua operacional. Etapa 5 iniciada pelo contrato no [guia 33](33-discovery-contract.md), após três respostas do usuário: acesso STARTUP/MENTOR autenticado, perfis publicados/completos (mentor aceitando novas startups) e exposição limitada ao nome/resumo e campos gerais, sem textos privados/equipe/contatos/agenda. Branch documental `codex/discovery-contract`; API/interface real ainda pendentes.
@@ -43,7 +45,7 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | 2. Publicação no backend | Integrada pelo PR #25 na main `2a5d321`; CI pós-merge #94 aprovada | Estado persistido, autorização, endpoints e testes; evidências operacionais na etapa 10 |
 | 3. Publicação no frontend | Integrada pelo PR #27 em `a847958`; CI pós-merge #98 aprovada | Publicar/pausar/retomar/voltar a rascunho e consultar pendências pela API |
 | 4. Integrantes | Integrada pelos PRs #29/#30/#31; main `dc66ec7`, CI pós-merge #108 aprovada; evidências locais no guia 32 | Equipe, convite/aceite, recuperação e permissões |
-| 5. Descoberta real | Contrato PR #32 integrado/main `c34edc6`/CI #110 success; backend validado localmente em `codex/discovery-api` (guia 34), aguardando CI/revisão/integração; interface pendente | Catálogo de perfis elegíveis pela API |
+| 5. Descoberta real | Contrato PR #32 e backend PR #33 integrados; main `5b2207e`/CI #113 success. Interface validada localmente em `codex/discovery-ui` (guia 35), aguardando CI/revisão/integração | Catálogo de perfis elegíveis pela API |
 | 6. Matching definitivo | Regra definida pelo usuário em 30/10 no [guia 29](29-matching-rule-decisions.md); implementação pendente | `damatch-mentoria-v1`, após as dependências; atualizar revisão formal do SRS |
 | 7. Salvos persistidos | Pendente; confirmar escopo | Favoritos por conta |
 | 8. Interesses e conexões | Pendente | Interesse e reciprocidade persistidos |
@@ -205,7 +207,7 @@ Conclusão de cada entrega: autorização, persistência, fluxo pela interface e
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** conferir CI/Quality Gate do backend `codex/discovery-api` (guia 34), revisar/integrar; depois main atualizada e nova branch para conectar a tela principal ao catálogo real. Remover dados fictícios do modo API nessa integração, mantendo DEMO explícito. Homologação publicada e backup/compatibilidade do alvo continuam operacionais. Não repetir decisões de integrantes/descoberta/matching nem antecipar JWT/Vercel; sem autorização de mudança remota de banco.
+- **Próxima ação exata:** conferir CI/Quality Gate e revisar/integrar a interface `codex/discovery-ui` (guia 35), que já consulta o banco no modo API sem dados fictícios/fallback. Depois main atualizada e nova branch para o matching da etapa 6 conforme guia 29, preservando DEMO separado. Homologação publicada e backup/compatibilidade do alvo continuam operacionais. Não repetir decisões de integrantes/descoberta/matching nem antecipar JWT/Vercel; sem autorização de mudança remota de banco.
 - **Entrega da publicação:** backend/Postman no PR #25, main `2a5d321`, CI #94 aprovada; interface validada em 31/10 e integrada pelo PR #27 em `a847958`, CI pós-merge #98 aprovada.
 - **Entrega desta definição (30/10) e resolução (31/10):** somente documentação no PR #26, branch `codex/matching-rule-decision`; 13 respostas, fórmula e 14 casos de referência, US-16/18/19 alinhadas. Main `2a5d321` incorporada à branch para conciliar o roteiro e o índice. Nenhuma implementação de matching, alteração de aplicação além da main, mudança remota de banco ou deploy manual nesta entrega.
 - **Entrega de 04/11:** contrato de integrantes no guia 30 e continuidade atualizada, branch `codex/startup-team-contract`, base `de71fa5`. Sem mudanças de aplicação, schema ou banco remoto; verificar checks do PR documental, sem alegar novos testes/gates de aplicação quando dispensados.

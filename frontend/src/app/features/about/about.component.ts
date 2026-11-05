@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { REGISTRATION_MODE } from "../../core/registration.config";
 import { RouterLink } from "@angular/router";
 import { IconComponent } from "../../shared/icon.component";
 @Component({
@@ -41,13 +42,16 @@ import { IconComponent } from "../../shared/icon.component";
     </section>
     <section class="demo-scope">
       <h2>O que você pode experimentar agora</h2>
-      <p>
+      @if (apiMode) {
+        <p>Crie sua conta, complete o cadastro e o questionário e publique seu perfil. Após entrar, startups podem conhecer mentores que aceitam novas startups; mentores podem conhecer startups em ideação. O catálogo mostra somente perfis completos e publicados.</p>
+        <p>Recomendações personalizadas, perfis salvos, interesses, conexões e reuniões estarão disponíveis nas próximas etapas.</p>
+      } @else { <p>
         Explore perfis fictícios, monte seu perfil em seis etapas com o Lumen e
         receba indicações ordenadas a partir das suas respostas. As combinações
         muito fortes ganham o selo Super DaMatch.
         Cadastros, perfis e salvos são temporários. Contas reais, login,
         conexões e reuniões dependem da integração com o backend.
-      </p>
+      </p> }
       <a class="text-button" routerLink="/"
         >Explorar os perfis<app-icon name="arrow"
       /></a>
@@ -151,6 +155,7 @@ import { IconComponent } from "../../shared/icon.component";
   `,
 })
 export class AboutComponent {
+  readonly apiMode = inject(REGISTRATION_MODE) === "API";
   readonly steps = [
     {
       number: "01",

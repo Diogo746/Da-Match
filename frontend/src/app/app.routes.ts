@@ -1,13 +1,13 @@
 import { Routes } from "@angular/router";
-import { ExploreComponent } from "./features/explore/explore.component";
+import { loadExploreComponent } from "./features/explore/explore.entry";
 import { AboutComponent } from "./features/about/about.component";
 import { ProfileComponent } from "./features/profile/profile.component";
 import { authGuard, demoProfileGuard, mentorGuard, startupGuard } from "./core/auth.guard";
 export const routes: Routes = [
-  { path: "", component: ExploreComponent, title: "Descobrir | DaMatch" },
+  { path: "", loadComponent: loadExploreComponent, title: "Descobrir | DaMatch" },
   {
     path: "salvos",
-    component: ExploreComponent,
+    loadComponent: loadExploreComponent,
     data: { savedOnly: true },
     title: "Perfis salvos | DaMatch",
   },

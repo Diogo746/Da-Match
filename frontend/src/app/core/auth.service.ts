@@ -40,9 +40,15 @@ export class AuthService {
   }
 
   me(): Observable<CurrentUser> {
-    return this.api(() => this.http.get<unknown>("/api/v1/auth/me").pipe(
-      map(readUser), tap((user) => this.state.confirmUser(user)),
-    ));
+    return this.api(() => {
+      const revision = this.state.revision();
+      return this.http.get<unknown>("/api/v1/auth/me").pipe(map(value => {
+        if (revision !== this.state.revision()) throw new Error("A sessão mudou durante a consulta.");
+        const user = readUser(value);
+        this.state.confirmUser(user);
+        return user;
+      }));
+    });
   }
 
   logout(): Observable<void> {

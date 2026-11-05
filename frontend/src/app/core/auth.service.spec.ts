@@ -60,6 +60,16 @@ it("logout requires CSRF and renews it after clearing the current user", async (
   await result;
 });
 
+it("ignores an old session restoration after logout/login even for the same account", async () => {
+  state.setUser(account);
+  const result = firstValueFrom(auth.me()).catch(error => error);
+  state.setUser(null); state.setUser(account);
+  const revision = state.revision();
+  http.expectOne(base + "/api/v1/auth/me").flush({ ...account, nome: "Resposta antiga" });
+  expect(await result).toBeInstanceOf(Error);
+  expect(state.user()).toEqual(account); expect(state.revision()).toBe(revision);
+});
+
 it.each([401, 403])("handles %s without replaying a write or persisting credentials", async (status) => {
   state.setUser(account);
   const result = firstValueFrom(TestBed.inject(HttpClient).patch("/api/v1/mentores/ficticio", {})).catch(error => error);

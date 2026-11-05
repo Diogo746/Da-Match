@@ -1,6 +1,6 @@
 # Descoberta real — backend e evidências
 
-Implementação local em 05/11/2026, branch `codex/discovery-api`, base main `c34edc6`. Contrato do [guia 33](33-discovery-contract.md) integrado pelo [PR #32](https://github.com/Diogo746/Da-Match/pull/32); [workflow #110 pós-merge](https://github.com/Diogo746/Da-Match/actions/runs/42067501541) concluído com sucesso. **Backend implementado e validado localmente, aguardando CI/revisão/integração; interface real ainda pendente.**
+Implementação local em 05/11/2026, branch `codex/discovery-api`, base main `c34edc6`. Contrato do [guia 33](33-discovery-contract.md) integrado pelo [PR #32](https://github.com/Diogo746/Da-Match/pull/32); [workflow #110 pós-merge](https://github.com/Diogo746/Da-Match/actions/runs/42067501541) concluído com sucesso. **Backend integrado pelo PR #33 na main `5b2207e`; CI #112 do head `9615b73` e #113 pós-merge aprovadas. Interface real implementada/validada localmente em `codex/discovery-ui`, aguardando revisão/integração; [guia 35](35-discovery-ui-validation.md).** Os registros abaixo descrevem o ensaio do backend antes dessa integração.
 
 ## API entregue na branch
 
