@@ -7,7 +7,7 @@ import {
   EnvironmentInjector,
 } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { ExploreComponent } from "./explore.component";
+import { DemoExploreComponent as ExploreComponent } from "./demo-explore.component";
 import { ProfilesStore } from "../../core/profiles.store";
 import { ProfileSessionStore } from "../../core/profile-session.store";
 import { ProfileDraft } from "../../core/profile.models";

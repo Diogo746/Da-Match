@@ -14,14 +14,14 @@ export function normalizeSearch(value: string): string {
 }
 
 @Component({
-  selector: "app-explore",
+  selector: "app-demo-explore",
   standalone: true,
   imports: [RouterLink, IconComponent, DiscoveryHeroComponent, ProfileCardComponent, ProfileDialogComponent, DiscoveryGuideComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./explore.component.html",
+  templateUrl: "./demo-explore.component.html",
   styleUrl: "./explore.component.css",
 })
-export class ExploreComponent {
+export class DemoExploreComponent {
   readonly store = inject(ProfilesStore);
   readonly session = inject(ProfileSessionStore);
   readonly savedOnly = inject(ActivatedRoute).snapshot.data["savedOnly"] === true;

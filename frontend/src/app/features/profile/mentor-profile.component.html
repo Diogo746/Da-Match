@@ -11,7 +11,8 @@
       <p>{{ mentor.nome }} · {{ mentor.email }}</p>
       <a class="button button-secondary" routerLink="/mentor/questionario">Abrir questionário</a>
       <p>Estado: <strong>{{ statusLabels[mentor.status] }}</strong></p>
-      <p>O perfil começa como rascunho. Publicar autoriza sua participação na descoberta quando ela estiver disponível.</p>
+      <p>Para aparecer no catálogo, publique o perfil, complete o cadastro e salve o questionário com a opção de aceitar novas startups.</p>
+      <p>Outros participantes verão seu nome, biografia, setores, temas de ajuda e modalidade/cidade dos encontros. Contatos e agenda semanal ficam privados.</p>
       <form [formGroup]="form" (ngSubmit)="save()">
         <fieldset [disabled]="busy() || loading() || uncertain()">
           <legend>Informações do perfil</legend>

@@ -57,9 +57,9 @@ afterEach(() => { http.verify(); localStorage.removeItem(THEME_STORAGE_KEY); });
 it("oferece startup e mentor no modo conectado e exige a biografia do mentor antes da rede", async () => {
   expect(page.querySelectorAll(".role-option")).toHaveLength(2);
   expect(page.querySelector('.main-nav a[href="/meu-perfil"]')).toBeNull();
-  expect(page.querySelector(".topbar-actions a")?.textContent).toContain("Criar conta");
+  expect(page.querySelector(".topbar-actions a")?.textContent).toContain("Entrar");
   expect(page.querySelector(".sidebar-invite a")?.textContent).toContain("Cadastrar startup ou mentor");
-  expect(page.querySelector(".demo-pill")?.textContent).toContain("Cadastros conectados");
+  expect(page.querySelector(".demo-pill")?.textContent).toContain("Comunidade DaMatch");
   expect(page.querySelector('input[formControlName="demoConsent"]')).toBeNull();
   enter("register-name", "Ana Mentora"); enter("register-email", "ana@example.test"); enter("register-password", "senha-ficticia");
   submit(); await refresh();

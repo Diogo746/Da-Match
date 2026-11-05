@@ -1,0 +1,79 @@
+<section class="catalog-page" aria-labelledby="catalog-title">
+  <header class="catalog-hero">
+    <p class="eyebrow">IDEIAS ENCONTRAM EXPERIÊNCIA</p>
+    <h1 id="catalog-title">{{ savedOnly ? 'Perfis salvos' : 'Sua próxima descoberta começa aqui.' }}</h1>
+    <p>Startups em ideação e mentores que compartilham conhecimento para dar os primeiros passos.</p>
+  </header>
+  @if (savedOnly) {
+    <div class="catalog-notice"><h2>Salvar perfis estará disponível em uma próxima etapa.</h2>
+      <p>Por enquanto, conheça os perfis publicados no catálogo.</p><a class="button button-primary" routerLink="/">Descobrir perfis</a></div>
+  } @else if (sessionStatus() === 'loading') {
+    <output class="catalog-notice">Consultando sua sessão…</output>
+  } @else if (sessionError()) {
+    <div class="catalog-notice"><p role="alert">Não foi possível consultar sua sessão.</p>
+      <button class="button button-primary" type="button" (click)="restoreSession()">Tentar novamente</button></div>
+  } @else if (!state.user()) {
+    <div class="catalog-notice"><h2>Entre para conhecer os perfis.</h2><p>O catálogo está disponível para contas de startup e mentor.</p>
+      <div class="actions"><a class="button button-primary" routerLink="/entrar">Entrar</a><a class="button button-secondary" routerLink="/cadastro">Criar conta</a></div></div>
+  } @else if (!target()) {
+    <div class="catalog-notice"><h2>Catálogo para startups e mentores</h2><p>Seu tipo de conta não possui acesso a esta área.</p><a routerLink="/conta">Ir para minha conta</a></div>
+  } @else {
+    <div class="section-heading"><div><p class="eyebrow">EXPLORE O ECOSSISTEMA</p>
+      <h2>{{ target() === 'MENTOR' ? 'Conheça os mentores' : 'Conheça as startups em ideação' }}</h2></div><a routerLink="/conta">Minha conta</a></div>
+    <p class="catalog-help">Perfis completos e publicados{{ target() === 'MENTOR' ? ', aceitando novas startups' : '' }}. Explore por nome e interesses.</p>
+    <form class="filter-panel" [formGroup]="form" (ngSubmit)="search()">
+      <div class="search-field"><app-icon name="search" /><label class="sr-only" for="discovery-search">Buscar por nome ou apresentação</label>
+        <input id="discovery-search" type="search" formControlName="busca" maxlength="100" placeholder="Nome ou apresentação" /></div>
+      <div class="filter-row">
+        <label>Setor<select formControlName="setor"><option value="">Todos os setores</option>@for (item of sectors(); track item.id) { <option [value]="item.id">{{ item.label }}</option> }</select></label>
+        <label>{{ target() === 'MENTOR' ? 'Tema de ajuda oferecida' : 'Tema de ajuda necessária' }}<select formControlName="topico"><option value="">Todos os temas</option>@for (item of topics; track item.id) { <option [value]="item.id">{{ item.label }}</option> }</select></label>
+        <label>Modalidade<select formControlName="formato"><option value="">Todas as modalidades</option>@for (item of formats; track item.id) { <option [value]="item.id">{{ formatLabel(item.id) }}</option> }</select></label>
+        <label>Cidade para encontros presenciais<select formControlName="cidade"><option value="">Todas as cidades</option>@for (item of cities; track item.id) { <option [value]="item.id">{{ item.label }}</option> }</select></label>
+      </div>
+      <div class="actions filter-actions"><button class="button button-primary" type="submit">Pesquisar</button><button class="text-button" type="button" (click)="clear()">Limpar pesquisa</button></div>
+      @if (form.invalid) { <p role="alert">A busca aceita até 100 caracteres.</p> }
+    </form>
+    @if (queryState().error) { <p class="catalog-notice" role="alert">{{ queryState().error }}</p> }
+    @else {
+      <div class="results-heading"><output aria-live="polite">@if (catalog()?.loading) { Buscando perfis… }
+        @else if (catalog()?.page; as results) { {{ results.totalItens }} {{ results.totalItens === 1 ? 'perfil encontrado' : 'perfis encontrados' }} }</output>
+        <button #reloadButton class="text-button" type="button" (click)="load()" [disabled]="catalog()?.loading">Atualizar pesquisa</button></div>
+      @if (catalog()?.error) { <p class="catalog-notice" role="alert">{{ catalog()?.error }}</p> }
+      @if (catalog()?.page; as results) {
+        <div class="profiles-grid" [attr.aria-busy]="catalog()?.loading">
+          @for (profile of results.itens; track profile.id) {
+            <article class="catalog-card">
+              <div class="card-heading"><app-icon [name]="profile.tipo === 'MENTOR' ? 'compass' : 'spark'" /><span>{{ profile.tipo === 'MENTOR' ? 'Mentor' : 'Startup em ideação' }}</span></div>
+              <div class="card-body"><h3>{{ profile.nome }}</h3><p class="card-summary">{{ profile.apresentacao }}</p>
+                <p class="location"><app-icon name="pin" />{{ formatLabel(profile.formato) }}{{ profile.cidadeId ? ' · ' + cityLabel(profile.cidadeId) : '' }}</p>
+                <ul class="tags" aria-label="Setores">@for (sector of profile.setores; track sector) { <li>{{ sectorLabel(sector) }}</li> }</ul>
+                <p class="topic-label">{{ profile.tipo === 'MENTOR' ? 'Pode ajudar com' : 'Precisa de ajuda com' }}</p>
+                <ul class="tags" aria-label="Temas de ajuda">@for (topic of profile.topicos; track topic) { <li>{{ topicLabel(topic) }}</li> }</ul>
+                <button class="profile-link" type="button" (click)="open(profile, $event)" [attr.aria-label]="'Conhecer ' + profile.nome">Conhecer perfil<app-icon name="arrow" /></button>
+              </div>
+            </article>
+          } @empty {
+            <div class="empty-state"><app-icon name="search" /><h3>Nenhum perfil nesta página.</h3><p>Os perfis precisam estar completos e publicados. Experimente ampliar os filtros ou voltar à primeira página.</p>
+              <button class="button button-primary" type="button" (click)="clear()">Recomeçar pesquisa</button></div>
+          }
+        </div>
+        @if (results.totalPaginas > 1 || results.pagina > 0) {
+          <nav class="pagination" aria-label="Páginas de perfis"><button class="button button-secondary" type="button" [disabled]="results.pagina === 0" (click)="page(results.pagina - 1)">Anterior</button>
+            <span>{{ results.pagina < results.totalPaginas ? 'Página ' + (results.pagina + 1) + ' de ' + results.totalPaginas : 'Página fora dos resultados' }}</span>
+            <button class="button button-secondary" type="button" [disabled]="results.pagina + 1 >= results.totalPaginas" (click)="page(results.pagina + 1)">Próxima</button></nav>
+        }
+      }
+    }
+  }
+</section>
+<dialog #profileDialog class="catalog-dialog" aria-labelledby="detail-title" (close)="detailClosed()">
+  <div class="dialog-top"><h2 id="detail-title">Conhecer perfil</h2><button #dialogClose class="text-button" type="button" (click)="dismiss()" aria-label="Fechar detalhe">Fechar<app-icon name="close" /></button></div>
+  @if (detail()?.loading) { <output>Consultando o perfil…</output> }
+  @if (detail()?.error) { <p role="alert">{{ detail()?.error }}</p> }
+  @if (detail()?.profile; as profile) {
+    <p class="eyebrow">{{ profile.tipo === 'MENTOR' ? 'MENTOR' : 'STARTUP EM IDEAÇÃO' }}</p><h3>{{ profile.nome }}</h3>
+    <p class="presentation">{{ profile.apresentacao }}</p><p>{{ formatLabel(profile.formato) }}{{ profile.cidadeId ? ' · ' + cityLabel(profile.cidadeId) : '' }}</p>
+    <h4>Setores</h4><ul class="tags">@for (sector of profile.setores; track sector) { <li>{{ sectorLabel(sector) }}</li> }</ul>
+    <h4>{{ profile.tipo === 'MENTOR' ? 'Pode ajudar com' : 'Precisa de ajuda com' }}</h4><ol class="detail-topics">@for (topic of profile.topicos; track topic) { <li>{{ topicLabel(topic) }}</li> }</ol>
+  }
+</dialog>
