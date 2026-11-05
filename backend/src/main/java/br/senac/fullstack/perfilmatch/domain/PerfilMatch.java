@@ -139,6 +139,10 @@ public class PerfilMatch {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    public static boolean cidadeConhecida(String cidade) {
+        return CITIES.contains(cidade);
+    }
+
     public void validar(TipoUsuario expected) {
         require(VERSION.equals(questionnaireVersion), "Versão do questionário inválida.");
         require(kind == expected && (kind == TipoUsuario.STARTUP || kind == TipoUsuario.MENTOR),
@@ -185,7 +189,7 @@ public class PerfilMatch {
 
     private void validarEncontro() {
         require(format != null && cadence != null && cityId != null, "Formato e frequência obrigatórios.");
-        require(cityId.isEmpty() || CITIES.contains(cityId), "Cidade inválida.");
+        require(cityId.isEmpty() || cidadeConhecida(cityId), "Cidade inválida.");
         require(format != Formato.PRESENCIAL || !cityId.isEmpty(), "Informe a cidade.");
         require(format != Formato.ONLINE || cityId.isEmpty(), "Encontros online não usam cidade.");
     }
