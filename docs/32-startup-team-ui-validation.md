@@ -2,6 +2,8 @@
 
 Entrega local de 05/11/2026 na branch `codex/startup-team-ui`, baseada na main `fc600c7`. O backend do [PR #30](https://github.com/Diogo746/Da-Match/pull/30) foi integrado; [workflow #105](https://github.com/Diogo746/Da-Match/actions/runs/41937983752) pós-merge concluído com sucesso. Contrato no [guia 30](30-startup-team-invitations.md), evidências do backend no [guia 31](31-startup-team-api-validation.md).
 
+Integração conferida em 05/11: [PR #31](https://github.com/Diogo746/Da-Match/pull/31) integrado na main `dc66ec7`. [CI #107](https://github.com/Diogo746/Da-Match/actions/runs/42062915030) aprovada no head `b57e3ed`, incluindo gate frontend; corrige S3776 ao separar a consulta da recuperação e S5906 ao usar `toHaveLength`. [CI pós-merge #108](https://github.com/Diogo746/Da-Match/actions/runs/42064283961) success, com ambos os gates, ZAP e job de deploy. Sem redução de gate/supressões. Homologação publicada continua pendente; próximo contrato no [guia 33](33-discovery-contract.md).
+
 ## Comportamento entregue
 
 - `/startup/perfil/{startupId}/equipe`: integrantes confirmados pela API, papéis, proteção do único fundador e remoção com confirmação da pessoa/projeto. FUNDADOR/REPRESENTANTE emitem e cancelam convites; MEMBRO consulta. O projeto deve constar dos vínculos atuais da sessão, sem exceção ADMIN.
@@ -36,6 +38,6 @@ Backend não foi alterado nesta etapa; referência de 187 testes/Checkstyle/arqu
 
 ## Integração e próxima etapa
 
-Revisar o PR da interface e conferir testes, segurança e Quality Gate do head atual antes de integrar. Nenhum merge ou deploy manual nesta entrega. Homologação publicada, backup/compatibilidade do ambiente alvo, rate limit, leitor de tela e zoom real permanecem no [roteiro operacional](27-startup-next-sessions.md).
+PR #31 integrado pelo usuário, CI pós-merge #108 conferida conforme registro acima. Nenhum merge/deploy manual pelo agente nesta entrega. Homologação publicada, backup/compatibilidade do ambiente alvo, rate limit, leitor de tela e zoom real permanecem no [roteiro operacional](27-startup-next-sessions.md).
 
 Depois da integração da interface, iniciar a etapa 5: definir o contrato de descoberta real (DTOs públicos, elegibilidade, filtros/paginação e privacidade de contato/equipe), sem utilizar as rotas de gestão como catálogo. Matching continua futuro na etapa 6, conforme [guia 29](29-matching-rule-decisions.md); JWT mantendo CSRF e avaliação Vercel continuam decisões futuras.

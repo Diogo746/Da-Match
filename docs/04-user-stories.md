@@ -225,6 +225,8 @@
 
 ## 🎯 Épico 3: Descoberta de perfis (DESCOBERTA)
 
+> Primeira versão definida pelo usuário em 05/11/2026 no [guia 33](33-discovery-contract.md). Acesso STARTUP/MENTOR autenticado, na direção permitida pela RN12; catálogo somente de perfis publicados com cadastro e quiz v3 completos, mentor também aceitando novas startups. Startup expõe nome/resumo e campos gerais definidos; equipe, contato, agenda e textos privados completos ficam fora. Contrato preparado, implementação ainda pendente; investidores permanecem em entrega futura. Catálogo não executa a regra de matching do guia 29.
+
 ### 🔹 `US-12`: Pesquisar startups
 * **Como** mentor ou investidor,
 * **Quero** buscar startups por nome e filtrar por setor, estágio e localização,
@@ -240,6 +242,7 @@
 >   * **Quando** faço a busca,
 >   * **Então** o sistema mostra claramente que não há resultados.
 * *Prioridade:* P1 · *Rastreabilidade:* RF12, RN12, RN13, CA10.
+* *Recorte da primeira entrega:* startups em ideação; filtros de nome/apresentação, setor, tema, formato e cidade, conforme guia 33. Não há filtro variável de estágio empresarial nem conversão dos quatro momentos do quiz em `statusValidacao`.
 
 ---
 
@@ -257,7 +260,12 @@
 >   * **Dado** que um mentor está em rascunho ou suspenso,
 >   * **Quando** faço qualquer busca,
 >   * **Então** ele não aparece.
+> * **Cenário 3 (Requisitos atuais):**
+>   * **Dado** um mentor publicado mas sem cadastro/quiz v3 válido, ou com `accepting=false`,
+>   * **Quando** consulto lista ou detalhe,
+>   * **Então** ele não é disponibilizado; a agenda usada na validação vem do perfil real, sem exigir a cópia vazia do quiz persistido.
 * *Prioridade:* P1 · *Rastreabilidade:* RF13, RN12, RN13, CA11, CA12.
+* *Limitação atual:* suspensão/desativação de conta ainda não possui fluxo implementado; não considerar esse trecho do cenário 2 entregue apenas pelo filtro de publicação.
 
 ---
 
@@ -293,6 +301,14 @@
 >   * **Dado** que ainda não tenho conexão ativa com a pessoa,
 >   * **Quando** abro o perfil dela,
 >   * **Então** os dados de contato não aparecem.
+> * **Cenário 3 (Recorte aprovado):**
+>   * **Dado** que abri o detalhe de uma startup elegível,
+>   * **Quando** a resposta é apresentada,
+>   * **Então** vejo nome/resumo, setores, temas, formato/cidade; não recebo problema, solução, público-alvo, modelo de negócio completos, integrantes ou agenda exata. Mentor usa nome/biografia e o mesmo recorte geral permitido.
+> * **Cenário 4 (Perfil deixou de ser elegível):**
+>   * **Dado** que um resultado foi pausado ou deixou de cumprir os requisitos depois da busca,
+>   * **Quando** solicito seu detalhe novamente,
+>   * **Então** recebo indisponibilidade sem seu motivo privado nem dados antigos mantidos pela interface.
 * *Prioridade:* P1 · *Rastreabilidade:* RF15, RN12, RN29, CA10, CA11, CA12.
 
 ---

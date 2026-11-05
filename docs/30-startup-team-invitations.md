@@ -1,6 +1,6 @@
 # Integrantes da startup e convites com aceite — etapa 4
 
-Contrato preparado em 04/11/2026, após as respostas do usuário na retomada da main `de71fa5`. Contrato integrado pelo PR #29 na main `33e8671`, CI pós-merge #102 aprovada. **Backend integrado pelo PR #30 em `fc600c7`, CI #105 aprovada. Interface implementada/validada localmente em `codex/startup-team-ui`, aguardando revisão/integração.** Evidências nos guias [31](31-startup-team-api-validation.md) e [32](32-startup-team-ui-validation.md). Autenticação atual por sessão e CSRF; a futura decisão JWT com CSRF não será implementada nesta entrega.
+Contrato preparado em 04/11/2026, após as respostas do usuário na retomada da main `de71fa5`. Contrato integrado pelo PR #29 na main `33e8671`, CI pós-merge #102 aprovada. **Backend integrado pelo PR #30 em `fc600c7`, CI #105 aprovada; interface integrada pelo PR #31 na main `dc66ec7`, CI #108 aprovada.** Evidências nos guias [31](31-startup-team-api-validation.md) e [32](32-startup-team-ui-validation.md). Autenticação atual por sessão e CSRF; JWT com CSRF continua decisão futura.
 
 ## Decisões do usuário
 
