@@ -53,3 +53,4 @@ Project Charter (Visão & Dores)
 - [Integrantes — contrato de convites com aceite e validade de 7 dias](30-startup-team-invitations.md).
 - [Integrantes — backend, PostgreSQL local e evidências de validação](31-startup-team-api-validation.md).
 - [Equipe e convites — interface, recuperação e validação local](32-startup-team-ui-validation.md).
+- [Descoberta real — acesso, elegibilidade, privacidade e contrato proposto](33-discovery-contract.md).
