@@ -2,7 +2,7 @@
 
 Implementação na branch `feature/security-configuration`. Autenticação por sessão no servidor, sem JWT, HTTP Basic ou formulário HTML do Spring. O banco mantém hashes BCrypt compatíveis com as contas existentes.
 
-Backend de convites implementado na branch `codex/startup-team-api`, aguardando integração. Contrato no [guia 30](30-startup-team-invitations.md), evidências e limitações no [guia 31](31-startup-team-api-validation.md). Sessão/CSRF atual preservados; JWT com CSRF é uma decisão futura, sem implementação nesta etapa.
+Equipe/convites integrados pelos PRs #30/#31. Backend de descoberta implementado em `codex/discovery-api`, aguardando revisão/integração; contrato no [guia 33](33-discovery-contract.md) e evidências no [guia 34](34-discovery-api-validation.md). Sessão/CSRF atual preservados; JWT com CSRF é uma decisão futura.
 
 ## Matriz de acesso
 
@@ -15,6 +15,8 @@ Backend de convites implementado na branch `codex/startup-team-api`, aguardando 
 | `GET /api/v1/auth/me` | Autenticado |
 | `GET /api/v1/mentores/me` | MENTOR; consulta somente o perfil associado à sessão |
 | `GET /api/v1/startups/me` | STARTUP; consulta somente projetos vinculados à conta da sessão |
+| `GET /api/v1/descoberta/mentores` e `/{mentorId}` | STARTUP; somente publicados/completos/quiz válido e aceitando novas startups; DTO de descoberta mínimo |
+| `GET /api/v1/descoberta/startups` e `/{startupId}` | MENTOR; somente publicados/completos/quiz válido; sem integrantes ou textos privados |
 | `POST /api/v1/auth/logout` | Autenticado, com CSRF; retorna 204 |
 | `GET /api/v1/startups`, `/{startupId}`, `/{startupId}/membros` | STARTUP com vínculo atual; listagem somente dos próprios projetos |
 | `PATCH /api/v1/mentores/{mentorId}` e `/{mentorId}/status` | MENTOR titular do recurso, com CSRF |
@@ -38,6 +40,8 @@ Backend de convites implementado na branch `codex/startup-team-api`, aguardando 
 | Demais rotas, inclusive `info` e `metrics` | Negadas |
 
 ADMIN não contorna a propriedade dos recursos. Não existem operações administrativas de edição autorizadas nesta entrega. No backend da etapa 4, a listagem de startups é restrita aos projetos da própria conta STARTUP; não é catálogo de descoberta. As respostas não incluem senhas nem e-mails de integrantes. Consulta por ID/equipe também exige vínculo, evitando contornar o aceite de convite pelas rotas antigas.
+
+As novas consultas de descoberta não concedem acesso às rotas de gestão. O serviço confere o papel antes da consulta, independentemente do ID/params. O leitor não precisa publicar/completar o próprio perfil para consultar; são os resultados que devem cumprir a elegibilidade. Detalhe inexistente/inelegível retorna o mesmo 404, sem pendências privadas. Cache de todas as respostas de descoberta é `private, no-store`. Cada leitura usa snapshot `REPEATABLE_READ` e reavalia os requisitos atuais; mentor usa a agenda real sem gravar no quiz. Não há exceção ADMIN, contatos, scores nem criação de vínculo/conexão ao pesquisar. Textos livres de apresentação são do autor e não equivalem a anonimização automática.
 
 Os cadastros continuam sendo onboarding público: o corpo cria uma nova conta com papel definido pelo serviço. Um usuário já autenticado recebe 403 nesses endpoints; não existe criação de outra startup por conta existente. Um futuro caso de uso desse tipo deverá obter o fundador do contexto de segurança.
 

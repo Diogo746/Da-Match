@@ -20,6 +20,8 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 
 ## Como executar o roteiro
 
+Retomada da API de descoberta em 05/11: contrato PR #32 integrado na main `c34edc6`; [workflow #110](https://github.com/Diogo746/Da-Match/actions/runs/42067501541) success. Backend implementado/validado localmente em `codex/discovery-api`, conforme [guia 34](34-discovery-api-validation.md): 257 testes/Checkstyle/arquitetura, 49 verificações HTTP/PostgreSQL e ensaio com 500 perfis fictícios. Sem schema novo, frontend alterado ou banco remoto acessado. Conferir CI/gate do head antes da integração; depois conectar a tela principal à API.
+
 Retomada posterior em 05/11: PR #31 integrado à main `dc66ec7`; [workflow #108](https://github.com/Diogo746/Da-Match/actions/runs/42064283961) success, incluindo ambos os gates, ZAP e job de deploy. Etapa 4 integrada; homologação publicada continua operacional. Etapa 5 iniciada pelo contrato no [guia 33](33-discovery-contract.md), após três respostas do usuário: acesso STARTUP/MENTOR autenticado, perfis publicados/completos (mentor aceitando novas startups) e exposição limitada ao nome/resumo e campos gerais, sem textos privados/equipe/contatos/agenda. Branch documental `codex/discovery-contract`; API/interface real ainda pendentes.
 
 Retomada em 05/11: PR #30 integrado à main `fc600c7`; [workflow #105](https://github.com/Diogo746/Da-Match/actions/runs/41937983752) concluído com sucesso. Interface de equipe e convites implementada/validada localmente em `codex/startup-team-ui`, aguardando revisão/integração. Fluxos, recuperação, testes e limitações no [guia 32](32-startup-team-ui-validation.md). Paleta preservada; sem alteração de backend ou banco remoto nesta entrega.
@@ -41,7 +43,7 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | 2. Publicação no backend | Integrada pelo PR #25 na main `2a5d321`; CI pós-merge #94 aprovada | Estado persistido, autorização, endpoints e testes; evidências operacionais na etapa 10 |
 | 3. Publicação no frontend | Integrada pelo PR #27 em `a847958`; CI pós-merge #98 aprovada | Publicar/pausar/retomar/voltar a rascunho e consultar pendências pela API |
 | 4. Integrantes | Integrada pelos PRs #29/#30/#31; main `dc66ec7`, CI pós-merge #108 aprovada; evidências locais no guia 32 | Equipe, convite/aceite, recuperação e permissões |
-| 5. Descoberta real | Contrato preparado no guia 33, branch `codex/discovery-contract`, aguardando revisão/integração; backend/interface pendentes | Catálogo de perfis elegíveis pela API |
+| 5. Descoberta real | Contrato PR #32 integrado/main `c34edc6`/CI #110 success; backend validado localmente em `codex/discovery-api` (guia 34), aguardando CI/revisão/integração; interface pendente | Catálogo de perfis elegíveis pela API |
 | 6. Matching definitivo | Regra definida pelo usuário em 30/10 no [guia 29](29-matching-rule-decisions.md); implementação pendente | `damatch-mentoria-v1`, após as dependências; atualizar revisão formal do SRS |
 | 7. Salvos persistidos | Pendente; confirmar escopo | Favoritos por conta |
 | 8. Interesses e conexões | Pendente | Interesse e reciprocidade persistidos |
@@ -168,7 +170,7 @@ Conclusão: gestão funcional e testada, sem ações fictícias de convite ou tr
 - Contrato no [guia 33](33-discovery-contract.md), preparado após três respostas do usuário em 05/11: acesso autenticado STARTUP/MENTOR; publicação, cadastro e quiz completos; mentor aceitando novas startups. Nome/apresentação e campos gerais definidos, sem textos completos privados da startup, equipe, contatos ou agenda.
 - Preservar RN12: STARTUP pesquisa MENTOR e MENTOR pesquisa STARTUP. Rotas de consulta próprias e DTO mínimo, filtros, páginas de até 20, ordem estável e elegibilidade antes da paginação. Não usar respostas/rotas de gestão como catálogo nem aplicar matching no frontend.
 - Validação do mentor deve usar agenda de `disponibilidade_mentor`, não a coleção vazia do quiz persistido. Publicado sem quiz continua fora da descoberta; não mudar implicitamente o PATCH de publicação existente.
-- Revisar/integrar a definição documental; depois implementar backend/testes/Postman/matriz de segurança em nova branch. Nenhuma API de descoberta está disponível por esta documentação.
+- Contrato integrado pelo PR #32, CI #110 aprovada. Backend/testes/Postman/matriz implementados em `codex/discovery-api`, com evidências no guia 34; revisar/integrar após CI/gate do head. As quatro rotas não estão na main apenas pela definição documental.
 - Conectar interface à API, com estados vazio/erro/carregamento e separação explícita de DEMO.
 
 Conclusão: catálogo real mostra somente perfis elegíveis e respeita a visibilidade definida.
@@ -203,7 +205,7 @@ Conclusão de cada entrega: autorização, persistência, fluxo pela interface e
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** revisar/integrar o contrato de descoberta `codex/discovery-contract` (guia 33), conferindo checks do head. Depois partir da main atualizada para implementar backend da etapa 5, com testes, Postman e validação PostgreSQL; interface em entrega seguinte ao backend integrado. Homologação publicada e backup/compatibilidade do alvo continuam operacionais. Não repetir decisões de integrantes/descoberta/matching nem antecipar JWT/Vercel; sem autorização de mudança remota de banco.
+- **Próxima ação exata:** conferir CI/Quality Gate do backend `codex/discovery-api` (guia 34), revisar/integrar; depois main atualizada e nova branch para conectar a tela principal ao catálogo real. Remover dados fictícios do modo API nessa integração, mantendo DEMO explícito. Homologação publicada e backup/compatibilidade do alvo continuam operacionais. Não repetir decisões de integrantes/descoberta/matching nem antecipar JWT/Vercel; sem autorização de mudança remota de banco.
 - **Entrega da publicação:** backend/Postman no PR #25, main `2a5d321`, CI #94 aprovada; interface validada em 31/10 e integrada pelo PR #27 em `a847958`, CI pós-merge #98 aprovada.
 - **Entrega desta definição (30/10) e resolução (31/10):** somente documentação no PR #26, branch `codex/matching-rule-decision`; 13 respostas, fórmula e 14 casos de referência, US-16/18/19 alinhadas. Main `2a5d321` incorporada à branch para conciliar o roteiro e o índice. Nenhuma implementação de matching, alteração de aplicação além da main, mudança remota de banco ou deploy manual nesta entrega.
 - **Entrega de 04/11:** contrato de integrantes no guia 30 e continuidade atualizada, branch `codex/startup-team-contract`, base `de71fa5`. Sem mudanças de aplicação, schema ou banco remoto; verificar checks do PR documental, sem alegar novos testes/gates de aplicação quando dispensados.

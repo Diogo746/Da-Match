@@ -50,6 +50,51 @@
       "key": "convitePapel",
       "value": "MEMBRO",
       "type": "string"
+    },
+    {
+      "key": "descobertaMentorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "descobertaStartupId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "descobertaBusca",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "descobertaSetor",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "descobertaTopico",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "descobertaFormato",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "descobertaCidade",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "descobertaPagina",
+      "value": "0",
+      "type": "string"
+    },
+    {
+      "key": "descobertaTamanho",
+      "value": "20",
+      "type": "string"
     }
   ],
   "item": [
@@ -1006,6 +1051,234 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Descoberta — Catálogo real",
+      "description": "Rotas implementadas na API de descoberta. Login STARTUP para pesquisar mentores; login MENTOR para pesquisar startups. ADMIN não tem exceção. Execute uma direção por sessão, não a pasta inteira com a mesma conta. Somente perfis publicados, completos e quiz v3 válido; mentor deve accepting=true. Filtros opcionais ficam desativados; códigos v3, páginas de até 20. Lista e detalhe têm só oito campos. Não há nota, salvos, interesse ou conexão; respostas de gestão continuam privadas.",
+      "item": [
+        {
+          "name": "Listar mentores — sessão STARTUP",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/descoberta/mentores?pagina={{descobertaPagina}}&tamanho={{descobertaTamanho}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "descoberta",
+                "mentores"
+              ],
+              "query": [
+                {
+                  "key": "pagina",
+                  "value": "{{descobertaPagina}}"
+                },
+                {
+                  "key": "tamanho",
+                  "value": "{{descobertaTamanho}}"
+                },
+                {
+                  "key": "busca",
+                  "value": "{{descobertaBusca}}",
+                  "disabled": true
+                },
+                {
+                  "key": "setor",
+                  "value": "{{descobertaSetor}}",
+                  "disabled": true
+                },
+                {
+                  "key": "topico",
+                  "value": "{{descobertaTopico}}",
+                  "disabled": true
+                },
+                {
+                  "key": "formato",
+                  "value": "{{descobertaFormato}}",
+                  "disabled": true
+                },
+                {
+                  "key": "cidade",
+                  "value": "{{descobertaCidade}}",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Exige sessão STARTUP. Filtros combinados por AND, ordem por nome sem caixa/acentos e UUID. Apenas elegíveis entram na contagem/paginação. O primeiro ID retornado alimenta descobertaMentorId, sem alterar os IDs de gestão."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.unset('descobertaMentorId'); pm.environment.unset('descobertaMentorId');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta autorizada confirmada', () => pm.response.to.have.status(200));",
+                  "pm.test('Cache privado sem armazenamento', () => { const cache = pm.response.headers.get('Cache-Control') || ''; pm.expect(cache).to.include('private'); pm.expect(cache).to.include('no-store'); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const fields = [\"id\", \"tipo\", \"nome\", \"apresentacao\", \"setores\", \"topicos\", \"formato\", \"cidadeId\"];",
+                  "  const validate = item => { pm.expect(Object.keys(item)).to.have.members(fields); pm.expect(item.tipo).to.equal('MENTOR'); pm.expect(item.nome).to.be.a('string'); pm.expect(item.apresentacao).to.be.a('string'); pm.expect(item.setores).to.be.an('array'); pm.expect(item.topicos).to.be.an('array'); };",
+                  "  pm.test('Página e projeção pública válidas', () => { pm.expect(Object.keys(body)).to.have.members(['itens','pagina','tamanho','totalItens','totalPaginas']); pm.expect(body.itens).to.be.an('array'); pm.expect(body.itens.length).to.be.at.most(20); pm.expect(body.totalItens).to.be.at.least(body.itens.length); body.itens.forEach(validate); });",
+                  "  if (body.itens.length) pm.environment.set('descobertaMentorId', body.itens[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Detalhar mentor — sessão STARTUP",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/descoberta/mentores/{{descobertaMentorId}}",
+            "description": "Use o ID confirmado pela listagem desta direção, nunca usuarioId/quizId. Sem parâmetros de consulta. Inexistente/pausado/incompleto retornam o mesmo 404 genérico. Não libera contato, agenda, integrantes ou textos privados."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta autorizada confirmada', () => pm.response.to.have.status(200));",
+                  "pm.test('Cache privado sem armazenamento', () => { const cache = pm.response.headers.get('Cache-Control') || ''; pm.expect(cache).to.include('private'); pm.expect(cache).to.include('no-store'); });",
+                  "if (pm.response.code === 200) {",
+                  "  const fields = [\"id\", \"tipo\", \"nome\", \"apresentacao\", \"setores\", \"topicos\", \"formato\", \"cidadeId\"];",
+                  "  const validate = item => { pm.expect(Object.keys(item)).to.have.members(fields); pm.expect(item.tipo).to.equal('MENTOR'); pm.expect(item.nome).to.be.a('string'); pm.expect(item.apresentacao).to.be.a('string'); pm.expect(item.setores).to.be.an('array'); pm.expect(item.topicos).to.be.an('array'); };",
+                  "  pm.test('Detalhe sem dados de gestão', () => validate(pm.response.json()));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Listar startups — sessão MENTOR",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/descoberta/startups?pagina={{descobertaPagina}}&tamanho={{descobertaTamanho}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "descoberta",
+                "startups"
+              ],
+              "query": [
+                {
+                  "key": "pagina",
+                  "value": "{{descobertaPagina}}"
+                },
+                {
+                  "key": "tamanho",
+                  "value": "{{descobertaTamanho}}"
+                },
+                {
+                  "key": "busca",
+                  "value": "{{descobertaBusca}}",
+                  "disabled": true
+                },
+                {
+                  "key": "setor",
+                  "value": "{{descobertaSetor}}",
+                  "disabled": true
+                },
+                {
+                  "key": "topico",
+                  "value": "{{descobertaTopico}}",
+                  "disabled": true
+                },
+                {
+                  "key": "formato",
+                  "value": "{{descobertaFormato}}",
+                  "disabled": true
+                },
+                {
+                  "key": "cidade",
+                  "value": "{{descobertaCidade}}",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Exige sessão MENTOR. Filtros combinados por AND, ordem por nome sem caixa/acentos e UUID. Apenas elegíveis entram na contagem/paginação. O primeiro ID retornado alimenta descobertaStartupId, sem alterar os IDs de gestão."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.unset('descobertaStartupId'); pm.environment.unset('descobertaStartupId');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta autorizada confirmada', () => pm.response.to.have.status(200));",
+                  "pm.test('Cache privado sem armazenamento', () => { const cache = pm.response.headers.get('Cache-Control') || ''; pm.expect(cache).to.include('private'); pm.expect(cache).to.include('no-store'); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const fields = [\"id\", \"tipo\", \"nome\", \"apresentacao\", \"setores\", \"topicos\", \"formato\", \"cidadeId\"];",
+                  "  const validate = item => { pm.expect(Object.keys(item)).to.have.members(fields); pm.expect(item.tipo).to.equal('STARTUP'); pm.expect(item.nome).to.be.a('string'); pm.expect(item.apresentacao).to.be.a('string'); pm.expect(item.setores).to.be.an('array'); pm.expect(item.topicos).to.be.an('array'); };",
+                  "  pm.test('Página e projeção pública válidas', () => { pm.expect(Object.keys(body)).to.have.members(['itens','pagina','tamanho','totalItens','totalPaginas']); pm.expect(body.itens).to.be.an('array'); pm.expect(body.itens.length).to.be.at.most(20); pm.expect(body.totalItens).to.be.at.least(body.itens.length); body.itens.forEach(validate); });",
+                  "  if (body.itens.length) pm.environment.set('descobertaStartupId', body.itens[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Detalhar startup — sessão MENTOR",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/descoberta/startups/{{descobertaStartupId}}",
+            "description": "Use o ID confirmado pela listagem desta direção, nunca usuarioId/quizId. Sem parâmetros de consulta. Inexistente/pausado/incompleto retornam o mesmo 404 genérico. Não libera contato, agenda, integrantes ou textos privados."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta autorizada confirmada', () => pm.response.to.have.status(200));",
+                  "pm.test('Cache privado sem armazenamento', () => { const cache = pm.response.headers.get('Cache-Control') || ''; pm.expect(cache).to.include('private'); pm.expect(cache).to.include('no-store'); });",
+                  "if (pm.response.code === 200) {",
+                  "  const fields = [\"id\", \"tipo\", \"nome\", \"apresentacao\", \"setores\", \"topicos\", \"formato\", \"cidadeId\"];",
+                  "  const validate = item => { pm.expect(Object.keys(item)).to.have.members(fields); pm.expect(item.tipo).to.equal('STARTUP'); pm.expect(item.nome).to.be.a('string'); pm.expect(item.apresentacao).to.be.a('string'); pm.expect(item.setores).to.be.an('array'); pm.expect(item.topicos).to.be.an('array'); };",
+                  "  pm.test('Detalhe sem dados de gestão', () => validate(pm.response.json()));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
         }
       ]
     }
