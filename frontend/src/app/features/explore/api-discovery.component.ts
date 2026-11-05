@@ -64,9 +64,9 @@ export class ApiDiscoveryComponent implements OnInit {
     setor: new FormControl("", { nonNullable: true }), topico: new FormControl("", { nonNullable: true }),
     formato: new FormControl("", { nonNullable: true }), cidade: new FormControl("", { nonNullable: true }),
   });
-  @ViewChild("profileDialog", { static: true }) private dialog?: ElementRef<HTMLDialogElement>;
-  @ViewChild("dialogClose", { static: true }) private dialogClose?: ElementRef<HTMLButtonElement>;
-  @ViewChild("reloadButton") private reloadButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild("profileDialog", { static: true }) private readonly dialog?: ElementRef<HTMLDialogElement>;
+  @ViewChild("dialogClose", { static: true }) private readonly dialogClose?: ElementRef<HTMLButtonElement>;
+  @ViewChild("reloadButton") private readonly reloadButton?: ElementRef<HTMLButtonElement>;
   private listRevision = 0;
   private detailRevision = 0;
   private restoreRevision = 0;

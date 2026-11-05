@@ -29,6 +29,8 @@ Capturas locais ignoradas em `frontend/.angular/cache/`: `discovery-desktop-full
 
 ## Ocorrências e limites
 
+O primeiro Quality Gate do PR #34 (CI #114, head `027879a`) encontrou uma ocorrência de imutabilidade: três referências `@ViewChild` nunca reatribuídas no componente. Declaradas como `readonly`, sem mudança de comportamento ou supressão. Conferir a nova CI/Quality Gate do head corrigido antes de integrar.
+
 O primeiro build compilou, mas excedeu os avisos de tamanho do bundle inicial e do CSS novo. A descoberta foi separada por carregamento de rota e o CSS reduzido; builds finais sem avisos, mantendo os limites existentes. A primeira execução sem elevação também encontrou `EPERM` na cópia de assets; a execução com acesso ao diretório de saída concluiu sem mudança no código de assets.
 
 O preparador HTTP inicialmente tentou enviar acento sem codificar a URL, depois de criar os 24 fixtures. Corrigida a codificação, as mesmas contas foram recuperadas apenas na cópia fictícia, com senhas de teste renovadas em memória, sem duplicar perfis nem modificar os registros legados. Senhas/cookies/tokens não foram gravados nos relatórios. A sessão perdida pelo preparador terminou com o reinício isolado da API; as sessões posteriores de ensaio foram encerradas por logout. A última leitura do console mostrou uma ocorrência de `removeChild` originada no content script da extensão Chrome, sem stack da aplicação; falhas HTTP induzidas foram intencionais. Captura completa móvel excedeu o tempo do navegador e foi refeita pela captura disponível, restaurando o viewport original e o tema escuro inicial.
