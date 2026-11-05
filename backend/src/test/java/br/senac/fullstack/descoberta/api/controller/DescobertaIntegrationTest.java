@@ -230,7 +230,7 @@ class DescobertaIntegrationTest {
             case "CIDADE" -> target.setCityId("PE_RECIFE");
             case "MOMENTOS" -> target.setMoments(List.of());
             case "TIPO_CONTA" -> { mentor.getUsuario().setTipoUsuario(TipoUsuario.STARTUP); users.save(mentor.getUsuario()); }
-            default -> { }
+            default -> assertThat(reason).isEqualTo("AUSENTE");
         }
         mentors.save(mentor);
         quizzes.save(target);
@@ -266,7 +266,7 @@ class DescobertaIntegrationTest {
             case "PUBLICO" -> startup.setPublicoAlvo("");
             case "MODELO" -> startup.setModeloDeNegocio("");
             case "TOPICOS" -> target.setTopics(List.of());
-            default -> { }
+            default -> assertThat(reason).isEqualTo("AUSENTE");
         }
         startups.save(startup);
         quizzes.save(target);
