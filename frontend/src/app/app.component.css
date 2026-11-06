@@ -31,59 +31,50 @@
 }
 
 .brand-dot {
-  color: var(--teal);
+  color: #85d9c7;
 }
-
 .brand-mark {
   width: 32px;
   height: 36px;
   position: relative;
   display: inline-block;
   flex-shrink: 0;
-  visibility: visible;
-  opacity: 1;
 }
-
 .brand-mark i {
   position: absolute;
   width: 24px;
   height: 27px;
-  border: 3px solid var(--teal);
+  border: 3px solid #8ad8ca;
   border-radius: 6px 12px 12px 6px;
   top: 0;
   left: 0;
 }
-
 .brand-mark i + i {
   top: 8px;
   left: 8px;
-  border-color: var(--on-navy);
+  border-color:var(--on-navy);
 }
-
 .sidebar-label {
   font-size: 10px;
   letter-spacing: 1.8px;
-  color: var(--muted);
+  color: #a0c1c8;
   margin: 48px 12px 16px;
   font-weight: 700;
 }
-
 .main-nav {
   display: grid;
   gap: 8px;
 }
-
 .main-nav a {
   display: flex;
   align-items: center;
   gap: 13px;
   padding: 13px 14px;
-  color: var(--on-navy);
+  color: #c4d7df;
   text-decoration: none;
   font-size: 13px;
   border-radius: 9px;
   font-weight: 550;
-  opacity: 0.82;
 }
 
 .main-nav a:hover {
