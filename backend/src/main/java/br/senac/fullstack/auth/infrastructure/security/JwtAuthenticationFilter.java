@@ -3,7 +3,6 @@ package br.senac.fullstack.auth.infrastructure.security;
 import br.senac.fullstack.auth.application.service.JwtSessionService;
 import br.senac.fullstack.shared.security.SecurityErrors;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,7 +45,7 @@ public final class JwtAuthenticationFilter extends OncePerRequestFilter {
                 request.setAttribute(JwtCookies.IDENTITY_ATTRIBUTE, identity);
                 response.setHeader(JwtCookies.MODE_HEADER, "JWT");
                 response.setHeader(JwtCookies.EXPIRY_HEADER, identity.expiresAt().toString());
-            } catch (JwtException | BadCredentialsException | IllegalArgumentException exception) {
+            } catch (BadCredentialsException | IllegalArgumentException exception) {
                 // Keep the anonymous context installed by Spring. No HttpSession or
                 // alternative authentication source is loaded in JWT mode.
                 SecurityErrors.audit("jwt_denied");

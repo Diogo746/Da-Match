@@ -46,7 +46,7 @@ public class JwtSessionService {
 
     @Transactional
     public JwtCredentials login(UUID userId, String previousRefreshToken) {
-        revoke(previousRefreshToken);
+        revokeKnownToken(previousRefreshToken);
         Instant now = now();
         refreshTokens.deleteExpired(now);
         sessions.deleteExpired(now);
@@ -93,6 +93,10 @@ public class JwtSessionService {
 
     @Transactional
     public void revoke(String token) {
+        revokeKnownToken(token);
+    }
+
+    private void revokeKnownToken(String token) {
         if (token == null) {
             return;
         }

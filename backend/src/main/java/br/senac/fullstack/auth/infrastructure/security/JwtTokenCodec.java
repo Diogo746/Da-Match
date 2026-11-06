@@ -1,11 +1,11 @@
 package br.senac.fullstack.auth.infrastructure.security;
 
 import br.senac.fullstack.auth.domain.JwtIdentity;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.UnsupportedJwtException;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
@@ -16,17 +16,17 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public final class JwtTokenCodec {
     private final JwtProperties properties;
     private final Clock clock;
-    private final RSAPrivateKey signingKey;
-    private final JwtParser parser;
+    private final Algorithm signingAlgorithm;
+    private final Map<String, JWTVerifier> verifiers;
 
     public JwtTokenCodec(JwtProperties properties, Clock clock) {
         properties.validatePolicy();
@@ -46,63 +46,72 @@ public final class JwtTokenCodec {
                 }
                 keys.put(entry.getKey(), key);
             }
-            signingKey = (RSAPrivateKey) factory.generatePrivate(
+            RSAPrivateKey signingKey = (RSAPrivateKey) factory.generatePrivate(
                     new PKCS8EncodedKeySpec(Base64.getDecoder().decode(properties.getPrivateKey())));
             RSAPublicKey active = keys.get(properties.getActiveKeyId());
             if (active == null || !active.getModulus().equals(signingKey.getModulus())) {
                 throw new IllegalArgumentException("Par de chaves inválido");
             }
+            signingAlgorithm = Algorithm.RSA256(active, signingKey);
         } catch (Exception exception) {
             // Never attach parsing causes: configuration may contain private key material.
             throw new IllegalStateException("Configure um par RSA válido e chaves públicas JWT com pelo menos 2048 bits.");
         }
-        parser = Jwts.parser().clock(() -> Date.from(clock.instant()))
-                .requireIssuer(properties.getIssuer())
-                .sig().clear().add(Jwts.SIG.RS256).and()
-                .zip().clear().and()
-                .keyLocator(header -> {
-                    if (!"RS256".equals(header.get("alg")) || !"at+jwt".equals(header.get("typ"))) {
-                        throw new UnsupportedJwtException("JWT inválido.");
-                    }
-                    RSAPublicKey key = keys.get(header.get("kid"));
-                    if (key == null) {
-                        throw new UnsupportedJwtException("JWT inválido.");
-                    }
-                    return key;
-                }).build();
+        verifiers = keys.entrySet().stream().collect(Collectors.toUnmodifiableMap(
+                Map.Entry::getKey, entry -> verifier(entry.getValue())));
     }
 
     public String issue(UUID userId, UUID sessionId, Instant expiresAt) {
         Instant now = clock.instant().truncatedTo(ChronoUnit.SECONDS);
-        return Jwts.builder().header().keyId(properties.getActiveKeyId()).type("at+jwt").and()
-                .issuer(properties.getIssuer()).audience().add(properties.getAudience()).and()
-                .subject(userId.toString()).id(UUID.randomUUID().toString()).claim("sid", sessionId.toString())
-                .issuedAt(Date.from(now)).notBefore(Date.from(now)).expiration(Date.from(expiresAt))
-                .signWith(signingKey, Jwts.SIG.RS256).compact();
+        return JWT.create().withKeyId(properties.getActiveKeyId()).withHeader(Map.of("typ", "at+jwt"))
+                .withIssuer(properties.getIssuer()).withAudience(properties.getAudience())
+                .withSubject(userId.toString()).withJWTId(UUID.randomUUID().toString()).withClaim("sid", sessionId.toString())
+                .withIssuedAt(now).withNotBefore(now).withExpiresAt(expiresAt).sign(signingAlgorithm);
     }
 
     public JwtIdentity verify(String token) {
         if (token == null || token.length() > 4096) {
-            throw new JwtException("JWT inválido.");
+            throw JwtSecrets.denied();
         }
-        Claims claims = parser.parseSignedClaims(token).getPayload();
         try {
-            Instant issuedAt = claims.getIssuedAt().toInstant();
-            Instant notBefore = claims.getNotBefore().toInstant();
-            Instant expiresAt = claims.getExpiration().toInstant();
+            DecodedJWT claims = JWT.decode(token);
+            verifySignature(claims);
+            Instant issuedAt = claims.getIssuedAtAsInstant();
+            Instant notBefore = claims.getNotBeforeAsInstant();
+            Instant expiresAt = claims.getExpiresAtAsInstant();
             Instant now = clock.instant();
-            if (!Set.of(properties.getAudience()).equals(claims.getAudience())
-                    || issuedAt.isAfter(now.plusSeconds(30)) || !notBefore.equals(issuedAt)
+            if (!properties.getIssuer().equals(claims.getIssuer())
+                    || !List.of(properties.getAudience()).equals(claims.getAudience())
+                    || issuedAt.isAfter(now) || !notBefore.equals(issuedAt)
                     || !expiresAt.isAfter(now) || !expiresAt.isAfter(issuedAt)
                     || expiresAt.isAfter(issuedAt.plus(properties.getAccessTtl()))) {
                 throw new IllegalArgumentException("Claims inválidas");
             }
             canonicalUuid(claims.getId());
             return new JwtIdentity(canonicalUuid(claims.getSubject()),
-                    canonicalUuid(claims.get("sid", String.class)), expiresAt);
-        } catch (IllegalArgumentException | NullPointerException exception) {
-            throw new JwtException("JWT inválido.");
+                    canonicalUuid(claims.getClaim("sid").asString()), expiresAt);
+        } catch (JWTVerificationException | IllegalArgumentException | NullPointerException exception) {
+            throw JwtSecrets.denied();
         }
+    }
+
+    private void verifySignature(DecodedJWT jwt) {
+        JWTVerifier verifier = verifiers.get(jwt.getKeyId());
+        if (verifier == null || !"RS256".equals(jwt.getAlgorithm()) || !"at+jwt".equals(jwt.getType())
+                || !jwt.getHeaderClaim("zip").isMissing() || !jwt.getHeaderClaim("crit").isMissing()) {
+            throw JwtSecrets.denied();
+        }
+        // Decoding grants no trust. The library verifies pinned RS256, issuer,
+        // audience and time claims; our required-claim/lifetime policy also applies.
+        verifier.verify(jwt);
+    }
+
+    private JWTVerifier verifier(RSAPublicKey key) {
+        var configuration = (JWTVerifier.BaseVerification) JWT.require(Algorithm.RSA256(key, null));
+        configuration.withIssuer(properties.getIssuer()).withAudience(properties.getAudience());
+        // The public Clock overload keeps library checks and application policy
+        // on the same injected clock, including deterministic expiry tests.
+        return configuration.build(clock);
     }
 
     private static UUID canonicalUuid(String value) {

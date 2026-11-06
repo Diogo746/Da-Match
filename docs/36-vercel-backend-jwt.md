@@ -9,7 +9,7 @@ A prova de conceito com H2 descartável respondeu ao health-check. Isso comprova
 ## Contrato JWT
 
 - `SESSION` continua padrão, preservando o ambiente atual. `APP_SECURITY_AUTH_MODE=JWT` ativa o novo contrato. O perfil `vercel` inclui `prod`, exige JWT e cookies Secure, reduz o pool JDBC e habilita encerramento gracioso.
-- Spring Security mantém a autorização e CSRF. Assinatura/parsing usam JJWT 0.13.0 (Apache 2.0), sem provedor pago. Somente RS256, RSA de pelo menos 2048 bits e `kid` presente no mapa externo. Não buscar chaves em URL indicada pelo token. Configuração ausente, fraca ou incompatível impede iniciar JWT.
+- Spring Security mantém a autorização e CSRF. Assinatura/parsing usam a biblioteca gratuita java-jwt 4.6.2, com API Instant nativa, sem contratar o serviço Auth0. JJWT 0.13.0 fica somente nos testes como assinador independente de tokens adversariais. Somente RS256, RSA de pelo menos 2048 bits e `kid` presente no mapa externo. Não buscar chaves em URL indicada pelo token. Configuração ausente, fraca ou incompatível impede iniciar JWT.
 - Exigir assinatura, `typ=at+jwt`, emissor, audiência exata, `sub`/`sid`/`jti` UUIDs canônicos, `iat`, `nbf`, `exp` e duração permitida. Limitar tamanho; rejeitar token sem assinatura, algoritmo diferente, chave desconhecida, adulteração e expiração. JWT não carrega nome, e-mail, papel, senha ou hash.
 - Access: 15 minutos. Refresh: 256 bits aleatórios, uso único, 30 minutos sem renovar. Família: máximo oito horas. Configuração pode reduzir esses prazos, nunca superar os tetos. Não há opção "lembrar de mim"; os cookies não persistem por Max-Age no navegador.
 - `DAMATCH-ACCESS`: HttpOnly, Path=/; `DAMATCH-REFRESH`: HttpOnly, Path=/api/v1/auth. Sem Domain. Secure obrigatório em produção, SameSite configurável com a validação existente. Preferir proxy na mesma origem e Lax. CSRF permanece obrigatório com cookies.
@@ -18,6 +18,8 @@ A prova de conceito com H2 descartável respondeu ao health-check. Isso comprova
 JWT elimina a dependência de sessão **na memória da instância**, mas esta implementação mantém estado mínimo no PostgreSQL existente para renovação e logout imediato. Não é arquitetura sem armazenamento. Hibernate adiciona `auth_session` (conta, datas, revogação, impressão interna da credencial/papel) e `auth_refresh_token` (somente SHA-256 de cada refresh, nunca o token bruto). Famílias vencidas e seus hashes são removidos ao criar novos logins.
 
 Troca de senha/papel invalida a família na próxima consulta. Logout revoga pelo refresh reconhecido ou access validado e remove cookies. Login substituindo cookies revoga a família anterior. Rotação bloqueia a família no banco e funciona entre instâncias. Reusar um refresh consumido revoga a família inteira, inclusive tokens posteriores. Pedidos já autorizados e em andamento não são cancelados retroativamente.
+
+Não há rota de alteração de senha/papel nesta entrega. Ao implementar essa gestão, revogar as famílias na mesma transação da alteração; o comparador atual confere os valores vigentes, não constitui histórico de mudanças/restaurações feitas diretamente no banco. Operações administrativas por SQL também devem revogar as famílias afetadas.
 
 Renovações simultâneas da mesma família em abas/clientes diferentes podem exigir nova entrada por reuso; o Angular compartilha uma renovação por vez dentro da mesma instância. Não há tolerância que reaproveite refresh antigo.
 
@@ -74,17 +76,18 @@ O pipeline atual ainda publica no Render. Esta preparação não troca o hook po
 
 ## Validação desta preparação
 
-- 299 testes backend, Checkstyle e arquitetura aprovados. Incluem assinatura/claims/chaves, expiração, renovação/reuso, concorrência, troca de senha/papel, compatibilidade SESSION e HTTP real com o perfil vercel/prod. Renovar/restaurar JWT preserva CSRF; login/logout o invalidam.
+- 305 testes backend, Checkstyle e arquitetura aprovados. Incluem assinatura/claims/chaves, expiração, datas extremas, confusão de algoritmo, renovação/reuso, concorrência, troca de senha/papel, compatibilidade SESSION e HTTP real com o perfil vercel/prod. Renovar/restaurar JWT preserva CSRF; login/logout o invalidam.
 - 621 testes frontend + 8 de configuração, lint e builds DEMO/API aprovados. Cobertura de linhas: 99,11% (2679/2703), sem reduzir limites/exclusões. Pacote backend de envio conferido pela CLI: 125 arquivos, cerca de 219kB, sem dados/chaves locais. Imagem definitiva construída localmente com sucesso.
 - Ensaio em cópia **fictícia** PG18: backup prévio de 39.987 bytes; dados das 14 tabelas anteriores preservados antes/depois do update; somente auth_session/auth_refresh_token adicionadas. Segunda instância iniciou com validate. Isso não comprova backup/schema de produção.
 - 14 cenários HTTP por Angular/proxy → Spring → PG18: cadastro, login, catálogo de 21 mentores, outra instância, reinício, renovação, logout e concorrência/reuso. JWT continuou válido após reinício; revogação foi respeitada por ambas.
 - Chrome local: login, recarga, catálogo, renovação induzida por política curta **só no QA**, consulta/edição de startup com CSRF, persistência após recarga e logout. Imagem em frontend/.angular/cache/vercel-jwt-profile-saved.png; logs/scripts/dumps ignorados em backend/database/vercel-poc-20261105.
 - Ocorrências corrigidas: rotação indevida de CSRF pela estratégia de sessão foi reproduzida por cliente real que respeita Set-Cookie, corrigida na ordem do filtro e coberta por regressão. Uma asserção de headers encontrou configuração ausente no recurso de teste; a política none ficou explícita em prod. Empacotamento Windows encontrou o JAR aberto pelas APIs de QA; parar somente essas APIs liberou repackage, sem clean nem perda de evidências. A primeira lista de envio omitia backend por barras nas negações de diretório; dry-run confirmou a correção antes de envio.
+- CI117 reprovou o backend por chamada interna a método transacional e dependência da API Date. A chamada passou a helper privado sob as transações públicas existentes; a biblioteca de produção passou a java-jwt com Instant, mantendo RS256 e validação por Clock. JJWT permaneceu apenas como assinador independente em testes. Frontend/gate e demais jobs aplicáveis da CI117 aprovados; repetir a análise do head corrigido, sem reduzir gate ou suprimir regras.
 
 ## Fontes oficiais
 
 - [Container Runtime](https://vercel.com/docs/functions/runtimes/container), [migração Render](https://vercel.com/kb/guide/migrate-render-to-vercel).
 - [Preços/franquias](https://vercel.com/pricing), [Hobby](https://vercel.com/docs/plans/hobby).
-- [JJWT](https://github.com/jwtk/jjwt), [release 0.13.0](https://github.com/jwtk/jjwt/releases/tag/0.13.0).
+- [java-jwt](https://github.com/auth0/java-jwt), [releases](https://github.com/auth0/java-jwt/releases); [JJWT para testes independentes](https://github.com/jwtk/jjwt).
 - [CSRF Spring Security](https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html).
 - [Conexões Supabase](https://supabase.com/docs/guides/database/connecting-to-postgres).

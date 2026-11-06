@@ -1,7 +1,9 @@
 package br.senac.fullstack.auth.infrastructure.security;
 
 import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.JwtException;
+import org.springframework.security.authentication.BadCredentialsException;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,7 +81,7 @@ class JwtTokenCodecTest {
             default -> throw new IllegalArgumentException(fault);
         }
         String token = builder.compact();
-        assertThatThrownBy(() -> codec.verify(token)).isInstanceOf(JwtException.class);
+        assertThatThrownBy(() -> codec.verify(token)).isInstanceOf(BadCredentialsException.class);
     }
 
     @Test
@@ -94,15 +96,37 @@ class JwtTokenCodecTest {
         assertThat(next.verify(next.issue(USER, SESSION, NOW.plusSeconds(900))).userId()).isEqualTo(USER);
         rotated.setPublicKeys(Map.of("new", encode(OTHER.getPublic().getEncoded())));
         JwtTokenCodec retired = new JwtTokenCodec(rotated, clock);
-        assertThatThrownBy(() -> retired.verify(old)).isInstanceOf(JwtException.class);
+        assertThatThrownBy(() -> retired.verify(old)).isInstanceOf(BadCredentialsException.class);
     }
 
     @Test
     void rejectsOversizedAndMalformedTokens() {
         String oversized = "a".repeat(4097);
-        assertThatThrownBy(() -> codec.verify(oversized)).isInstanceOf(JwtException.class);
-        assertThatThrownBy(() -> codec.verify("malformed")).isInstanceOf(JwtException.class);
-        assertThatThrownBy(() -> codec.verify(null)).isInstanceOf(JwtException.class);
+        assertThatThrownBy(() -> codec.verify(oversized)).isInstanceOf(BadCredentialsException.class);
+        assertThatThrownBy(() -> codec.verify("malformed")).isInstanceOf(BadCredentialsException.class);
+        assertThatThrownBy(() -> codec.verify(null)).isInstanceOf(BadCredentialsException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"far-exp", "far-iat", "text-exp", "zip", "crit", "hmac"})
+    void rejectsOutOfRangeDatesUnsupportedHeadersAndAlgorithmConfusion(String fault) {
+        var builder = JWT.create().withKeyId("test").withHeader(Map.of("typ", "at+jwt"))
+                .withIssuer("test-issuer").withAudience("test-audience").withSubject(USER.toString())
+                .withJWTId(UUID.randomUUID().toString()).withClaim("sid", SESSION.toString())
+                .withIssuedAt(NOW).withNotBefore(NOW).withExpiresAt(NOW.plusSeconds(900));
+        Algorithm algorithm = Algorithm.RSA256((java.security.interfaces.RSAPublicKey) KEYS.getPublic(),
+                (java.security.interfaces.RSAPrivateKey) KEYS.getPrivate());
+        switch (fault) {
+            case "far-exp" -> builder.withPayload(Map.of("exp", Long.MAX_VALUE));
+            case "far-iat" -> builder.withPayload(Map.of("iat", Long.MAX_VALUE));
+            case "text-exp" -> builder.withPayload(Map.of("exp", "invalid"));
+            case "zip" -> builder.withHeader(Map.of("zip", "DEF"));
+            case "crit" -> builder.withHeader(Map.of("crit", java.util.List.of("unknown")));
+            case "hmac" -> algorithm = Algorithm.HMAC256(KEYS.getPublic().getEncoded());
+            default -> throw new IllegalArgumentException(fault);
+        }
+        String token = builder.sign(algorithm);
+        assertThatThrownBy(() -> codec.verify(token)).isInstanceOf(BadCredentialsException.class);
     }
 
     @ParameterizedTest
