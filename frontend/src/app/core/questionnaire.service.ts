@@ -1,3 +1,4 @@
+import { API_REQUEST_TIMEOUT_MS } from "./api-timeout";
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable, map, timeout } from "rxjs";
@@ -46,7 +47,7 @@ export class QuestionnaireService {
   private readonly http = inject(HttpClient);
 
   load(kind: ProfileKind, id: string): Observable<ProfileDraft | null> {
-    return this.http.get<unknown>(this.path(kind, id), { observe: "response" }).pipe(timeout(15000), map(response => {
+    return this.http.get<unknown>(this.path(kind, id), { observe: "response" }).pipe(timeout(API_REQUEST_TIMEOUT_MS), map(response => {
       if (response.status === 204 && response.body === null) return null;
       if (response.status !== 200) throw new Error("Resposta inválida.");
       return readQuestionnaire(response.body, kind);
@@ -57,7 +58,7 @@ export class QuestionnaireService {
     const validated = readQuestionnaire({ questionnaireVersion: QUESTIONNAIRE_VERSION, ...answers }, kind);
     return this.http.put<unknown>(this.path(kind, id), {
       questionnaireVersion: QUESTIONNAIRE_VERSION, ...validated, capacity: validated.capacity || null,
-    }, { observe: "response" }).pipe(timeout(15000), map(response => {
+    }, { observe: "response" }).pipe(timeout(API_REQUEST_TIMEOUT_MS), map(response => {
       if (response.status !== 200) throw new Error("Resposta inválida.");
       return readQuestionnaire(response.body, kind);
     }));

@@ -1,3 +1,4 @@
+import { API_REQUEST_TIMEOUT_MS } from "./api-timeout";
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable, map, timeout } from "rxjs";
@@ -10,12 +11,12 @@ export class StartupService {
 
   publication(id: string): Observable<StartupPublication> {
     return this.http.get<unknown>(`/api/v1/startups/${encodeURIComponent(id)}/status`)
-      .pipe(timeout(15000), map(value => readStartupPublication(value, id)));
+      .pipe(timeout(API_REQUEST_TIMEOUT_MS), map(value => readStartupPublication(value, id)));
   }
 
   setStatus(id: string, status: StartupPublicationStatus): Observable<StartupPublication> {
     return this.http.patch<unknown>(`/api/v1/startups/${encodeURIComponent(id)}/status`, { status })
-      .pipe(timeout(15000), map(value => {
+      .pipe(timeout(API_REQUEST_TIMEOUT_MS), map(value => {
         const result = readStartupPublication(value, id);
         if (result.status !== status || !result.podeGerenciar || status === "PUBLICADO" && !result.aptoParaPublicacao) {
           throw new Error("Publicação não confirmada.");
@@ -25,7 +26,7 @@ export class StartupService {
   }
 
   mine(): Observable<StartupProfile[]> {
-    return this.http.get<unknown>("/api/v1/startups/me").pipe(timeout(15000), map(value => {
+    return this.http.get<unknown>("/api/v1/startups/me").pipe(timeout(API_REQUEST_TIMEOUT_MS), map(value => {
       if (!Array.isArray(value)) throw new Error("Resposta de startups inválida.");
       return value.map(readStartupProfile);
     }));
@@ -33,6 +34,6 @@ export class StartupService {
 
   update(id: string, details: StartupRegistrationDetails): Observable<StartupProfile> {
     return this.http.patch<unknown>(`/api/v1/startups/${encodeURIComponent(id)}`, normalizeStartupDetails(details))
-      .pipe(timeout(15000), map(readStartupProfile));
+      .pipe(timeout(API_REQUEST_TIMEOUT_MS), map(readStartupProfile));
   }
 }

@@ -38,8 +38,20 @@ class SecurityPropertiesTest {
         SecurityConfig configuration = new SecurityConfig();
         SecurityProperties properties = new SecurityProperties();
         assertThatThrownBy(() -> configuration.securityFilterChain(
-                null, null, null, properties, environment, null))
+                null, null, null, properties, environment, null, null))
                 .isInstanceOf(IllegalStateException.class).hasMessage("Produção exige cookies Secure.");
+    }
+
+    @Test
+    void vercelRejectsInMemorySessionsBeforeBuildingTheFilterChain() {
+        MockEnvironment environment = new MockEnvironment();
+        environment.setActiveProfiles("vercel", "prod");
+        SecurityConfig configuration = new SecurityConfig();
+        SecurityProperties properties = new SecurityProperties();
+        properties.getCookies().setSecure(true);
+        assertThatThrownBy(() -> configuration.securityFilterChain(
+                null, null, null, properties, environment, null, null))
+                .isInstanceOf(IllegalStateException.class).hasMessage("O perfil Vercel exige autenticação JWT.");
     }
 
     @Configuration(proxyBeanMethods = false)

@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "89f937f0-df1e-43b4-92d1-19b7680021bb",
     "name": "Da-Match API",
-    "description": "API com autenticação por sessão. Preserve os cookies no Postman e obtenha CSRF antes de escritas, inclusive login/logout. Após login/logout, obtenha um novo CSRF. Cadastro exige visitante sem sessão e senha de 6 ou mais caracteres e até 72 bytes UTF-8. Agenda de mentor não aceita itens nulos. Leitura de startups exige sessão; edição de mentor exige titular e gestão de membros exige fundador/representante. PENDENTE contém somente propostas.",
+    "description": "API com autenticação por cookies: SESSION padrão ou JWT no perfil Vercel. Preserve os cookies no Postman e obtenha CSRF antes de escritas, inclusive login/logout/refresh. Após login/logout, obtenha um novo CSRF. JWT usa renovação de uso único, sem repetir após resultado incerto. Cadastro exige visitante sem sessão e senha de 6 ou mais caracteres e até 72 bytes UTF-8. Agenda de mentor não aceita itens nulos. Leitura de startups exige autenticação; edição de mentor exige titular e gestão de membros exige fundador/representante. PENDENTE contém somente propostas.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -100,7 +100,7 @@
   "item": [
     {
       "name": "Autenticação",
-      "description": "Use authEmail e authPassword apenas localmente com conta fictícia existente. Não exporte credenciais. Execute Obter token CSRF antes do login e novamente após login/logout. O cookie JSESSIONID é mantido pelo Postman.",
+      "description": "Use authEmail e authPassword apenas localmente com conta fictícia existente. Não exporte credenciais. Execute Obter token CSRF antes do login e novamente após login/logout. O Postman mantém JSESSIONID em SESSION, ou DAMATCH-ACCESS e DAMATCH-REFRESH em JWT. Nunca copie tokens para variáveis/scripts. X-Auth-Mode e X-Auth-Expires-At informam o contrato sem expor credenciais.",
       "item": [
         {
           "name": "Login",
@@ -116,6 +116,7 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Login confirmado', () => pm.response.to.have.status(200));",
             "pm.test('Resposta sem credenciais', () => { const body = pm.response.json(); pm.expect(body).not.to.have.property('senha'); pm.expect(body).not.to.have.property('sessionId'); });",
+            "if (pm.response.code === 200) pm.collectionVariables.set('authMode', pm.response.headers.get('X-Auth-Mode') || 'SESSION');",
             "if (pm.response.code === 200) pm.collectionVariables.unset('csrfToken');"
           ] } }],
           "response": []
@@ -123,6 +124,22 @@
         {
           "name": "Conta atual",
           "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/v1/auth/me" },
+          "response": []
+        },
+        {
+          "name": "Renovar sessão JWT (somente modo JWT)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }],
+            "url": "{{baseUrl}}/api/v1/auth/refresh",
+            "description": "Somente JWT: retorna 204 e substitui os cookies, preservando CSRF. Em SESSION retorna 401. Não repetir após falha ambígua: consultar me; se não confirmar acesso, entrar novamente. Reuso de refresh consumido revoga a família. Não executar esta requisição como etapa obrigatória de uma coleção em SESSION."
+          },
+          "event": [{ "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
+            "if (pm.collectionVariables.get('authMode') !== 'JWT') pm.execution.skipRequest();"
+          ] } }, { "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Renovação JWT confirmada', () => pm.response.to.have.status(204));",
+            "pm.test('Modo JWT', () => pm.expect(pm.response.headers.get('X-Auth-Mode')).to.eql('JWT'));"
+          ] } }],
           "response": []
         },
         {
