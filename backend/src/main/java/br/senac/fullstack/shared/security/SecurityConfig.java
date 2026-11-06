@@ -1,9 +1,12 @@
 package br.senac.fullstack.shared.security;
 
+import br.senac.fullstack.auth.infrastructure.security.JwtAuthenticationFilter;
+import br.senac.fullstack.auth.infrastructure.security.JwtCookies;
 import br.senac.fullstack.shared.enums.TipoUsuario;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
@@ -17,6 +20,8 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.NullSecurityContextRepository;
+import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -37,11 +42,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http, CookieCsrfTokenRepository csrfRepository,
             SecurityContextRepository contextRepository,
-            SecurityProperties properties, Environment environment, ObjectMapper mapper
+            SecurityProperties properties, Environment environment, ObjectMapper mapper,
+            ObjectProvider<JwtAuthenticationFilter> jwtFilter
     ) throws Exception {
         boolean production = environment.acceptsProfiles(Profiles.of("prod"));
         if (production && !properties.getCookies().isSecure()) {
             throw new IllegalStateException("Produção exige cookies Secure.");
+        }
+        if (environment.acceptsProfiles(Profiles.of("vercel")) && !properties.usesJwt()) {
+            throw new IllegalStateException("O perfil Vercel exige autenticação JWT.");
+        }
+        if (properties.usesJwt()) {
+            // Restoring a stateless identity is not a new login. Run after the legacy
+            // session strategy so it cannot rotate CSRF on every authenticated request.
+            http.addFilterAfter(jwtFilter.getObject(), SessionManagementFilter.class);
         }
         return http
                 .cors(Customizer.withDefaults())
@@ -49,7 +63,8 @@ public class SecurityConfig {
                         // JSON /csrf returns the raw cookie token; HTTP response compression remains disabled.
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .securityContext(context -> context.securityContextRepository(contextRepository))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionManagement(session -> session.sessionCreationPolicy(properties.usesJwt()
+                                ? SessionCreationPolicy.STATELESS : SessionCreationPolicy.IF_REQUIRED)
                         .sessionFixation(fixation -> fixation.changeSessionId()))
                 .requestCache(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -73,6 +88,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                             .requestMatchers(HttpMethod.GET, "/csrf", "/api/v1/health").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/api/v1/auth/refresh").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/v1/mentores", "/api/v1/startups").anonymous()
                             .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
                             .requestMatchers(HttpMethod.GET, "/api/v1/mentores/me")
@@ -89,7 +105,6 @@ public class SecurityConfig {
                             .hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.PUT, "/api/v1/startups/*/perfil-match")
                             .hasRole(TipoUsuario.STARTUP.name())
-                            .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                             .requestMatchers(HttpMethod.PATCH, "/api/v1/mentores/*", "/api/v1/mentores/*/status")
                             .hasRole(TipoUsuario.MENTOR.name())
                             .requestMatchers(HttpMethod.GET, "/api/v1/startups/me").hasRole(TipoUsuario.STARTUP.name())
@@ -116,6 +131,11 @@ public class SecurityConfig {
                             .hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**")
                             .hasRole(TipoUsuario.ADMIN.name());
+                    if (properties.usesJwt()) {
+                        auth.requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").permitAll();
+                    } else {
+                        auth.requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated();
+                    }
                     if (!production) {
                         auth.requestMatchers(HttpMethod.GET, "/api/v1/hello").permitAll();
                     }
@@ -134,7 +154,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityContextRepository securityContextRepository() {
+    public SecurityContextRepository securityContextRepository(SecurityProperties properties) {
+        if (properties.usesJwt()) {
+            return new NullSecurityContextRepository();
+        }
         HttpSessionSecurityContextRepository repository = new HttpSessionSecurityContextRepository();
         repository.setDisableUrlRewriting(true);
         return repository;
@@ -146,6 +169,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(properties.getCors().getAllowedOrigins());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Content-Type", "Accept", "X-XSRF-TOKEN"));
+        configuration.setExposedHeaders(List.of(JwtCookies.MODE_HEADER, JwtCookies.EXPIRY_HEADER));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
