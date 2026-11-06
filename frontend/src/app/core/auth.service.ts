@@ -4,6 +4,7 @@ import { Observable, defer, map, switchMap, tap, throwError, timeout } from "rxj
 import { AuthStateStore, CurrentUser } from "./auth-state.store";
 import { CsrfService } from "./csrf.service";
 import { REGISTRATION_MODE } from "./registration.config";
+import { AuthRenewalService } from "./auth-renewal.service";
 
 function readUser(value: unknown): CurrentUser {
   if (!value || typeof value !== "object") throw new Error("Resposta de autenticação inválida.");
@@ -22,15 +23,22 @@ export class AuthService {
   private readonly csrf = inject(CsrfService);
   private readonly state = inject(AuthStateStore);
   private readonly mode = inject(REGISTRATION_MODE);
+  private readonly renewal = inject(AuthRenewalService);
 
   login(email: string, senha: string): Observable<CurrentUser> {
     return this.api(() => {
+      const revision = this.state.revision();
       this.csrf.clear();
       return this.csrf.getToken().pipe(
         switchMap((token) => this.http.post<unknown>("/api/v1/auth/login", { email: email.trim(), senha },
-          { headers: { "X-XSRF-TOKEN": token } })),
-        map(readUser),
-        tap((user) => this.state.setUser(user)),
+          { observe: "response", headers: { "X-XSRF-TOKEN": token } })),
+        map(response => {
+          if (revision !== this.state.revision()) throw new Error("A sessão mudou durante a entrada.");
+          const user = readUser(response.body);
+          this.state.setUser(user);
+          this.renewal.accept(response.headers);
+          return user;
+        }),
         switchMap((user) => {
           this.csrf.clear();
           return this.csrf.getToken().pipe(map(() => user));
@@ -42,10 +50,11 @@ export class AuthService {
   me(): Observable<CurrentUser> {
     return this.api(() => {
       const revision = this.state.revision();
-      return this.http.get<unknown>("/api/v1/auth/me").pipe(map(value => {
+      return this.http.get<unknown>("/api/v1/auth/me", { observe: "response" }).pipe(map(response => {
         if (revision !== this.state.revision()) throw new Error("A sessão mudou durante a consulta.");
-        const user = readUser(value);
+        const user = readUser(response.body);
         this.state.confirmUser(user);
+        this.renewal.accept(response.headers);
         return user;
       }));
     });
