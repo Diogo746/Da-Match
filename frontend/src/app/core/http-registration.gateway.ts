@@ -1,3 +1,4 @@
+import { API_REQUEST_TIMEOUT_MS } from "./api-timeout";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable, TimeoutError, catchError, defer, map, switchMap, throwError, timeout } from "rxjs";
@@ -6,7 +7,6 @@ import { RegistrationError, RegistrationGateway, RegistrationReceipt, Registrati
 import { readMentorProfile, validAvailability } from "./mentor.models";
 import { readStartupProfile, validStartupDetails } from "./startup.models";
 
-const REQUEST_TIMEOUT_MS = 15000;
 
 function csrfHeader(value: unknown): Record<string, string> {
   if (!value || typeof value !== "object" || !("headerName" in value) ||
@@ -44,11 +44,11 @@ export class HttpRegistrationGateway extends RegistrationGateway {
       const path = kind === "MENTOR" ? "/api/v1/mentores" : "/api/v1/startups";
       let sent = false;
       return this.http.get<unknown>("/csrf").pipe(
-        timeout(REQUEST_TIMEOUT_MS),
+        timeout(API_REQUEST_TIMEOUT_MS),
         map(csrfHeader),
         switchMap((headers) => {
           sent = true;
-          return this.http.post<unknown>(path, payload, { headers, observe: "response" }).pipe(timeout(REQUEST_TIMEOUT_MS));
+          return this.http.post<unknown>(path, payload, { headers, observe: "response" }).pipe(timeout(API_REQUEST_TIMEOUT_MS));
         }),
         map((response): RegistrationReceipt => {
           if (response.status !== 201) throw new RegistrationError("UNCONFIRMED");

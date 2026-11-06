@@ -1,3 +1,4 @@
+import { API_REQUEST_TIMEOUT_MS } from "./api-timeout";
 import { HttpBackend, HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable, catchError, defer, finalize, map, of, shareReplay, switchMap, throwError, timeout } from "rxjs";
@@ -51,7 +52,7 @@ export class AuthRenewalService {
             observe: "response", withCredentials: true, headers: { "X-XSRF-TOKEN": token },
           });
         }),
-        timeout(15000),
+        timeout(API_REQUEST_TIMEOUT_MS),
         map(response => {
           this.checkRevision(revision);
           if (response.status !== 204 || response.headers.get("X-Auth-Mode") !== "JWT" ||

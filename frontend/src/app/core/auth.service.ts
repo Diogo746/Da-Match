@@ -1,3 +1,4 @@
+import { API_REQUEST_TIMEOUT_MS } from "./api-timeout";
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable, defer, map, switchMap, tap, throwError, timeout } from "rxjs";
@@ -70,6 +71,6 @@ export class AuthService {
 
   private api<T>(work: () => Observable<T>): Observable<T> {
     return defer(() => this.mode === "API" ? work() :
-      throwError(() => new Error("A demonstração não autentica contas reais."))).pipe(timeout(15000));
+      throwError(() => new Error("A demonstração não autentica contas reais."))).pipe(timeout(API_REQUEST_TIMEOUT_MS));
   }
 }

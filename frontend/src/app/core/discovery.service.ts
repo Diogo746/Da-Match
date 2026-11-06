@@ -1,3 +1,4 @@
+import { API_REQUEST_TIMEOUT_MS } from "./api-timeout";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable, defer, map, throwError, timeout } from "rxjs";
@@ -25,6 +26,6 @@ export class DiscoveryService {
   }
   private api<T>(work: () => Observable<T>): Observable<T> {
     return defer(() => this.mode === "API" ? work() : throwError(() => new Error("Catálogo real indisponível na demonstração.")))
-      .pipe(timeout(15000));
+      .pipe(timeout(API_REQUEST_TIMEOUT_MS));
   }
 }
