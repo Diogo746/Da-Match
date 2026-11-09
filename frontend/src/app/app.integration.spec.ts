@@ -215,4 +215,15 @@ it("limpa o perfil pela interface e mantém acessíveis o cadastro e a explicaç
   await TestBed.inject(Router).navigateByUrl("/como-funciona"); await settle();
   expect(root.textContent).toContain("monte seu perfil em seis etapas com o Lumen");
   expect(root.querySelector('.topbar-actions a')?.textContent).toContain("Criar perfil");
+
+  it("easter egg: clicar em Ecossistema de inovação liga e desliga o tema arco-íris", async () => {
+    await render("/");
+    const title = root.querySelector<HTMLElement>(".workspace-name")!;
+    title.click(); await settle();
+    expect(document.documentElement.dataset["palette"]).toBe("arco");
+    title.click(); await settle();
+    expect(document.documentElement.dataset["palette"]).toBe("azul");
+    title.querySelector<HTMLElement>("span")!.click(); await settle();
+    expect(document.documentElement.dataset["palette"]).toBe("azul");
+  });
 });
