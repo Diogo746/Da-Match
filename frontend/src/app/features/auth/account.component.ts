@@ -14,16 +14,19 @@ import { AuthStateStore } from "../../core/auth-state.store";
     @if (state.user(); as user) {
       <p>{{ user.nome }}</p><p>{{ user.email }}</p>
       <p>Sua sessão está ativa.</p>
-      @if (user.tipoUsuario === 'MENTOR') {
+    }
+    @if (state.notice()) { <p role="alert">{{ state.notice() }}</p> }
+    <div class="account-actions">
+      @if (state.user()?.tipoUsuario === 'MENTOR') {
         <a class="button button-primary" routerLink="/mentor/perfil">Abrir meu perfil de mentor</a>
       }
-      @if (user.tipoUsuario === 'STARTUP') {
+      @if (state.user()?.tipoUsuario === 'STARTUP') {
         <a class="button button-primary" routerLink="/startup/perfil">Abrir minha startup</a>
         <a class="button button-secondary" routerLink="/startup/convites">Convites recebidos</a>
       }
-    }
-    @if (state.notice()) { <p role="alert">{{ state.notice() }}</p> }
-    <button class="button button-primary" type="button" [disabled]="loading()" (click)="logout()">Sair da conta</button>`,
+      <button class="button button-primary" type="button" [disabled]="loading()" (click)="logout()">Sair da conta</button>
+    </div>`,
+  styles: [`.account-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }`],
 })
 export class AccountComponent {
   readonly state = inject(AuthStateStore);
