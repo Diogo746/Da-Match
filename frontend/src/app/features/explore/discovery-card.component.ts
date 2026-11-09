@@ -18,7 +18,7 @@ export class DiscoveryCardComponent {
   readonly tone = computed(() => profileTone(this.profile().tipo, this.profile().id));
   readonly initials = computed(() => {
     const words = this.profile().nome.trim().split(/\s+/u);
-    const ends = words.length > 1 ? [words[0], words[words.length - 1]] : [words[0]];
+    const ends = words.length > 1 ? [words[0], words.at(-1) ?? ''] : [words[0]];
     return ends.map(word => [...word][0]).join("").toLocaleUpperCase("pt-BR");
   });
 }
