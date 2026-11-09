@@ -189,3 +189,20 @@ it("the route entry constructs only the API view in API mode", async () => {
   expect(harness.routeNativeElement?.querySelector(".catalog-page")).not.toBeNull();
   expect(harness.routeNativeElement?.querySelector("app-demo-explore")).toBeNull();
 });
+
+it("keeps advanced filters out of the initial search and restores an applied filter from the address", async () => {
+  const { component, element, harness } = await create();
+  const filters = element.querySelector("details")!;
+  expect(filters.open).toBe(false);
+  expect(api.list).toHaveBeenCalledWith("MENTOR", expect.objectContaining({ pagina: 0, tamanho: 6 }));
+  filters.open = true;
+  component.form.controls.setor.setValue("TECH");
+  await component.search(); await settle(harness);
+  expect(filters.open).toBe(true);
+  expect(TestBed.inject(Router).url).toContain("setor=TECH");
+  await component.page(1); await settle(harness);
+  expect(api.list).toHaveBeenLastCalledWith("MENTOR", expect.objectContaining({ pagina: 1, tamanho: 6, setor: "TECH" }));
+  await component.clear(); await settle(harness);
+  expect(filters.open).toBe(false);
+  expect(component.form.controls.setor.value).toBe("");
+});

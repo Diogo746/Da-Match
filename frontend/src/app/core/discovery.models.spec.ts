@@ -34,7 +34,7 @@ it("checks the requested detail id and startup-specific lengths and limits", () 
   expect(() => readDiscoveryProfile({ ...startup, apresentacao: "a".repeat(256) }, "STARTUP")).toThrow();
 });
 it("validates page context, counts, unique ids and out-of-range empty pages", () => {
-  const page = { itens: [mentor], pagina: 0, tamanho: 20, totalItens: 1, totalPaginas: 1 };
+  const page = { itens: [mentor], pagina: 0, tamanho: 6, totalItens: 1, totalPaginas: 1 };
   expect(readDiscoveryPage(page, "MENTOR", query).itens).toHaveLength(1);
   expect(readDiscoveryPage({ ...page, itens: [], pagina: 5 }, "MENTOR", { ...query, pagina: 5 }).totalItens).toBe(1);
   for (const value of [{ ...page, pagina: 1 }, { ...page, tamanho: 10 }, { ...page, totalItens: -1 },
@@ -48,7 +48,7 @@ it("round-trips filters and page with encoded codes, trimming literal search onl
   const result = readDiscoveryQuery(convertToParamMap({ busca: "  Árvore%_'  ", setor: "GENERAL", topico: "BUSINESS",
     formato: "AMBOS", cidade: "PE_RECIFE", pagina: "3", tamanho: "10" }), "MENTOR");
   expect(result).toEqual({ busca: "Árvore%_'", setor: "GENERAL", topico: "BUSINESS", formato: "AMBOS", cidade: "PE_RECIFE", pagina: 3, tamanho: 10 });
-  expect(discoveryParams(result)["pagina"]).toBe("3"); expect(discoveryParams(query)).toEqual({ pagina: "0", tamanho: "20" });
+  expect(discoveryParams(result)["pagina"]).toBe("3"); expect(discoveryParams(query)).toEqual({ pagina: "0", tamanho: "6" });
   expect(readDiscoveryQuery(convertToParamMap({ setor: "DISCOVERING" }), "STARTUP").setor).toBe("DISCOVERING");
 });
 it.each([{ actor: "other" }, { busca: ["a", "b"] }, { busca: "a".repeat(101) }, { setor: "DISCOVERING" },

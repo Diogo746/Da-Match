@@ -1,0 +1,15 @@
+<article class="catalog-card" [class]="tone()">
+  <div class="cover" aria-hidden="true"></div>
+  <div class="identity">
+    <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+    <span class="kind">{{ profile().tipo === 'MENTOR' ? 'Mentor' : 'Startup em ideação' }}</span>
+  </div>
+  <div class="body">
+    <h3>{{ profile().nome }}</h3>
+    <p class="location"><app-icon name="pin" />{{ location() }}</p>
+    <p class="summary">{{ profile().apresentacao }}</p>
+    <button type="button" class="profile-link" (click)="opened.emit($event)" [attr.aria-label]="'Conhecer ' + profile().nome">
+      Ver perfil <app-icon name="arrow" />
+    </button>
+  </div>
+</article>
