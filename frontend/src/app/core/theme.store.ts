@@ -2,6 +2,8 @@ import { DOCUMENT, Injectable, computed, inject, signal } from "@angular/core";
 
 export type ThemeMode = "light" | "dark";
 export type PaletteName = "azul" | "roxo" | "verde";
+// "arco" é um easter egg: não aparece no seletor e não fica salvo ao recarregar.
+export type AppPalette = PaletteName | "arco";
 export const THEME_STORAGE_KEY = "damatch.theme";
 export const PALETTE_STORAGE_KEY = "damatch.palette";
 export const PALETTES: ReadonlyArray<{ id: PaletteName; label: string }> = [
@@ -15,8 +17,9 @@ export class ThemeStore {
   private readonly document = inject(DOCUMENT);
   private readonly current = signal<ThemeMode>(this.initialMode());
   readonly mode = this.current.asReadonly();
-  private readonly currentPalette = signal<PaletteName>(this.initialPalette());
-  readonly palette = this.currentPalette.asReadonly();
+  private readonly savedPalette = signal<PaletteName>(this.initialPalette());
+  private readonly rainbow = signal(false);
+  readonly palette = computed<AppPalette>(() => (this.rainbow() ? "arco" : this.savedPalette()));
   readonly palettes = PALETTES;
   readonly isDark = computed(() => this.mode() === "dark");
 
@@ -34,13 +37,20 @@ export class ThemeStore {
 
   setPalette(palette: PaletteName): void {
     if (!PALETTES.some((p) => p.id === palette)) return;
-    this.currentPalette.set(palette);
+    this.rainbow.set(false);
+    this.savedPalette.set(palette);
     this.apply();
     try {
       this.document.defaultView?.localStorage.setItem(PALETTE_STORAGE_KEY, palette);
     } catch {
       // A escolha continua funcionando na sessão se o navegador bloquear o armazenamento.
     }
+  }
+
+  /** Easter egg: liga/desliga o tema arco-íris. Não grava nada; ao desligar volta à paleta escolhida. */
+  toggleRainbow(): void {
+    this.rainbow.set(!this.rainbow());
+    this.apply();
   }
 
   private initialPalette(): PaletteName {
