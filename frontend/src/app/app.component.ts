@@ -12,12 +12,18 @@ import { REGISTRATION_MODE } from "./core/registration.config";
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.css",
+  // Easter egg: clicar no texto "Ecossistema de inovação" (barra de cima) liga/desliga o tema arco-íris.
+  host: { "(click)": "onRootClick($event)" },
 })
 export class AppComponent {
   readonly apiMode = inject(REGISTRATION_MODE) === "API";
   readonly session = inject(ProfileSessionStore);
   readonly theme = inject(ThemeStore);
   readonly motionPaused = inject(MotionStore).paused;
+  onRootClick(event: Event): void {
+    const target = event.target;
+    if (target instanceof Element && target.classList.contains("workspace-name")) this.theme.toggleRainbow();
+  }
   readonly accountLabel = computed(() => {
     if (this.apiMode) return "Criar conta";
     return this.session.profile() ? "Meu perfil" : "Criar perfil";
