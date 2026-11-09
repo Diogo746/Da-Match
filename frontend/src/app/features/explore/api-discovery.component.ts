@@ -13,13 +13,16 @@ import { DiscoveryPage, DiscoveryProfile, DiscoveryQuery, EMPTY_DISCOVERY_QUERY,
 import { CITIES, FORMATS, TOPICS, cityLabel, sectorLabel, topicLabel } from "../../core/profile.models";
 import { IconComponent } from "../../shared/icon.component";
 
+import { LumenComponent } from "../../shared/lumen.component";
+import { DiscoveryCardComponent } from "./discovery-card.component";
+
 interface CatalogResult { key: string; loading: boolean; error: string; page: DiscoveryPage | null; }
 interface DetailResult { key: string; loading: boolean; error: string; profile: DiscoveryProfile | null; }
 
 @Component({
   selector: "app-api-discovery",
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent, LumenComponent, DiscoveryCardComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./api-discovery.component.html",
   styleUrl: "./api-discovery.component.css",
@@ -53,6 +56,10 @@ export class ApiDiscoveryComponent implements OnInit {
   readonly detail = computed(() => this.detailResult()?.key === this.key() ? this.detailResult() : null);
   readonly sessionError = computed(() => this.sessionStatus() === "error" && this.restoreErrorSession() === this.state.revision());
   readonly sectors = computed(() => discoverySectors(this.target() ?? "MENTOR"));
+  readonly filtersActive = computed(() => {
+    const query = this.queryState().query;
+    return !!(query?.setor || query?.topico || query?.formato || query?.cidade);
+  });
   readonly topics = TOPICS;
   readonly formats = FORMATS;
   readonly cities = CITIES;
@@ -145,7 +152,7 @@ export class ApiDiscoveryComponent implements OnInit {
     const query = this.queryState().query ?? EMPTY_DISCOVERY_QUERY;
     await this.navigate({ ...query, ...this.form.getRawValue(), busca: this.form.controls.busca.value.trim(), pagina: 0 } as DiscoveryQuery);
   }
-  async clear(): Promise<void> { await this.navigate({ ...EMPTY_DISCOVERY_QUERY }); }
+  async clear(): Promise<void> { this.form.reset(EMPTY_DISCOVERY_QUERY); await this.navigate({ ...EMPTY_DISCOVERY_QUERY }); }
   async page(index: number): Promise<void> {
     const query = this.queryState().query;
     if (query && Number.isInteger(index) && index >= 0) await this.navigate({ ...query, pagina: index });

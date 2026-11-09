@@ -1,8 +1,11 @@
 <section class="catalog-page" aria-labelledby="catalog-title">
   <header class="catalog-hero">
-    <p class="eyebrow">IDEIAS ENCONTRAM EXPERIÊNCIA</p>
-    <h1 id="catalog-title">{{ savedOnly ? 'Perfis salvos' : 'Sua próxima descoberta começa aqui.' }}</h1>
-    <p>Startups em ideação e mentores que compartilham conhecimento para dar os primeiros passos.</p>
+    <div>
+      <p class="eyebrow">DAMATCH · DESCOBERTA</p>
+      <h1 id="catalog-title">{{ savedOnly ? 'Perfis salvos' : 'Ideias encontram experiência.' }}</h1>
+      <p class="intro">Um espaço de encontro entre startups em ideação e quem já percorreu esse caminho.</p>
+    </div>
+    <app-lumen pose="welcome" [priority]="true" />
   </header>
   @if (savedOnly) {
     <div class="catalog-notice"><h2>Salvar perfis estará disponível em uma próxima etapa.</h2>
@@ -18,19 +21,25 @@
   } @else if (!target()) {
     <div class="catalog-notice"><h2>Catálogo para startups e mentores</h2><p>Seu tipo de conta não possui acesso a esta área.</p><a routerLink="/conta">Ir para minha conta</a></div>
   } @else {
-    <div class="section-heading"><div><p class="eyebrow">EXPLORE O ECOSSISTEMA</p>
-      <h2>{{ target() === 'MENTOR' ? 'Conheça os mentores' : 'Conheça as startups em ideação' }}</h2></div><a routerLink="/conta">Minha conta</a></div>
+    <div class="section-heading">
+      <h2>{{ target() === 'MENTOR' ? 'Conheça os mentores' : 'Conheça as startups em ideação' }}</h2></div>
     <p class="catalog-help">Perfis completos e publicados{{ target() === 'MENTOR' ? ', aceitando novas startups' : '' }}. Explore por nome e interesses.</p>
     <form class="filter-panel" [formGroup]="form" (ngSubmit)="search()">
       <div class="search-field"><app-icon name="search" /><label class="sr-only" for="discovery-search">Buscar por nome ou apresentação</label>
-        <input id="discovery-search" type="search" formControlName="busca" maxlength="100" placeholder="Nome ou apresentação" /></div>
-      <div class="filter-row">
+        <input id="discovery-search" type="search" formControlName="busca" maxlength="100" placeholder="Nome ou apresentação" />
+        <button class="button button-primary" type="submit">Pesquisar</button></div>
+      <details class="advanced" [open]="filtersActive()">
+        <summary>Mais filtros @if (filtersActive()) { <span>· em uso</span> }</summary>
+        <div class="filter-row">
         <label>Setor<select formControlName="setor"><option value="">Todos os setores</option>@for (item of sectors(); track item.id) { <option [value]="item.id">{{ item.label }}</option> }</select></label>
         <label>{{ target() === 'MENTOR' ? 'Tema de ajuda oferecida' : 'Tema de ajuda necessária' }}<select formControlName="topico"><option value="">Todos os temas</option>@for (item of topics; track item.id) { <option [value]="item.id">{{ item.label }}</option> }</select></label>
         <label>Modalidade<select formControlName="formato"><option value="">Todas as modalidades</option>@for (item of formats; track item.id) { <option [value]="item.id">{{ formatLabel(item.id) }}</option> }</select></label>
         <label>Cidade para encontros presenciais<select formControlName="cidade"><option value="">Todas as cidades</option>@for (item of cities; track item.id) { <option [value]="item.id">{{ item.label }}</option> }</select></label>
       </div>
-      <div class="actions filter-actions"><button class="button button-primary" type="submit">Pesquisar</button><button class="text-button" type="button" (click)="clear()">Limpar pesquisa</button></div>
+      </details>
+      @if (form.dirty || queryState().query?.busca || filtersActive() || queryState().error) {
+        <button class="text-button reset-search" type="button" (click)="clear()">Limpar pesquisa</button>
+      }
       @if (form.invalid) { <p role="alert">A busca aceita até 100 caracteres.</p> }
     </form>
     @if (queryState().error) { <p class="catalog-notice" role="alert">{{ queryState().error }}</p> }
@@ -40,18 +49,11 @@
         <button #reloadButton class="text-button" type="button" (click)="load()" [disabled]="catalog()?.loading">Atualizar pesquisa</button></div>
       @if (catalog()?.error) { <p class="catalog-notice" role="alert">{{ catalog()?.error }}</p> }
       @if (catalog()?.page; as results) {
-        <div class="profiles-grid" [attr.aria-busy]="catalog()?.loading">
+        <div class="directory">
           @for (profile of results.itens; track profile.id) {
-            <article class="catalog-card">
-              <div class="card-heading"><app-icon [name]="profile.tipo === 'MENTOR' ? 'compass' : 'spark'" /><span>{{ profile.tipo === 'MENTOR' ? 'Mentor' : 'Startup em ideação' }}</span></div>
-              <div class="card-body"><h3>{{ profile.nome }}</h3><p class="card-summary">{{ profile.apresentacao }}</p>
-                <p class="location"><app-icon name="pin" />{{ formatLabel(profile.formato) }}{{ profile.cidadeId ? ' · ' + cityLabel(profile.cidadeId) : '' }}</p>
-                <ul class="tags" aria-label="Setores">@for (sector of profile.setores; track sector) { <li>{{ sectorLabel(sector) }}</li> }</ul>
-                <p class="topic-label">{{ profile.tipo === 'MENTOR' ? 'Pode ajudar com' : 'Precisa de ajuda com' }}</p>
-                <ul class="tags" aria-label="Temas de ajuda">@for (topic of profile.topicos; track topic) { <li>{{ topicLabel(topic) }}</li> }</ul>
-                <button class="profile-link" type="button" (click)="open(profile, $event)" [attr.aria-label]="'Conhecer ' + profile.nome">Conhecer perfil<app-icon name="arrow" /></button>
-              </div>
-            </article>
+            <app-discovery-card [profile]="profile"
+              [location]="formatLabel(profile.formato) + (profile.cidadeId ? ' · ' + cityLabel(profile.cidadeId) : '')"
+              (opened)="open(profile, $event)" />
           } @empty {
             <div class="empty-state"><app-icon name="search" /><h3>Nenhum perfil nesta página.</h3><p>Os perfis precisam estar completos e publicados. Experimente ampliar os filtros ou voltar à primeira página.</p>
               <button class="button button-primary" type="button" (click)="clear()">Recomeçar pesquisa</button></div>

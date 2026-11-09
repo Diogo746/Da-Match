@@ -1,0 +1,14 @@
+:host { display: grid; min-width: 0; }
+.catalog-card { display: flex; flex-direction: column; overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+.catalog-card:focus-within { border-color: var(--profile-ink); }
+.cover { height: 78px; background-color: var(--profile-cover); background-image: repeating-radial-gradient(circle at 85% 150%,transparent 0 21px,#ffffff26 22px 23px,transparent 24px 40px),linear-gradient(115deg,#0002,transparent 52%); }
+.identity { padding: 0 18px; display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.avatar { display: grid; place-items: center; width: 54px; height: 54px; margin-top: -22px; border: 3px solid var(--surface); border-radius: 14px; background: var(--profile-tint); color: var(--profile-ink); font-weight: 750; }
+.kind { color: var(--profile-ink); font-size: 12px; font-weight: 650; }
+.body { display: flex; flex: 1; flex-direction: column; padding: 12px 18px 3px; overflow-wrap: anywhere; }
+h3 { margin: 0; font-size: 19px; }
+p { font-size: 13px; line-height: 1.6; color: var(--muted); }
+.location { display: flex; align-items: center; gap: 6px; margin: 7px 0; }
+.summary { margin: 0 0 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.profile-link { display: flex; justify-content: space-between; align-items: center; min-height: 44px; width: 100%; margin-top: auto; border: 0; border-top: 1px solid var(--border); background: transparent; color: var(--profile-ink); cursor: pointer; font: inherit; font-size: 13px; font-weight: 650; }
+app-icon { width: 16px; height: 16px; flex: none; }

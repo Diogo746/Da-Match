@@ -14,7 +14,7 @@ export interface DiscoveryPage {
   itens: DiscoveryProfile[]; pagina: number; tamanho: number; totalItens: number; totalPaginas: number;
 }
 export const EMPTY_DISCOVERY_QUERY: DiscoveryQuery = {
-  busca: "", setor: "", topico: "", formato: "", cidade: "", pagina: 0, tamanho: 20,
+  busca: "", setor: "", topico: "", formato: "", cidade: "", pagina: 0, tamanho: 6,
 };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const PROFILE_KEYS = ["id", "tipo", "nome", "apresentacao", "setores", "topicos", "formato", "cidadeId"];
@@ -78,7 +78,7 @@ export function readDiscoveryQuery(params: ParamMap, kind: ProfileKind): Discove
     (!query.cidade || CITIES.some(item => item.id === query.cidade)));
   return { ...query, setor: query.setor as SectorId | "", topico: query.topico as TopicId | "",
     formato: query.formato as MeetingFormat | "", pagina: integer(params.get("pagina"), 0, 2147483647),
-    tamanho: integer(params.get("tamanho"), 20, 20, 1) };
+    tamanho: integer(params.get("tamanho"), EMPTY_DISCOVERY_QUERY.tamanho, 20, 1) };
 }
 function integer(value: string | null, fallback: number, max: number, min = 0): number {
   if (value === null) return fallback;

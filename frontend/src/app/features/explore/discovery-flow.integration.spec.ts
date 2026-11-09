@@ -27,7 +27,7 @@ it("restores the session before catalog requests, follows filters and fresh deta
   http.expectOne("/api/v1/auth/me").flush(account); await fixture.whenStable(); fixture.detectChanges();
   const catalog = http.expectOne(req => req.url === "/api/v1/descoberta/mentores");
   expect(catalog.request.withCredentials).toBe(true); expect(catalog.request.params.get("busca")).toBe("Ágata");
-  catalog.flush({ itens: [profile], pagina: 0, tamanho: 20, totalItens: 1, totalPaginas: 1 });
+  catalog.flush({ itens: [profile], pagina: 0, tamanho: 6, totalItens: 1, totalPaginas: 1 });
   await fixture.whenStable(); fixture.detectChanges();
   expect(root.textContent).toContain(profile.nome); expect(root.querySelector('.main-nav a[href="/salvos"]')).toBeNull();
   expect(root.querySelector(".topbar-actions a")?.getAttribute("href")).toBe("/conta");
@@ -41,7 +41,7 @@ it("restores the session before catalog requests, follows filters and fresh deta
   root.querySelector<HTMLFormElement>("form")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
   await vi.waitFor(() => expect(router.url).toContain("Sem%20resultado")); await fixture.whenStable();
   const empty = http.expectOne(req => req.url === "/api/v1/descoberta/mentores");
-  empty.flush({ itens: [], pagina: 0, tamanho: 20, totalItens: 0, totalPaginas: 0 }); await fixture.whenStable(); fixture.detectChanges();
+  empty.flush({ itens: [], pagina: 0, tamanho: 6, totalItens: 0, totalPaginas: 0 }); await fixture.whenStable(); fixture.detectChanges();
   expect(root.textContent).toContain("Nenhum perfil nesta página"); expect(root.textContent).not.toContain(profile.nome);
   const pending = firstValueFrom(TestBed.inject(HttpClient).get("/api/v1/auth/me")).catch(error => error);
   http.expectOne("/api/v1/auth/me").flush({}, { status: 401, statusText: "Expired" }); await pending;
