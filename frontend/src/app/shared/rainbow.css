@@ -1,0 +1,205 @@
+/* Easter egg: tema arco-íris, ativado ao clicar em "Ecossistema de inovação" (barra de cima).
+   Base neutra + arco-íris só em detalhes. Não aparece no seletor de paletas e não fica salvo ao recarregar.
+   Usa <html data-palette="arco"> + data-theme="light|dark". */
+
+html[data-palette="arco"]:not([data-theme="dark"]) {
+  /* Arco-íris: cores vivas (linha da barra) e versões "tinta" legíveis (ícones do menu) */
+  --rb-1: #e8457a; --rb-2: #f4731c; --rb-3: #f6b800; --rb-4: #2fb866; --rb-5: #2d8cf0; --rb-6: #8b49e8;
+  --rbk-1: #c0245e; --rbk-2: #b8530a; --rbk-3: #8a6500; --rbk-4: #1b7f45; --rbk-5: #1a6bc4; --rbk-6: #6a2fc9;
+
+  --navy: #f1f2f8;
+  --on-navy: #1f2240;
+  --bg: #fafafd;
+  --surface: #ffffff;
+  --surface-overlay: #ffffffed;
+  --surface-alt: #f1f2f8;
+  --surface-soft: #fafafd;
+  --surface-hover: #eeeefb;
+  --surface-tint: #f3f1fd;
+  --text-primary: #1f2240;
+  --muted: #5a5e78;
+  --text-soft: #43476a;
+  --placeholder: #666a82;
+  --teal: #5b3fd1;
+  --accent-ink: #4630a8;
+  --focus: #2d8cf0;
+  --border: #e0e2ee;
+  --border-soft: #ebedf5;
+  --field-border: #8b8fa8;
+  --border-hover: #5b3fd1;
+  --action-bg: #5b3fd1;
+  --action-text: #ffffff;
+  --action-hover: #4630a8;
+  --button-soft-bg: #e9e3ff;
+  --button-soft-text: #1f2240;
+  --button-soft-hover: #dcd2ff;
+  --selected-bg: #ece7ff;
+  --saved-bg: #1f2240;
+  --saved-text: #ffffff;
+  --badge-bg: #e9e3ff;
+  --badge-text: #3a2a8a;
+  --tag-bg: #f1f2f8;
+  --tag-text: #4630a8;
+  --track: #e4e6f1;
+  --track-fill: #5b3fd1;
+  --hero-bg: #f1f2f8;
+  --help-bg: #f1f2f8;
+  --help-icon-bg: #e9e3ff;
+  --preview-cover-start: #fde3ee;
+  --preview-cover-end: #e2e8ff;
+  --success-bg: #e4f3e9;
+  --success-text: #236146;
+  --error-bg: #fff4f1;
+  --error-border: #ba7168;
+  --error-text: #963d3d;
+  --attention-text: #43476a;
+  --shadow-soft: #1f22400d;
+  --shadow-card: #1f22400d;
+  --dialog-shadow: #1f224060;
+  --backdrop: #14162ba6;
+  --cover-ring: #ffffff85;
+  --cover-ring-soft: #ffffff35;
+  --lumen-bubble-bg: #ffffff;
+  --lumen-bubble-border: #d9d3f5;
+  --lumen-bubble-text: #1f2240;
+  --lumen-halo-rest: .22;
+  --lumen-halo-peak: .8;
+  --lumen-core: #f6f0ff;
+  --lumen-core-rest: .12;
+  --lumen-core-peak: .78;
+  --lumen-halo-inner: #efe6ffe6;
+  --lumen-halo-outer: #8b49e880;
+  --lumen-halo-shadow: #8b49e880;
+  --lumen-halo-blur: 5px;
+  --lumen-core-shadow: #d9c9ff99;
+
+  /* Listas de cores reaproveitadas no menu lateral e nos botões */
+  --rainbow-ink-stops: var(--rbk-1), var(--rbk-2), var(--rbk-3), var(--rbk-4), var(--rbk-5), var(--rbk-6);
+  --rainbow-soft-stops: #f7c0d2, #fbcfb2, #fce7a8, #b8e7cb, #b8d8fa, #d8c1f7;
+  --veil-strong: #00000024; /* escurece um pouco o botão principal no hover */
+  --veil-soft: #1f224014;   /* escurece um pouco o botão suave no hover */
+}
+
+html[data-palette="arco"][data-theme="dark"] {
+  --rb-1: #e8457a; --rb-2: #f4731c; --rb-3: #f6b800; --rb-4: #2fb866; --rb-5: #2d8cf0; --rb-6: #8b49e8;
+  --rbk-1: #ff7fa8; --rbk-2: #ff9a55; --rbk-3: #ffd24d; --rbk-4: #5ee08f; --rbk-5: #6db6ff; --rbk-6: #b596ff;
+
+  --navy: #0e0f1c;
+  --on-navy: #f3f4fb;
+  --bg: #12131f;
+  --surface: #1c1e30;
+  --surface-overlay: #252840ee;
+  --surface-alt: #20233a;
+  --surface-soft: #171829;
+  --surface-hover: #2d3150;
+  --surface-tint: #262a47;
+  --text-primary: #f3f4fb;
+  --muted: #c4c7de;
+  --text-soft: #d5d8ec;
+  --placeholder: #9fa3c2;
+  --teal: #b596ff;
+  --accent-ink: #c9b5ff;
+  --focus: #6db6ff;
+  --border: #383c5c;
+  --border-soft: #2b2e4a;
+  --field-border: #8085ab;
+  --border-hover: #b596ff;
+  --action-bg: #b596ff;
+  --action-text: #12131f;
+  --action-hover: #c9b5ff;
+  --button-soft-bg: #3b2b7a;
+  --button-soft-text: #f3f4fb;
+  --button-soft-hover: #4b3a96;
+  --selected-bg: #3b2b7a;
+  --saved-bg: #b596ff;
+  --saved-text: #12131f;
+  --badge-bg: #3b2b7a;
+  --badge-text: #e6dcff;
+  --tag-bg: #262a47;
+  --tag-text: #d5d8ec;
+  --track: #2b2e4a;
+  --track-fill: #b596ff;
+  --hero-bg: #1a1c2e;
+  --help-bg: #1e2036;
+  --help-icon-bg: #3b2b7a;
+  --preview-cover-start: #4a2b7a;
+  --preview-cover-end: #1f4a6e;
+  --success-bg: #214335;
+  --success-text: #bde6cd;
+  --error-bg: #402724;
+  --error-border: #bc796e;
+  --error-text: #ffc1b7;
+  --attention-text: #d5d8ec;
+  --shadow-soft: #00000024;
+  --shadow-card: #00000030;
+  --dialog-shadow: #00000099;
+  --backdrop: #080912cf;
+  --cover-ring: #e6dcff28;
+  --cover-ring-soft: #e6dcff12;
+  --lumen-bubble-bg: #252840;
+  --lumen-bubble-border: #6a5fa8;
+  --lumen-bubble-text: #f3f4fb;
+  --lumen-halo-rest: .42;
+  --lumen-halo-peak: 1;
+  --lumen-core-rest: .25;
+  --lumen-core-peak: 1;
+  --lumen-halo-inner: #e6dcffff;
+  --lumen-halo-outer: #b596ffb3;
+  --lumen-halo-shadow: #b596ffb3;
+  --lumen-halo-blur: 8px;
+  --lumen-core-shadow: #e6dcffcc;
+
+  --rainbow-ink-stops: var(--rbk-1), var(--rbk-2), var(--rbk-3), var(--rbk-4), var(--rbk-5), var(--rbk-6);
+  --rainbow-soft-stops: #632441, #68361c, #685111, #1b5139, #1a406f, #3f266c;
+  --veil-strong: #ffffff2e; /* clareia um pouco o botão principal no hover */
+  --veil-soft: #ffffff1a;   /* clareia um pouco o botão suave no hover */
+}
+
+/* Linha de arco-íris sob a barra de cima */
+html[data-palette="arco"] .topbar {
+  position: relative;
+}
+html[data-palette="arco"] .topbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--rb-1), var(--rb-2), var(--rb-3), var(--rb-4), var(--rb-5), var(--rb-6));
+}
+
+/* Cada item do menu lateral com uma cor (ícone e barrinha do item ativo) */
+html[data-palette="arco"] .main-nav a:nth-child(6n + 1) { --teal: var(--rbk-1); }
+html[data-palette="arco"] .main-nav a:nth-child(6n + 2) { --teal: var(--rbk-2); }
+html[data-palette="arco"] .main-nav a:nth-child(6n + 3) { --teal: var(--rbk-3); }
+html[data-palette="arco"] .main-nav a:nth-child(6n + 4) { --teal: var(--rbk-4); }
+html[data-palette="arco"] .main-nav a:nth-child(6n + 5) { --teal: var(--rbk-5); }
+html[data-palette="arco"] .main-nav a:nth-child(6n + 6) { --teal: var(--rbk-6); }
+html[data-palette="arco"] .main-nav a app-icon { color: var(--teal); }
+
+/* Menu lateral com as 6 cores do arco-íris (tons suaves no claro e profundos no escuro, para o texto continuar legível) */
+html[data-palette="arco"] .sidebar {
+  background: linear-gradient(180deg, var(--rainbow-soft-stops));
+}
+/* No celular o menu vira uma faixa no topo: o degradê passa a correr na horizontal */
+@media (max-width: 700px) {
+  html[data-palette="arco"] .sidebar {
+    background: linear-gradient(90deg, var(--rainbow-soft-stops));
+  }
+}
+
+/* Botões: principal com as 6 cores do arco-íris, suave com as versões suaves.
+   O botão secundário (branco com borda) continua neutro. */
+html[data-palette="arco"] .button-primary {
+  background: linear-gradient(90deg, var(--rainbow-ink-stops));
+}
+html[data-palette="arco"] .button-primary:hover {
+  background: linear-gradient(var(--veil-strong), var(--veil-strong)), linear-gradient(90deg, var(--rainbow-ink-stops));
+}
+html[data-palette="arco"] .button-light {
+  background: linear-gradient(90deg, var(--rainbow-soft-stops));
+}
+html[data-palette="arco"] .button-light:hover {
+  background: linear-gradient(var(--veil-soft), var(--veil-soft)), linear-gradient(90deg, var(--rainbow-soft-stops));
+}
