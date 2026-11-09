@@ -85,4 +85,30 @@ describe("Preferência de tema", () => {
     localStorage.setItem(PALETTE_STORAGE_KEY, "laranja");
     expect(TestBed.inject(ThemeStore).palette()).toBe("azul");
   });
+
+  it("easter egg: o arco-íris liga e desliga sem salvar nada e volta à paleta escolhida", () => {
+    const theme = TestBed.inject(ThemeStore);
+    theme.setPalette("roxo");
+    theme.toggleRainbow();
+    expect(theme.palette()).toBe("arco");
+    expect(document.documentElement.dataset["palette"]).toBe("arco");
+    expect(localStorage.getItem(PALETTE_STORAGE_KEY)).toBe("roxo");
+    theme.toggleRainbow();
+    expect(theme.palette()).toBe("roxo");
+    expect(document.documentElement.dataset["palette"]).toBe("roxo");
+  });
+
+  it("easter egg: escolher uma paleta no seletor sai do arco-íris", () => {
+    const theme = TestBed.inject(ThemeStore);
+    theme.toggleRainbow();
+    theme.setPalette("verde");
+    expect(theme.palette()).toBe("verde");
+    expect(document.documentElement.dataset["palette"]).toBe("verde");
+  });
+
+  it("easter egg: o arco-íris não volta sozinho em uma nova sessão", () => {
+    TestBed.inject(ThemeStore).toggleRainbow();
+    TestBed.resetTestingModule();
+    expect(TestBed.inject(ThemeStore).palette()).toBe("azul");
+  });
 });
