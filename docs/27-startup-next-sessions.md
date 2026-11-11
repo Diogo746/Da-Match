@@ -51,6 +51,7 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | 6. Matching definitivo | Regra definida pelo usuário em 30/10 no [guia 29](29-matching-rule-decisions.md); implementação pendente | `damatch-mentoria-v1`, após as dependências; atualizar revisão formal do SRS |
 | 7. Salvos persistidos | Pendente; confirmar escopo | Favoritos por conta |
 | 8. Interesses e conexões | Pendente | Interesse e reciprocidade persistidos |
+| 8.1. Conversas reais | Incluída pelo usuário em 11/11; backend e integração API pendentes | Conversas e mensagens no banco, com listagem/envio paginados e autorização dos participantes; depende das conexões |
 | 9. Reuniões | Pendente | Agendamento entre conexões |
 | 10. Homologação operacional | Pendente; transversal | PostgreSQL, acessibilidade e operação validados |
 
@@ -192,13 +193,28 @@ Conclusão: catálogo real mostra somente perfis elegíveis e respeita a visibil
 
 Conclusão: casos de referência aprovados conferem com o cálculo e as permissões; nenhuma nota enviada pelo cliente é confiada.
 
-## Etapas 7 a 9 — Relacionamento e reuniões
+## Etapas 7 a 9 — Relacionamento, conversas e reuniões
 
 7. Confirmar salvos no escopo, persistir por conta e restaurar após novo acesso. Salvar não cria interesse/conexão.
 8. Definir e implementar interesse enviado/recebido, conexão por reciprocidade, visibilidade de contato e proteção contra duplicidade/concorrência.
 9. Definir e implementar proposta, confirmação/recusa e demais ações de reunião aprovadas, dentro de conexão ativa, com instante/fuso explícitos (`America/Sao_Paulo` na interface).
 
 Conclusão de cada entrega: autorização, persistência, fluxo pela interface e documentação verificados separadamente.
+
+### Etapa 8.1 — Backend e integração das conversas reais
+
+Incluída a pedido do usuário em 11/11/2026, após a entrega das telas pelo frontend. Executar depois de interesses/conexões e antes de reuniões, preservando a prioridade atual da migração Vercel e a sequência do matching.
+
+- Definir o contrato de conversa, participantes e papéis autorizados da startup a partir das conexões aceitas. Compatibilidade, perfil salvo e simples vínculo com a startup não concedem acesso automático a mensagens.
+- Persistir conversas e mensagens no PostgreSQL; oferecer listagem, histórico paginado e envio. Remetente vem da autenticação, e identificadores, ordem e datas oficiais são gerados pelo backend.
+- Conferir participação/autorização em cada leitura e escrita, manter CSRF e validar conteúdo/limites. Definir prevenção de envio duplicado, tratamento de resultado incerto e política para histórico/envio após encerramento da conexão.
+- Conectar as telas existentes ao contrato real, com carregamento, vazio, erro e confirmação de envio. Não importar o histórico local de demonstração nem oferecer troca de persona no modo API.
+- Definir a necessidade de atualização em tempo real antes de escolher tecnologia ou contratar serviço; a tarefa não autoriza recursos pagos.
+- Incluir testes de isolamento entre conversas/contas, permissões, persistência após novo login e envio, além de Postman e documentação do contrato.
+
+Referência da interface e das limitações atuais: [prévia de conversas](../frontend/CONVERSAS.md). Hoje o histórico é local e fictício apenas em DEMO; `/conversas` no modo API informa indisponibilidade. Endpoints reais de mensagens ainda não existem.
+
+Conclusão: duas contas autorizadas trocam mensagens persistidas pela aplicação real, enquanto terceiros não conseguem ler ou enviar nessa conversa. Resolver as decisões de participantes, encerramento e entrega antes da implementação.
 
 ## Etapa 10 — Validação operacional e trabalho futuro
 
