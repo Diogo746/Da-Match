@@ -9,7 +9,7 @@ export const STARTUP = "startup-1";
 export const MENTOR = "mentor-1";
 // Estes pares representam conexões aceitas, nunca uma indicação por compatibilidade.
 const PAIRS = [[STARTUP, MENTOR], [STARTUP, "mentor-2"], ["startup-2", MENTOR]] as const;
-function threadKey(a: string, b: string) { return [a,b].sort().join("/"); }
+function threadKey(a: string, b: string) { return [a, b].sort((left, right) => left.localeCompare(right, "en")).join("/"); }
 function read(key: string): string | null { try { return localStorage.getItem(key); } catch { return null; } }
 function validMessage(item: unknown, pair: readonly string[]): item is ChatMessage {
   if (!item || typeof item !== "object") return false;
