@@ -35,7 +35,7 @@ describe("Perfil em seis etapas e três fases com o Lumen", () => {
   it("faz a pergunta no balão e orienta o foco quando falta uma resposta", async () => {
     await render();
     expect(root.querySelector(".speech h2")?.textContent).toContain("O que você já tem");
-    expect(root.querySelector("app-lumen img")?.getAttribute("src")).toBe("assets/lumen/curious.png");
+    expect(root.querySelector("app-lumen [data-pose]")?.getAttribute("data-pose")).toBe("curious");
     expect(root.textContent).toContain("personalizar as indicações");
     next(); await Promise.resolve();
     expect(root.querySelector('[role="alert"]')?.textContent).toContain("momento");
@@ -72,7 +72,7 @@ describe("Perfil em seis etapas e três fases com o Lumen", () => {
     expect(root.querySelector(".phase-celebration")?.textContent).not.toContain("Ideia registrada!");
     expect(root.querySelector(".speech h2")?.textContent).toBe("Ideia registrada!");
     expect(speech()).toContain("Próxima fase: Sua missão");
-    expect(root.querySelector("app-lumen img")?.getAttribute("src")).toBe("assets/lumen/complete.png");
+    expect(root.querySelector("app-lumen [data-pose]")?.getAttribute("data-pose")).toBe("complete");
     expect(root.querySelector<HTMLElement>(".phase-track li .phase-bar i")?.style.width).toBe("100%");
     click("Voltar");
     expect(fixture.componentInstance.celebrating()).toBeNull();

@@ -86,7 +86,7 @@ it("permite pausar e retomar o movimento mantendo a escolha durante a navegaçã
   expect(pause.getAttribute("aria-pressed")).toBe("true");
   expect(root.querySelector(".app-layout")?.classList.contains("motion-paused")).toBe(true);
   await TestBed.inject(Router).navigateByUrl("/cadastro"); await settle();
-  expect(root.querySelector("app-lumen img")?.getAttribute("src")).toBe("assets/lumen/welcome.png");
+  expect(root.querySelector("app-lumen [data-pose]")?.getAttribute("data-pose")).toBe("welcome");
   expect(root.querySelector(".app-layout")?.classList.contains("motion-paused")).toBe(true);
   await click("Retomar animações");
   expect(pause.getAttribute("aria-pressed")).toBe("false");
