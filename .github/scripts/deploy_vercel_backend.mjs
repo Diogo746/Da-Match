@@ -45,13 +45,23 @@ export function deployBackend(env, run = command, readHealth = readFileSync) {
     "--project", env.VERCEL_PROJECT_ID, "--regions", region,
     "--meta", `migrationCommit=${env.GITHUB_SHA}`, ...scope]));
   const deployment = result.deployment;
-  if (result.status !== "ok" || deployment?.target !== "production" || deployment.readyState !== "READY") {
-    throw new Error("Backend candidate is not ready; domains remain unchanged");
+  if (result.status !== "ok" || typeof deployment?.id !== "string" || !deployment.id || deployment.target !== "production") {
+    throw new Error("Backend candidate was not created; domains remain unchanged");
   }
   const candidate = new URL(deployment.url.startsWith("https://") ? deployment.url : `https://${deployment.url}`);
   if (candidate.protocol !== "https:" || !candidate.hostname.endsWith(".vercel.app") ||
       candidate.username || candidate.password || candidate.pathname !== "/" || candidate.search || candidate.hash) {
     throw new Error("Unexpected candidate deployment URL");
+  }
+  // deploy --json may retain INITIALIZING even after the CLI has streamed the build.
+  // Wait for completion, then verify the authoritative deployment and its provenance.
+  run("vercel", ["inspect", candidate.origin, "--wait", "--timeout", "9m", ...scope]);
+  const ready = api(`/v13/deployments/${encodeURIComponent(deployment.id)}` + query);
+  const readyUrl = ready.url?.replace(/^https:\/\//, "");
+  if (ready.id !== deployment.id || ready.projectId !== env.VERCEL_PROJECT_ID ||
+      ready.target !== "production" || ready.readyState !== "READY" ||
+      ready.meta?.migrationCommit !== env.GITHUB_SHA || readyUrl !== candidate.hostname) {
+    throw new Error("Backend candidate readiness or provenance failed; domains remain unchanged");
   }
   const folder = mkdtempSync(join(tmpdir(), "damatch-backend-health-"));
   const body = join(folder, "health.json");

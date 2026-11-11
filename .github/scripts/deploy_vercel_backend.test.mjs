@@ -12,8 +12,13 @@ function fixture(options = {}) {
     if (binary === "git") return options.commit || "abc123";
     if (args[0] === "api" && args[1].startsWith("/v2/teams/")) return JSON.stringify({ billing: {plan:options.plan || "hobby",trial:null,status:"active"} });
     if (args[0] === "api" && args[1].includes("/domains")) return JSON.stringify({domains:[{name:options.domain || "backend.example.test",verified:true}]});
+    if (args[0] === "api" && args[1].startsWith("/v13/deployments/")) return JSON.stringify({
+      id:"test-deploy",projectId:options.candidateProject || "backend-test",url:options.candidateUrl || "candidate.vercel.app",
+      target:"production",readyState:options.state || "READY",meta:{migrationCommit:options.candidateCommit || "abc123"}
+    });
     if (args[0] === "api") return JSON.stringify({id:options.project || "backend-test",accountId:"team-test",framework:"container"});
-    if (args[0] === "deploy") return JSON.stringify({status:"ok",deployment:{id:"test-deploy",url:"candidate.vercel.app",target:"production",readyState:options.state || "READY"}});
+    if (args[0] === "deploy") return JSON.stringify({status:"ok",deployment:{id:"test-deploy",url:"candidate.vercel.app",target:"production",readyState:options.initialState || "READY"}});
+    if (args[0] === "inspect" && options.waitFailure) throw new Error("Deployment wait failed");
     return "";
   };
   const health = () => JSON.stringify({status:options.health || "UP",environment:"production",application:"fullstack-api-damatch"});
@@ -26,13 +31,22 @@ test("stages the exact commit, checks health, then promotes the same candidate",
   const deployment=f.calls.find(call=>call[1]==="deploy");
   assert.ok(deployment.includes("--skip-domain"));
   assert.ok(deployment.includes("migrationCommit=abc123"));
+  assert.ok(f.calls.findIndex(call=>call[1]==="inspect") < f.calls.findIndex(call=>call[1]==="curl"));
   assert.ok(f.calls.findIndex(call=>call[1]==="curl") < f.calls.findIndex(call=>call[1]==="promote"));
   assert.equal(f.calls.at(-1)[2],"https://candidate.vercel.app");
   assert.ok(f.calls.every(call=>!call.includes("--token")));
 });
 
+test("waits for the authoritative READY deployment when deploy JSON retains INITIALIZING", () => {
+  const f=fixture({initialState:"INITIALIZING"});
+  assert.equal(deployBackend(env,f.run,f.health).deploymentId,"test-deploy");
+  assert.deepEqual(f.calls.find(call=>call[1]==="inspect").slice(2),
+    ["https://candidate.vercel.app","--wait","--timeout","9m","--scope","test"]);
+});
+
 for (const options of [{plan:"pro"},{commit:"other"},{project:"frontend"},{domain:"other.example.test"},
-  {state:"ERROR"},{health:"DOWN"}]) {
+  {state:"ERROR"},{state:"BUILDING"},{state:"CANCELED"},{health:"DOWN"},{waitFailure:true},
+  {candidateProject:"frontend"},{candidateCommit:"unreviewed"},{candidateUrl:"different.vercel.app"}]) {
   test(`does not promote on a failed release boundary ${JSON.stringify(options)}`, () => {
     const f=fixture(options);
     assert.throws(()=>deployBackend(env,f.run,f.health));
