@@ -4,6 +4,8 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 
 ## Onde paramos
 
+- Estado atual em 11/11: PRs #34 (descoberta real), #37 (frontend/Lumen), #35 (JWT) e #38 integrados; main `fab053b`. Corte operacional para Vercel concluído e homologado na origem publicada/Chrome, somente Hobby, JWT + CSRF e Render preservado para retorno. A correção adicional do parser da CLI para os próximos deploys automáticos e as evidências estão no [guia 36](36-vercel-backend-jwt.md). Conversas reais foram adicionadas à etapa 8.1; matching continua sendo a próxima funcionalidade. Os registros anteriores abaixo são históricos.
+
 - Cadastro, sessão/CSRF, consulta e edição próprias com múltiplos projetos e questionário persistido já estão implementados.
 - Correções da revisão integradas pelo [PR #22](https://github.com/Diogo746/Da-Match/pull/22), head `ac3f0d1`, merge na main `e8c851b`.
 - [Workflow #83 do PR](https://github.com/Diogo746/Da-Match/actions/runs/40798248553): concluído com sucesso, incluindo ambos os Quality Gates e DAST. Validação: 145 testes backend/Checkstyle, 378 frontend + 8 de configuração, 99,05% de linhas frontend, lint e builds DEMO/API.
@@ -20,7 +22,7 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 
 ## Como executar o roteiro
 
-**Prioridade solicitada pelo usuário em 05/11:** preparar a transferência do backend para Vercel, com JWT e CSRF, usando somente recursos gratuitos. PR #34 já integrado na main `5d54233`. Autenticação, contrato, ensaios e condições antes de trocar o ambiente real no [guia 36](36-vercel-backend-jwt.md). Esta decisão substitui a orientação anterior de não antecipar JWT/Vercel. Matching continua sendo a próxima etapa funcional depois desta prioridade; não repetir suas 13 decisões. O ensaio local não é backup do banco real; não integrar/publicar alterações de schema sem a verificação do destino.
+**Prioridade solicitada pelo usuário em 05/11:** transferência do backend para Vercel com JWT e CSRF, somente recursos gratuitos. Corte operacional concluído em 11/11; conferir a correção do parser e o próximo release automático conforme [guia 36](36-vercel-backend-jwt.md). Matching continua sendo a próxima etapa funcional; não repetir suas 13 decisões. Backups reais e ensaios foram conferidos na migração, mas novas alterações de schema continuam exigindo verificação do destino.
 
 Retomada da interface em 05/11: PR #33 integrado na main `5b2207e`; [CI #113](https://github.com/Diogo746/Da-Match/actions/runs/42079760834) success. Branch `codex/discovery-ui` conecta a tela principal no modo API aos perfis do banco, sem fallback fictício, preservando DEMO. Validação e limites no [guia 35](35-discovery-ui-validation.md): 606 testes + oito de configuração, lint/builds, navegador desktop/360 px e PostgreSQL local, sem alteração de schema/backend ou banco remoto. Conferir CI/gate e revisar/integrar a interface; depois etapa 6 conforme guia 29.
 
@@ -47,11 +49,11 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | 2. Publicação no backend | Integrada pelo PR #25 na main `2a5d321`; CI pós-merge #94 aprovada | Estado persistido, autorização, endpoints e testes; evidências operacionais na etapa 10 |
 | 3. Publicação no frontend | Integrada pelo PR #27 em `a847958`; CI pós-merge #98 aprovada | Publicar/pausar/retomar/voltar a rascunho e consultar pendências pela API |
 | 4. Integrantes | Integrada pelos PRs #29/#30/#31; main `dc66ec7`, CI pós-merge #108 aprovada; evidências locais no guia 32 | Equipe, convite/aceite, recuperação e permissões |
-| 5. Descoberta real | Contrato PR #32 e backend PR #33 integrados; main `5b2207e`/CI #113 success. Interface validada localmente em `codex/discovery-ui` (guia 35), aguardando CI/revisão/integração | Catálogo de perfis elegíveis pela API |
+| 5. Descoberta real | Contrato PR #32, backend PR #33 e interface PR #34 integrados; catálogo publicado conferido novamente no corte Vercel em 11/11 | Catálogo de perfis elegíveis pela API |
 | 6. Matching definitivo | Regra definida pelo usuário em 30/10 no [guia 29](29-matching-rule-decisions.md); implementação pendente | `damatch-mentoria-v1`, após as dependências; atualizar revisão formal do SRS |
 | 7. Salvos persistidos | Pendente; confirmar escopo | Favoritos por conta |
 | 8. Interesses e conexões | Pendente | Interesse e reciprocidade persistidos |
-| 8.1. Conversas reais | Incluída pelo usuário em 11/11; backend e integração API pendentes | Conversas e mensagens no banco, com listagem/envio paginados e autorização dos participantes; depende das conexões |
+| 8.1. Conversas reais | Incluída pelo usuário em 11/11; backend e integração API pendentes | Conversas e mensagens no banco, listagem/histórico paginados, envio e autorização dos participantes; depende das conexões |
 | 9. Reuniões | Pendente | Agendamento entre conexões |
 | 10. Homologação operacional | Pendente; transversal | PostgreSQL, acessibilidade e operação validados |
 
