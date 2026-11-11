@@ -1,3 +1,4 @@
+import { API_REQUEST_TIMEOUT_MS } from "./api-timeout";
 import { HttpBackend, HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable, defer, finalize, map, of, shareReplay, tap, timeout } from "rxjs";
@@ -19,7 +20,7 @@ export class CsrfService {
     return defer(() => {
       if (this.token) return of(this.token);
       this.pending ??= this.http.get<unknown>(`${this.baseUrl}/csrf`, { withCredentials: true }).pipe(
-        timeout(15000),
+        timeout(API_REQUEST_TIMEOUT_MS),
         map((value) => {
           if (!value || typeof value !== "object" || !("headerName" in value) || value.headerName !== "X-XSRF-TOKEN" ||
               !("token" in value) || typeof value.token !== "string" || !value.token.trim()) {

@@ -181,9 +181,23 @@ describe("Contrato HTTP do cadastro de mentor", () => {
     http.expectNone("/api/v1/mentores");
   });
 
+  it("aguarda a partida fria antes do CSRF e envia somente um cadastro", async () => {
+    vi.useFakeTimers();
+    const result = start();
+    const protection = http.expectOne("/csrf");
+    await vi.advanceTimersByTimeAsync(23000);
+    expect(protection.cancelled).toBe(false);
+    http.expectNone("/api/v1/mentores");
+    protection.flush({ headerName: "X-XSRF-TOKEN", token: "cold-start-csrf" });
+    const post = http.expectOne({ method: "POST", url: "/api/v1/mentores" });
+    post.flush(response, { status: 201, statusText: "Created" });
+    expect((await result).value?.mode).toBe("API");
+    http.expectNone("/api/v1/mentores");
+  });
+
   it("limita a espera de CSRF e não envia o cadastro depois do tempo limite", async () => {
     vi.useFakeTimers(); const result = start(); const request = http.expectOne("/csrf");
-    await vi.advanceTimersByTimeAsync(15001);
+    await vi.advanceTimersByTimeAsync(45001);
     expect((await result).error).toMatchObject({ code: "CONNECTION_ERROR" });
     expect(request.cancelled).toBe(true);
     http.expectNone("/api/v1/mentores");
@@ -191,7 +205,7 @@ describe("Contrato HTTP do cadastro de mentor", () => {
 
   it("não repete um POST que excede o tempo limite", async () => {
     vi.useFakeTimers(); const result = start(); const request = csrf();
-    await vi.advanceTimersByTimeAsync(15001);
+    await vi.advanceTimersByTimeAsync(45001);
     expect((await result).error).toMatchObject({ code: "UNCONFIRMED" });
     expect(request.cancelled).toBe(true);
     http.expectNone("/api/v1/mentores");

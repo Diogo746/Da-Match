@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    group:
+      vercel: prod
   application:
     name: fullstack-api-damatch
   datasource:
@@ -41,6 +44,7 @@ server:
 app:
   environment: development
   security:
+    auth-mode: ${APP_SECURITY_AUTH_MODE:SESSION}
     cors:
       allowed-origins: ${APP_SECURITY_CORS_ALLOWED_ORIGINS:http://localhost:4200}
     cookies:

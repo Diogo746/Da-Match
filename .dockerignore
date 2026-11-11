@@ -1,13 +1,10 @@
-.git
-.github
-.idea
-.mvn
-backend/target
-frontend/node_modules
-frontend/dist
-frontend/.angular
-docs
-*.md
-*.iml
-.DS_Store
-Thumbs.db
+# Build context is an allowlist: no local databases, credentials or test artifacts.
+**
+!Dockerfile
+!pom.xml
+!backend/
+!backend/pom.xml
+!backend/checkstyle.xml
+!backend/src/
+!backend/src/main/
+!backend/src/main/**

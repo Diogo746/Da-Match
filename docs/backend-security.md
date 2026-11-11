@@ -1,8 +1,8 @@
 # Segurança da API
 
-Implementação na branch `feature/security-configuration`. Autenticação por sessão no servidor, sem JWT, HTTP Basic ou formulário HTML do Spring. O banco mantém hashes BCrypt compatíveis com as contas existentes.
+Implementação inicial na branch `feature/security-configuration`: SESSION continua padrão, sem HTTP Basic ou formulário HTML do Spring. A preparação Vercel adiciona JWT em cookies HttpOnly com renovação/revogação no banco, mantendo CSRF; contrato e condições de publicação no [guia 36](36-vercel-backend-jwt.md). BCrypt e contas existentes permanecem compatíveis.
 
-Equipe/convites integrados pelos PRs #30/#31. Backend de descoberta implementado em `codex/discovery-api`, aguardando revisão/integração; contrato no [guia 33](33-discovery-contract.md) e evidências no [guia 34](34-discovery-api-validation.md). Sessão/CSRF atual preservados; JWT com CSRF é uma decisão futura.
+Equipe/convites e descoberta real integrados pelos PRs #30–#34; contratos/evidências nos guias 30–35. O modo SESSION atual é preservado enquanto JWT/Vercel são preparados em branch separada.
 
 ## Matriz de acesso
 

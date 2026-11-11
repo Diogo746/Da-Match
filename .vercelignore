@@ -1,0 +1,11 @@
+# Backend project only. The frontend deploys independently from frontend/.
+**
+!Dockerfile
+!vercel.json
+!pom.xml
+!backend
+!backend/pom.xml
+!backend/checkstyle.xml
+!backend/src
+!backend/src/main
+!backend/src/main/**

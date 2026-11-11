@@ -49,7 +49,7 @@ it("times out without replaying a request", async () => {
   vi.useFakeTimers();
   const result = firstValueFrom(service.detail("MENTOR", profile.id)).catch(error => error);
   const request = http.expectOne(req => req.url.includes("/descoberta/mentores/"));
-  await vi.advanceTimersByTimeAsync(15001);
+  await vi.advanceTimersByTimeAsync(45001);
   expect(request.cancelled).toBe(true); expect((await result).name).toBe("TimeoutError");
 });
 it("does not contact the API in DEMO", async () => {

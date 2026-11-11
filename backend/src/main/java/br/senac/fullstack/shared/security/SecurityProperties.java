@@ -21,6 +21,12 @@ public class SecurityProperties {
     private Cors cors = new Cors();
     @Valid
     private Cookies cookies = new Cookies();
+    @Pattern(regexp = "SESSION|JWT")
+    private String authMode = "SESSION";
+
+    public boolean usesJwt() {
+        return "JWT".equals(authMode);
+    }
 
     @Getter
     @Setter
