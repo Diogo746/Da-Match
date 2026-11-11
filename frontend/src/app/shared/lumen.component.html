@@ -1,0 +1,55 @@
+<span class="art" [attr.data-pose]="pose()" [class.compact]="compact()" aria-hidden="true">
+<svg viewBox="14 8 1226 1226" focusable="false">
+  <defs>
+    <image [attr.id]="id('source')" [attr.href]="drawing().asset" width="1254" height="1254"/>
+    <filter [attr.id]="id('ice')" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceGraphic" result="blueMask" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -4 0 4 0 -.49"/>
+      <feColorMatrix in="SourceGraphic" result="ice" values="0 .80 .12 0 .016  0 1.47 0 0 .038  0 0 1.52 0 .034  0 0 0 1 0"/>
+      <feComposite in="ice" in2="blueMask" operator="in" result="paint"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="paint"/></feMerge>
+    </filter>
+    <filter [attr.id]="id('edge')" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceGraphic" result="dark" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 -4 0 0 1.6"/>
+      <feColorMatrix in="SourceGraphic" result="rim" values="1 0 0 0 .28  0 1 0 0 .46  0 0 1 0 .5  0 0 0 1 0"/>
+      <feComposite in="rim" in2="dark" operator="in"/>
+    </filter>
+    <linearGradient [attr.id]="id('fade')" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="white"/><stop offset=".24" stop-color="white"/>
+      <stop offset=".35" stop-color="black"/><stop offset=".65" stop-color="black"/>
+      <stop offset=".80" stop-color="white"/>
+    </linearGradient>
+    <mask [attr.id]="id('tips')"><rect width="1254" height="1254" fill="white"/><path [attr.d]="drawing().remove"/></mask>
+    <mask [attr.id]="id('accents')"><rect width="1254" height="1254" [attr.fill]="ref('fade')"/></mask>
+    <g [attr.id]="id('painted')">
+      <g [attr.mask]="ref('tips')">
+        <use [attr.href]="'#'+id('source')" [attr.filter]="ref('ice')"/>
+        <use [attr.href]="'#'+id('source')" [attr.filter]="ref('edge')" [attr.mask]="ref('accents')"/>
+      </g>
+      @for (foot of drawing().feet; track $index) {
+        <path [attr.d]="foot" fill="#76c5ee" stroke="#386c88" stroke-width="4" stroke-linejoin="round"/>
+      }
+    </g>
+    <clipPath [attr.id]="id('body')"><path d="M0 309H1254V590H900V990H1254V1254H0V990H365V590H0Z"/></clipPath>
+    <clipPath [attr.id]="id('left')"><rect y="585" width="374" height="411"/></clipPath>
+    <clipPath [attr.id]="id('right')"><rect x="891" y="585" width="363" height="411"/></clipPath>
+    <clipPath [attr.id]="id('antennae')"><rect width="1254" height="314"/></clipPath>
+  </defs>
+  <g class="flight">
+    <use [attr.href]="'#'+id('painted')" [attr.clip-path]="ref('body')"/>
+    <use class="left-wing" [attr.href]="'#'+id('painted')" [attr.clip-path]="ref('left')"/>
+    <use class="right-wing" [attr.href]="'#'+id('painted')" [attr.clip-path]="ref('right')"/>
+    <use class="antenna" [attr.href]="'#'+id('painted')" [attr.clip-path]="ref('antennae')"/>
+    @for (eye of drawing().eyes; track $index) {
+      <clipPath [attr.id]="id('socket'+$index)"><path [attr.d]="eye.outline"/></clipPath>
+      <g [attr.clip-path]="ref('socket'+$index)">
+        <g [attr.transform]="'translate('+eye.cx+' '+eye.cy+') rotate('+eye.angle+')'">
+          <g class="blink-cover">
+            <rect x="-110" y="-112" width="220" height="224" fill="#72c4ef"/>
+            <path class="eyelids" [attr.d]="'M-'+eye.radius+' 29 Q0 53 '+eye.radius+' 29'" fill="none" stroke="#12344a" stroke-width="9" stroke-linecap="round"/>
+          </g>
+        </g>
+      </g>
+    }
+  </g>
+</svg>
+</span>

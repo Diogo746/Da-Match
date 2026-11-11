@@ -63,6 +63,7 @@
     <footer class="page-footer">
       <span>DaMatch · Conexões com propósito</span
       ><span>{{ apiMode ? 'Conheça startups em ideação e mentores da comunidade.' : 'Demonstração com perfis fictícios e cadastros simulados.' }}</span>
+      @if (!apiMode) { <a class="back-link" routerLink="/demo/lumen">Testar animações do Lumen</a> }
       <button class="motion-toggle" type="button" [attr.aria-pressed]="motionPaused()"
         title="A preferência de redução de movimento do dispositivo é sempre respeitada."
         (click)="motionPaused.set(!motionPaused())">{{ motionPaused() ? 'Retomar animações' : 'Pausar animações' }}</button>

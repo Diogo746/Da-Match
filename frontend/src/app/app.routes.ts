@@ -4,6 +4,8 @@ import { AboutComponent } from "./features/about/about.component";
 import { ProfileComponent } from "./features/profile/profile.component";
 import { authGuard, demoProfileGuard, mentorGuard, startupGuard } from "./core/auth.guard";
 export const routes: Routes = [
+  { path: "demo/lumen", canActivate:[demoProfileGuard], title:"Lumen em movimento | DaMatch",
+    loadComponent: () => import("./features/profile/lumen-preview.component").then(m => m.LumenPreviewComponent) },
   { path: "", loadComponent: loadExploreComponent, title: "Descobrir | DaMatch" },
   {
     path: "salvos",

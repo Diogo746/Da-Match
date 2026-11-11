@@ -1,20 +1,21 @@
-import { ChangeDetectionStrategy, Component, input } from "@angular/core";
-export type LumenPose = "welcome" | "curious" | "thinking" | "presenting" | "confirmed" | "complete";
+import { ChangeDetectionStrategy, Component, computed, input } from "@angular/core";
+import rig from "./lumen-rig.json";
+export type LumenPose = keyof typeof rig;
+let instance = 0;
 @Component({
   selector: "app-lumen",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<span class="lumen-art" [class.compact]="compact()" [attr.data-pose]="pose()" aria-hidden="true">
-    @for (current of [pose()]; track current) {
-      <img [src]="'assets/lumen/' + current + '.png'" width="1254" height="1254" alt=""
-        decoding="async" draggable="false" [attr.fetchpriority]="priority() ? 'high' : 'auto'" />
-    }
-  </span>`,
+  templateUrl: "./lumen.component.html",
   styleUrl: "./lumen.component.css",
 })
 export class LumenComponent {
   readonly compact = input(false);
   readonly pose = input<LumenPose>("welcome");
+  readonly drawing = computed(() => rig[this.pose()]);
+  readonly prefix = "lumen-rig-" + (++instance) + "-";
+  id(part: string) { return this.prefix + part; }
+  ref(part: string) { return "url(#" + this.id(part) + ")"; }
   readonly priority = input(false);
 }
 
