@@ -17,7 +17,10 @@ function fixture(options = {}) {
       target:"production",readyState:options.state || "READY",meta:{migrationCommit:options.candidateCommit || "abc123"}
     });
     if (args[0] === "api") return JSON.stringify({id:options.project || "backend-test",accountId:"team-test",framework:"container"});
-    if (args[0] === "deploy") return JSON.stringify({status:"ok",deployment:{id:"test-deploy",url:"candidate.vercel.app",target:"production",readyState:options.initialState || "READY"}});
+    if (args[0] === "deploy") {
+      const deployment={id:"test-deploy",url:"candidate.vercel.app",target:"production",readyState:options.initialState || "READY"};
+      return JSON.stringify(options.flat ? deployment : {status:options.status || "ok",deployment});
+    }
     if (args[0] === "inspect" && options.waitFailure) throw new Error("Deployment wait failed");
     return "";
   };
@@ -31,6 +34,7 @@ test("stages the exact commit, checks health, then promotes the same candidate",
   const deployment=f.calls.find(call=>call[1]==="deploy");
   assert.ok(deployment.includes("--skip-domain"));
   assert.ok(deployment.includes("migrationCommit=abc123"));
+  assert.ok(deployment.includes("--non-interactive"));
   assert.ok(f.calls.findIndex(call=>call[1]==="inspect") < f.calls.findIndex(call=>call[1]==="curl"));
   assert.ok(f.calls.findIndex(call=>call[1]==="curl") < f.calls.findIndex(call=>call[1]==="promote"));
   assert.equal(f.calls.at(-1)[2],"https://candidate.vercel.app");
@@ -44,9 +48,16 @@ test("waits for the authoritative READY deployment when deploy JSON retains INIT
     ["https://candidate.vercel.app","--wait","--timeout","9m","--scope","test"]);
 });
 
+test("accepts the flat deployment JSON returned outside agent mode", () => {
+  const f=fixture({flat:true,initialState:"INITIALIZING"});
+  assert.equal(deployBackend(env,f.run,f.health).deploymentId,"test-deploy");
+  assert.equal(f.calls.at(-1)[1],"promote");
+});
+
 for (const options of [{plan:"pro"},{commit:"other"},{project:"frontend"},{domain:"other.example.test"},
   {state:"ERROR"},{state:"BUILDING"},{state:"CANCELED"},{health:"DOWN"},{waitFailure:true},
-  {candidateProject:"frontend"},{candidateCommit:"unreviewed"},{candidateUrl:"different.vercel.app"}]) {
+  {candidateProject:"frontend"},{candidateCommit:"unreviewed"},{candidateUrl:"different.vercel.app"},
+  {status:"error"},{status:"pending"}]) {
   test(`does not promote on a failed release boundary ${JSON.stringify(options)}`, () => {
     const f=fixture(options);
     assert.throws(()=>deployBackend(env,f.run,f.health));

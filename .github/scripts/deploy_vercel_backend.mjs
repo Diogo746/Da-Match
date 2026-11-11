@@ -41,11 +41,12 @@ export function deployBackend(env, run = command, readHealth = readFileSync) {
   }
   const region = env.VERCEL_BACKEND_REGION || "gru1";
   if (!/^[a-z]{3}\d$/.test(region)) throw new Error("Configure one Vercel backend region");
-  const result = JSON.parse(run("vercel", ["deploy", "--prod", "--skip-domain", "--yes", "--json",
+  const result = JSON.parse(run("vercel", ["deploy", "--prod", "--skip-domain", "--yes", "--json", "--non-interactive",
     "--project", env.VERCEL_PROJECT_ID, "--regions", region,
     "--meta", `migrationCommit=${env.GITHUB_SHA}`, ...scope]));
-  const deployment = result.deployment;
-  if (result.status !== "ok" || typeof deployment?.id !== "string" || !deployment.id || deployment.target !== "production") {
+  // CLI 59 returns a flat object in regular mode and an envelope in agent mode.
+  const deployment = result.status === undefined ? result : result.status === "ok" ? result.deployment : null;
+  if (result.error || deployment?.error || typeof deployment?.id !== "string" || !deployment.id || deployment.target !== "production") {
     throw new Error("Backend candidate was not created; domains remain unchanged");
   }
   const candidate = new URL(deployment.url.startsWith("https://") ? deployment.url : `https://${deployment.url}`);
