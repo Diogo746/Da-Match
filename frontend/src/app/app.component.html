@@ -14,6 +14,7 @@
         ariaCurrentWhenActive="page"
         ><app-icon name="compass" />Descobrir</a
       >
+      <a routerLink="/conversas" routerLinkActive="active" ariaCurrentWhenActive="page"><app-icon name="message" />Conversas</a>
       @if (!apiMode) { <a
         routerLink="/salvos"
         routerLinkActive="active"
@@ -69,4 +70,5 @@
         (click)="motionPaused.set(!motionPaused())">{{ motionPaused() ? 'Retomar animações' : 'Pausar animações' }}</button>
     </footer>
   </div>
+  <app-lumen-chat />
 </div>

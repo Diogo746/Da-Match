@@ -53,3 +53,6 @@
   </g>
 </svg>
 </span>
+@if (priority()) {
+  <button class="ask" type="button" aria-label="Conversar com o Lumen" aria-haspopup="dialog" title="Pergunte ao Lumen" (click)="chat.open($event)"></button>
+}

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input } from "@angular/core";
+import { LumenChatTrigger } from "../core/lumen-chat-trigger";
+import { ChangeDetectionStrategy, Component, computed, inject, input } from "@angular/core";
 import rig from "./lumen-rig.json";
 export type LumenPose = keyof typeof rig;
 let instance = 0;
@@ -10,6 +11,7 @@ let instance = 0;
   styleUrl: "./lumen.component.css",
 })
 export class LumenComponent {
+  readonly chat = inject(LumenChatTrigger);
   readonly compact = input(false);
   readonly pose = input<LumenPose>("welcome");
   readonly drawing = computed(() => rig[this.pose()]);

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@a
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { ProfilesStore, DemoProfile, ProfileKind } from "../../core/profiles.store";
 import { ProfileSessionStore } from "../../core/profile-session.store";
+import { CONVERSATIONS, MENTOR } from "../../core/conversations.gateway";
 import { calculateMatch, MatchResult } from "../../core/matching.engine";
 import { IconComponent } from "../../shared/icon.component";
 import { DiscoveryHeroComponent } from "./discovery-hero.component";
@@ -25,7 +26,8 @@ export class DemoExploreComponent {
   readonly store = inject(ProfilesStore);
   readonly session = inject(ProfileSessionStore);
   readonly savedOnly = inject(ActivatedRoute).snapshot.data["savedOnly"] === true;
-  readonly kind = signal<ProfileKind | "TODOS">(this.savedOnly ? "TODOS" : "MENTOR");
+  private readonly targetKind = inject(CONVERSATIONS).viewer() === MENTOR ? "STARTUP" : "MENTOR";
+  readonly kind = signal<ProfileKind | "TODOS">(this.savedOnly ? "TODOS" : this.targetKind);
   readonly mode = signal<"recommended" | "catalog">("recommended");
   readonly search = signal("");
   readonly sector = signal("");

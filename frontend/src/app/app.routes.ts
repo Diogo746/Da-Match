@@ -3,7 +3,12 @@ import { loadExploreComponent } from "./features/explore/explore.entry";
 import { AboutComponent } from "./features/about/about.component";
 import { ProfileComponent } from "./features/profile/profile.component";
 import { authGuard, demoProfileGuard, mentorGuard, startupGuard } from "./core/auth.guard";
+import { inject } from "@angular/core";
+import { REGISTRATION_MODE } from "./core/registration.config";
 export const routes: Routes = [
+  { path: "conversas", title: "Conversas | DaMatch", loadComponent: () => inject(REGISTRATION_MODE) === "DEMO"
+    ? import("./features/conversations/conversations.component").then(m => m.ConversationsComponent)
+    : import("./features/conversations/conversations-pending.component").then(m => m.ConversationsPendingComponent) },
   { path: "demo/lumen", canActivate:[demoProfileGuard], title:"Lumen em movimento | DaMatch",
     loadComponent: () => import("./features/profile/lumen-preview.component").then(m => m.LumenPreviewComponent) },
   { path: "", loadComponent: loadExploreComponent, title: "Descobrir | DaMatch" },
@@ -18,6 +23,9 @@ export const routes: Routes = [
     loadComponent: () => import("./features/register/register.component").then(module => module.RegisterComponent),
     title: "Cadastro | DaMatch",
   },
+  { path: "demo/questionario", canActivate: [demoProfileGuard],
+    loadComponent: () => import("./features/profile/questionnaire-preview.component").then(m => m.QuestionnairePreviewComponent),
+    title: "Testar o questionário | DaMatch" },
   { path: "solicitar-acesso", redirectTo: "cadastro", pathMatch: "full" },
   { path: "meu-perfil", component: ProfileComponent, canActivate: [demoProfileGuard], title: "Meu perfil | DaMatch" },
   { path: "entrar", loadComponent: () => import("./features/auth/login.component").then(module => module.LoginComponent), title: "Entrar | DaMatch" },

@@ -1,0 +1,25 @@
+<header class="heading"><p class="eyebrow">SUA REDE</p><h1>Conversas</h1><p>Continue o papo com quem já se conectou a você.</p></header>
+<div class="demo-tools"><div><strong>Demonstração local</strong><small>As mensagens ficam neste navegador. Use perfis fictícios para testar os dois lados.</small></div>
+<label>Testar como <select #persona [value]="chat.viewer()" (change)="switch(persona.value)">
+<option [value]="startup">Semente Labs · startup</option><option [value]="mentor">Marina Albuquerque · mentora</option></select></label></div>
+@if (chat.storageWarning()) { <p role="alert">O navegador não conseguiu salvar os dados. O histórico desta sessão continua disponível até você sair.</p> }
+<div class="inbox" [class.detail-open]="!!selected()">
+<nav class="threads" aria-label="Conexões aceitas"><h2>Minhas conexões <span>{{chat.contacts().length}}</span></h2>
+@for (p of chat.contacts(); track p.id) {
+  <a routerLink="/conversas" [queryParams]="{com:p.id}" [class.current]="p.id === selected()?.id" [attr.aria-current]="p.id === selected()?.id ? 'page' : null">
+    <i [class.startup]="p.kind === 'STARTUP'">{{p.initials}}</i><div><strong>{{p.name}}</strong><small>{{chat.messages(p.id).at(-1)?.text || 'Começar conversa'}}</small></div>
+  </a>
+} @empty { <p>Suas conexões aceitas aparecerão aqui.</p> }</nav>
+<section class="thread" aria-label="Histórico da conversa">
+@if (selected(); as p) {
+  <header><a class="back" routerLink="/conversas">← Conexões</a><strong>{{p.name}}</strong><small>{{p.kind === 'MENTOR' ? 'Mentor' : 'Startup em ideação'}} · Conexão aceita</small></header>
+  <div class="messages" #log role="log" aria-live="polite" aria-relevant="additions">
+  @for (m of entries(); track m.id) {
+    <div class="bubble" [class.mine]="m.sender === chat.viewer()"><span class="sr-only">{{m.sender === chat.viewer() ? 'Você' : p.name}}: </span><p>{{m.text}}</p><small>{{date(m.at)}}</small></div>
+  } @empty { <div class="prompt"><app-icon name="message"/><h3>O primeiro oi é seu.</h3><p>Que tal contar o que você gostaria de explorar nesta conexão?</p></div> }</div>
+  <form (submit)="$event.preventDefault(); send(); field.focus()"><label class="sr-only" for="send-text">Mensagem para {{p.name}}</label>
+  <input id="send-text" #field type="text" maxlength="2000" autocomplete="off" placeholder="Escreva uma mensagem…" [value]="draft()" (input)="write(field.value)"/>
+  <button class="button button-primary" type="submit" [disabled]="!draft().trim()">Enviar</button></form>
+} @else {
+  <div class="prompt"><app-icon name="message"/><h3>{{requested() ? 'Conversa indisponível' : 'Escolha uma conexão'}}</h3><p>{{requested() ? 'Este perfil não está entre suas conexões aceitas.' : 'Selecione alguém da lista para abrir o histórico.'}}</p></div>
+}</section></div>

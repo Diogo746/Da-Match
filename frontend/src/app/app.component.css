@@ -300,9 +300,6 @@ main {
     gap: 10px;
   }
   .topbar-actions > .demo-pill {
-    font-size: 10px;
-  }
-  .topbar-actions > .button {
     display: none;
   }
   main {

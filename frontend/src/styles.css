@@ -202,3 +202,5 @@ body:has(dialog[open]) {
   line-height: 1.7;
   margin-bottom: 18px;
 }
+
+.app-layout .page-footer{padding-bottom:calc(76px + env(safe-area-inset-bottom))}

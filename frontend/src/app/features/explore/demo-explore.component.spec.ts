@@ -8,6 +8,7 @@ import {
 } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { DemoExploreComponent as ExploreComponent } from "./demo-explore.component";
+import { CONVERSATIONS, DemoConversationsGateway } from "../../core/conversations.gateway";
 import { ProfilesStore } from "../../core/profiles.store";
 import { ProfileSessionStore } from "../../core/profile-session.store";
 import { ProfileDraft } from "../../core/profile.models";
@@ -18,6 +19,7 @@ function create(savedOnly = false) {
     [
       { provide: ProfilesStore, useValue: store },
       ProfileSessionStore,
+      {provide: CONVERSATIONS, useClass: DemoConversationsGateway},
       {
         provide: ActivatedRoute,
         useValue: { snapshot: { data: { savedOnly } } },

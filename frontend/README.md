@@ -123,3 +123,12 @@ O CI mantém lint, cobertura, ambos os builds e transferência do LCOV ao Sonar.
 ## Hospedagem
 
 Use um servidor HTTP; não abra o build por `file://`. As rotas precisam de fallback para `index.html`. No modo API, o servidor de hospedagem também deve encaminhar `/api/**` e `/csrf` ao backend antes desse fallback, preservando cookies e headers. O proxy de `ng serve` atende apenas ao desenvolvimento.
+
+## Pergunte ao Lumen
+
+Para experimentar sem backend, execute `npm ci` e `npm start` nesta pasta e abra http://localhost:4200.
+Clique no Lumen da home ou no botão flutuante de qualquer página. Teste “Posso mudar minhas respostas?” e compare com uma pergunta fora do assunto. Escape fecha o painel. O rodapé permite pausar o movimento.
+
+O assistente classifica cada pergunta pelo exemplo de treino mais próximo (vetores TF-IDF e similaridade de cosseno). Os exemplos rotulados e as respostas revisadas, em português, estão em `src/app/core/lumen-topics.ts`. Um limite mínimo de similaridade e a diferença para o segundo tema evitam escolher um assunto em caso de dúvida. É um classificador local, não um modelo generativo; não lê contas, não consulta o banco nem envia mensagens a participantes. Mantém até 30 trocas em memória; a conversa pode ser limpa e desaparece ao recarregar a página ou trocar de conta. Não usa serviços externos.
+
+Para experimentar as animações sem cadastrar dados, no modo demonstração escolha **Testar questionário** na home, ou **Criar perfil → Testar questionário sem cadastro**. A rota local é http://localhost:4200/demo/questionario. Escolha startup ou mentor; as respostas dessa prévia não alteram o seu perfil. O cadastro normal continua disponível.

@@ -8,6 +8,8 @@
 .right-wing{transform-origin:892px 740px;animation-name:other-wing}
 .antenna{transform-origin:620px 313px;animation:sway 3.8s ease-in-out infinite alternate}
 .blink-cover{clip-path:inset(0 0 100% 0) fill-box;animation:blink 7.3s ease-in-out infinite}
+.ask{position:absolute;inset:0;background:transparent;border:0;border-radius:45%;cursor:pointer}
+.ask:focus-visible{outline:3px solid var(--focus)}
 .art[data-pose=welcome]:not(.compact) .flight,.art[data-pose=waving]:not(.compact) .flight{animation:arrive .95s cubic-bezier(.2,.7,.2,1) both}
 [data-pose=thinking] .flight{animation:consider 1.15s ease-in-out both}
 [data-pose=complete] .flight{animation:celebrate 1.15s ease-in-out both}

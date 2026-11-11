@@ -1,0 +1,34 @@
+<button #trigger type="button" class="launcher" aria-haspopup="dialog" aria-controls="lumen-panel"
+  [attr.aria-expanded]="opened()" aria-label="Pergunte ao Lumen" (click)="show(trigger)">
+  <app-lumen [compact]="true" /><span>Pergunte ao Lumen</span>
+</button>
+<dialog #panel id="lumen-panel" aria-labelledby="lumen-title" (cancel)="$event.preventDefault(); close()">
+  @if (opened()) {
+  <header><div class="avatar"><app-lumen [pose]="exchanges().length ? 'confirmed' : 'curious'" /></div>
+    <div><small>GUIA DO DAMATCH</small><h2 id="lumen-title">Pergunte ao Lumen</h2></div>
+    <button class="icon close" type="button" aria-label="Fechar conversa" (click)="close()"><app-icon name="close" /></button>
+  </header>
+  <div #log class="transcript">
+    <div class="welcome"><small>LUMEN</small><p>Olá! Quer descobrir como encontrar um mentor ou montar seu perfil?</p></div>
+    @if (!exchanges().length) {
+      <div class="suggestions" aria-label="Sugestões de perguntas">
+        @for (item of starters; track item) { <button type="button" (click)="send(item)">{{ item }}</button> }
+      </div>
+    }
+    <div role="log" aria-label="Mensagens" aria-live="polite" aria-relevant="additions">
+      @for (item of exchanges(); track item.id) {
+        <div class="turn"><p class="question"><span class="sr-only">Você: </span>{{ item.question }}</p>
+          <div class="reply"><small>LUMEN</small><p>{{ item.answer }}</p></div></div>
+      }
+    </div>
+  </div>
+  <footer>
+    <form (submit)="$event.preventDefault(); send(draft())">
+      <input #field type="text" aria-label="Sua pergunta ao Lumen" maxlength="360" autocomplete="off" placeholder="Escreva sua dúvida…" [value]="draft()" (input)="draft.set(field.value)" />
+      <button class="icon send" type="submit" aria-label="Enviar pergunta" [disabled]="!draft().trim()"><app-icon name="arrow" /></button>
+    </form>
+    <div class="note"><span>Ajuda local · só neste navegador</span>
+      @if (exchanges().length) { <button type="button" (click)="reset(); field.focus()">Limpar conversa</button> }</div>
+  </footer>
+  }
+</dialog>
