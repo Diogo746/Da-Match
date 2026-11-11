@@ -1,12 +1,25 @@
-:host { display: block; width: var(--lumen-size, 150px); flex-shrink: 0; }
-.lumen-art { display: block; position: relative; width: 100%; aspect-ratio: 1; isolation: isolate; animation: lumen-hover 8s ease-in-out infinite; }
-img { display: block; width: 100%; height: auto; position: relative; z-index: 1; animation: pose-enter 240ms ease-out both; }
-.lumen-art::before, .lumen-art::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; left: 50%; top: 77%; }
-.lumen-art::before { width: 43%; height: 33%; background: radial-gradient(ellipse, var(--lumen-halo-inner), var(--lumen-halo-outer) 48%, transparent 74%); filter: blur(8px); transform: translate(-50%,-50%); opacity: var(--lumen-halo-rest); z-index: 0; animation: lantern-breathe 8s ease-in-out infinite; }
-.lumen-art::after { width: 13%; height: 9%; transform: translate(-50%,-50%); background: var(--lumen-core); filter: blur(6px); box-shadow: 0 0 15px var(--lumen-core-shadow); opacity: var(--lumen-core-rest); z-index: 2; }
-.compact::before { filter: blur(5px); }
-@keyframes lantern-breathe { 0%,100% { transform: translate(-50%,-50%) scale(.88); opacity: var(--lumen-halo-rest); } 50% { transform: translate(-50%,-50%) scale(1.16); opacity: var(--lumen-halo-peak); } }
-@keyframes lumen-hover { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
-@keyframes pose-enter { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { .lumen-art, img, .lumen-art::before { animation: none; } .lumen-art::before { transform: translate(-50%,-50%); opacity: var(--lumen-halo-rest); } }
-
+:host{position:relative;display:block;width:var(--lumen-size,150px);flex-shrink:0}
+.art,svg{display:block;width:100%}
+.art{position:relative;isolation:isolate;animation:float 6s ease-in-out infinite}
+.art::before{content:"";position:absolute;inset:63% 24% 0;border-radius:50%;background:radial-gradient(ellipse,#ffef92 0%,#c5ffc855 37%,transparent 72%);opacity:.45;animation:glow 5s ease-in-out infinite alternate;z-index:-1}
+:host-context([data-theme=dark]) .art::before{filter:drop-shadow(0 0 7px #daffb0);background:radial-gradient(ellipse,#ffffc8 0%,#c5ffc888 40%,transparent 72%)}
+.flight{transform-origin:50% 55%}
+.left-wing,.right-wing{animation:wing 1.4s ease-in-out infinite alternate;transform-origin:373px 740px}
+.right-wing{transform-origin:892px 740px;animation-name:other-wing}
+.antenna{transform-origin:620px 313px;animation:sway 3.8s ease-in-out infinite alternate}
+.blink-cover{clip-path:inset(0 0 100% 0) fill-box;animation:blink 7.3s ease-in-out infinite}
+.ask{position:absolute;inset:0;background:transparent;border:0;border-radius:45%;cursor:pointer}
+.ask:focus-visible{outline:3px solid var(--focus)}
+.art[data-pose=welcome]:not(.compact) .flight,.art[data-pose=waving]:not(.compact) .flight{animation:arrive .95s cubic-bezier(.2,.7,.2,1) both}
+[data-pose=thinking] .flight{animation:consider 1.15s ease-in-out both}
+[data-pose=complete] .flight{animation:celebrate 1.15s ease-in-out both}
+[data-pose=complete] .left-wing,[data-pose=complete] .right-wing{animation-duration:.65s}
+@keyframes blink{0%,45%,48.8%,100%{clip-path:inset(0 0 100% 0) fill-box}46.5%,46.9%{clip-path:inset(0 0 0 0) fill-box}}
+@keyframes wing{to{transform:skewY(2deg) scaleX(.975)}}
+@keyframes other-wing{to{transform:skewY(-2deg) scaleX(.975)}}
+@keyframes sway{to{transform:skewX(2deg)}}
+@keyframes glow{to{opacity:.9}}
+@keyframes float{50%{transform:translateY(-3px) rotate(1deg)}}
+@keyframes arrive{0%{transform:translate(-47px,30px) rotate(-8deg)}65%{transform:translate(9px,-6px) rotate(2deg)}100%{transform:none}}
+@keyframes consider{45%{transform:translate(3px,-8px) rotate(3deg)}}
+@keyframes celebrate{35%{transform:translate(-14px,-34px) rotate(-5deg)}70%{transform:translate(11px,-14px) rotate(3deg)}}

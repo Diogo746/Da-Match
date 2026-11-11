@@ -86,7 +86,7 @@ it("permite pausar e retomar o movimento mantendo a escolha durante a navegaçã
   expect(pause.getAttribute("aria-pressed")).toBe("true");
   expect(root.querySelector(".app-layout")?.classList.contains("motion-paused")).toBe(true);
   await TestBed.inject(Router).navigateByUrl("/cadastro"); await settle();
-  expect(root.querySelector("app-lumen img")?.getAttribute("src")).toBe("assets/lumen/welcome.png");
+  expect(root.querySelector("app-lumen [data-pose]")?.getAttribute("data-pose")).toBe("welcome");
   expect(root.querySelector(".app-layout")?.classList.contains("motion-paused")).toBe(true);
   await click("Retomar animações");
   expect(pause.getAttribute("aria-pressed")).toBe("false");
@@ -215,4 +215,51 @@ it("limpa o perfil pela interface e mantém acessíveis o cadastro e a explicaç
   await TestBed.inject(Router).navigateByUrl("/como-funciona"); await settle();
   expect(root.textContent).toContain("monte seu perfil em seis etapas com o Lumen");
   expect(root.querySelector('.topbar-actions a')?.textContent).toContain("Criar perfil");
+});
+
+it("abre a prévia pelo cadastro, permite testar os dois papéis e preserva o perfil da sessão", async () => {
+  await render("/");
+  const clickLink = async (label: string) => {
+    const link = [...root.querySelectorAll("a")].find(a => a.textContent?.trim() === label);
+    expect(link).toBeDefined(); link!.click(); await settle();
+  };
+  await clickLink("Criar perfil");
+  await clickLink("Testar questionário sem cadastro");
+  await click("Testar como startup");
+  await click("Um problema que quero entender");
+  expect(root.querySelector(".lumen-message [data-pose]")?.getAttribute("data-pose")).toBe("confirmed");
+  await click("Continuar");
+  expect(root.querySelector(".speech h2")?.textContent).toBe("Em que universo sua ideia vive?");
+  await click("Trocar perfil de teste");
+  await click("Testar como mentor");
+  await click("Descoberta do problema");
+  expect(root.querySelector(".speech-text")?.textContent).toContain("fase");
+  expect(TestBed.inject(ProfileSessionStore).profile()).toBeNull();
+});
+
+it("abre o contato pelo card e apresenta a mesma mensagem no histórico da mentora", async () => {
+  localStorage.removeItem("damatch:conversas:persona:v1");
+  localStorage.removeItem("damatch:conversas:demo:v1");
+  await render("/");
+  expect(root.querySelector('a[aria-label="Conversar com Camila Duarte"]')).toBeNull();
+  root.querySelector<HTMLAnchorElement>('a[aria-label="Conversar com Marina Albuquerque"]')!.click();
+  await settle();
+  expect(root.querySelector(".thread header")?.textContent).toContain("Marina");
+  fill("send-text","Vamos falar sobre validação?");
+  await click("Enviar");
+  const select = root.querySelector("select")!;
+  select.value = "mentor-1"; select.dispatchEvent(new Event("change")); await settle();
+  expect(root.querySelector(".thread header")?.textContent).toContain("Semente");
+  expect(root.querySelector(".bubble:not(.mine)")?.textContent).toContain("Vamos falar sobre validação?");
+  await TestBed.inject(Router).navigateByUrl("/conversas?com=mentor-3"); await settle();
+  expect(root.querySelector("#send-text")).toBeNull();
+  localStorage.removeItem("damatch:conversas:persona:v1");
+  localStorage.removeItem("damatch:conversas:demo:v1");
+});
+it("repete e alterna as sete poses originais do Lumen no estúdio", async () => {
+  await render("/demo/lumen");
+  for (const [label,pose] of [["Pensar","thinking"],["Comemorar","complete"],["Receber","welcome"],["Perguntar","curious"],["Apresentar","presenting"],["Confirmar","confirmed"],["Acenar","waving"]]) {
+    await click(label);
+    expect(root.querySelector(".stage [data-pose]")?.getAttribute("data-pose")).toBe(pose);
+  }
 });

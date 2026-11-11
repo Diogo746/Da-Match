@@ -18,6 +18,7 @@
 }
 
 .brand {
+  --brand-mint: #65DCC5;
   display: flex;
   gap: 11px;
   align-items: center;
@@ -31,7 +32,7 @@
 }
 
 .brand-dot {
-  color: var(--teal);
+  color: var(--brand-mint);
 }
 
 .brand-mark {
@@ -48,7 +49,7 @@
   position: absolute;
   width: 24px;
   height: 27px;
-  border: 3px solid var(--teal);
+  border: 3px solid var(--brand-mint);
   border-radius: 6px 12px 12px 6px;
   top: 0;
   left: 0;
@@ -299,9 +300,6 @@ main {
     gap: 10px;
   }
   .topbar-actions > .demo-pill {
-    font-size: 10px;
-  }
-  .topbar-actions > .button {
     display: none;
   }
   main {

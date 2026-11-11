@@ -153,7 +153,7 @@ export class ProfileSetupComponent implements OnInit, AfterViewInit {
   readonly pose = computed<LumenPose>(() => {
     if (this.reviewing() || this.celebrating() !== null) return "complete";
     if (this.acknowledged() && this.motion.allowed()) return "confirmed";
-    return (["curious", "thinking", "presenting", "curious", "curious", "thinking"] as LumenPose[])[this.step()];
+    return (["curious", "thinking", "presenting", "waving", "curious", "thinking"] as LumenPose[])[this.step()];
   });
   readonly summary = computed(() => [
     { step: 0, title: "Momento da ideia", value: this.draft().moments.map(momentLabel).join(" · ") },

@@ -33,6 +33,9 @@
       <p class="form-intro">
         {{ apiMode ? 'Crie uma conta de mentor ou cadastre sua startup com a conta da pessoa fundadora.' : 'Comece pelos dados da conta. Depois, seis pequenas etapas para montar seu perfil.' }}
       </p>
+      @if (!apiMode) {
+        <p><a class="text-button" routerLink="/demo/questionario">Testar questionário sem cadastro</a></p>
+      }
       <form
         [formGroup]="form"
         (ngSubmit)="submit()"

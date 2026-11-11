@@ -2,22 +2,25 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  input,
+  inject, input,
   output,
 } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { CONVERSATIONS } from "../../core/conversations.gateway";
 import { DemoProfile } from "../../core/profiles.store";
 import { IconComponent } from "../../shared/icon.component";
 import { MatchResult, isHighCompatibility } from "../../core/matching.engine";
 @Component({
   selector: "app-profile-card",
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./profile-card.component.html",
   styleUrl: "./profile-card.component.css",
 })
 export class ProfileCardComponent {
   readonly profile = input.required<DemoProfile>();
+  readonly chat = inject(CONVERSATIONS);
   readonly saved = input(false);
   readonly match = input<MatchResult | null>(null);
   // A porcentagem não aparece para o participante; só o selo das combinações muito fortes.

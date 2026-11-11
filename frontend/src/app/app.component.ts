@@ -1,3 +1,4 @@
+import { LumenChatComponent } from "./features/lumen-chat/lumen-chat.component";
 import { ChangeDetectionStrategy, Component, computed, inject } from "@angular/core";
 import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { IconComponent } from "./shared/icon.component";
@@ -9,7 +10,7 @@ import { AuthStateStore } from "./core/auth-state.store";
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, IconComponent],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, IconComponent, LumenChatComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.css",

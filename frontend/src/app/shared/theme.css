@@ -159,5 +159,6 @@ option { background: var(--surface); color: var(--text-primary); }
 .theme-toggle app-icon { width: 15px; height: 15px; }
 @media(max-width:480px) {
   .topbar-actions > .demo-pill { display: none; }
-  .theme-toggle { padding: 8px; font-size: 10px; }
+  .theme-toggle { padding: 8px; min-width: 38px; }
+  .theme-toggle span { display: none; }
 }

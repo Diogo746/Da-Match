@@ -36,6 +36,10 @@
       }
     </div>
     <div class="card-bottom">
+    @if (chat.connected(profile().id)) {
+      <a class="button button-secondary button-small" routerLink="/conversas" [queryParams]="{com:profile().id}" [attr.aria-label]="'Conversar com ' + profile().name"><app-icon name="message"/>Conversar</a>
+    }
+
 
       <span><app-icon name="clock" />{{ profile().availability }}</span
       ><button
