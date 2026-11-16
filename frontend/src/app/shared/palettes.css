@@ -68,6 +68,7 @@ html[data-palette="roxo"]:not([data-theme="dark"]) {
   --lumen-halo-shadow: #85d9c780;
   --lumen-halo-blur: 5px;
   --lumen-core-shadow: #d3f1e199;
+  --texto-lateral: #ffffff;
 }
 
 html[data-palette="roxo"][data-theme="dark"] {
@@ -135,12 +136,13 @@ html[data-palette="roxo"][data-theme="dark"] {
   --lumen-halo-shadow: #85d9c7b3;
   --lumen-halo-blur: 8px;
   --lumen-core-shadow: #d3f1e1cc;
+  --texto-lateral: #ffffff;
 }
 
 /* ===================== VERDE ===================== */
 /* Variáveis não citadas aqui (erro, sombras, lumen…) herdam de theme.css. */
 html[data-palette="verde"]:not([data-theme="dark"]) {
-  --navy: #E9ECE5;
+  --navy: #2e3630;
   --on-navy: #222831;
   --bg: #F4F4F2;
   --surface: #FFFFFF;
@@ -180,6 +182,7 @@ html[data-palette="verde"]:not([data-theme="dark"]) {
   --help-icon-bg: #E5F4B5;
   --preview-cover-start: #E9ECE5;
   --preview-cover-end: #DCE8C8;
+  --texto-lateral: #ffffff;
 }
 
 html[data-palette="verde"][data-theme="dark"] {
@@ -223,6 +226,7 @@ html[data-palette="verde"][data-theme="dark"] {
   --help-icon-bg: #3A4D2E;
   --preview-cover-start: #34452C;
   --preview-cover-end: #263522;
+  --texto-lateral: #ffffff;
 }
 
 /* ===================== ACENTO DO MENU LATERAL =====================
