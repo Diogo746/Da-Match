@@ -65,6 +65,7 @@
   --lumen-halo-shadow: #aedd2b80;
   --lumen-halo-blur: 5px;
   --lumen-core-shadow: #e3ff9a99;
+  --texto-lateral: #ffffff;
 }
 
 html[data-theme="dark"] {
@@ -133,6 +134,7 @@ html[data-theme="dark"] {
   --lumen-halo-shadow: #aedd2bb3;
   --lumen-halo-blur: 8px;
   --lumen-core-shadow: #e3ff9acc;
+  --texto-lateral: #ffffff;
 }
 
 input::placeholder { color: var(--placeholder); opacity: 1; }
