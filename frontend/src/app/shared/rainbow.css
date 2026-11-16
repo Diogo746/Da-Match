@@ -72,6 +72,7 @@ html[data-palette="arco"]:not([data-theme="dark"]) {
   --lumen-halo-shadow: #8b49e880;
   --lumen-halo-blur: 5px;
   --lumen-core-shadow: #d9c9ff99;
+  --texto-lateral: #070707;
 
   /* Listas de cores reaproveitadas no menu lateral e nos botões */
   --rainbow-ink-stops: var(--rbk-1), var(--rbk-2), var(--rbk-3), var(--rbk-4), var(--rbk-5), var(--rbk-6);
@@ -148,6 +149,7 @@ html[data-palette="arco"][data-theme="dark"] {
   --lumen-halo-shadow: #b596ffb3;
   --lumen-halo-blur: 8px;
   --lumen-core-shadow: #e6dcffcc;
+  --texto-lateral: #ffffff;
 
   --rainbow-ink-stops: var(--rbk-1), var(--rbk-2), var(--rbk-3), var(--rbk-4), var(--rbk-5), var(--rbk-6);
   --rainbow-soft-stops: #632441, #68361c, #685111, #1b5139, #1a406f, #3f266c;
