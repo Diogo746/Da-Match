@@ -57,3 +57,6 @@ Project Charter (Visão & Dores)
 - [Descoberta real — backend, PostgreSQL e evidências de validação](34-discovery-api-validation.md).
 - [Descoberta real — tela principal API, isolamento DEMO e validação no navegador](35-discovery-ui-validation.md).
 - [Preparação do backend para Vercel — JWT, CSRF, configuração e condições do corte](36-vercel-backend-jwt.md).
+
+- [Matching de mentoria — contrato HTTP, interface e evidências locais](37-mentorship-matching.md).
+- [DAMATCH-SRS-001 — adendo de matching para revisão 1.1](38-srs-matching-v1.1.md).

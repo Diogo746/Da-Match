@@ -319,7 +319,7 @@
 
 ## 🎯 Épico 4: Matching e recomendações (MATCH)
 
-> Mentoria: regra **damatch-mentoria-v1**, definida pelo usuário em 30/10/2026 no [guia 29](29-matching-rule-decisions.md). Nota interna de 0 a 100, corte inclusivo 60, até 20 indicações após ordenação; participante recebe somente ordem e selo Super DaMatch a partir de 95. O SRS anterior deve ser atualizado na próxima revisão formal. Investimento continua em entrega própria; não aplicar esta regra automaticamente a investidores. A pontuação não é probabilidade estatística nem garantia de mentoria.
+> Mentoria: regra **damatch-mentoria-v1**, definida pelo usuário em 30/10/2026 no [guia 29](29-matching-rule-decisions.md). Nota interna de 0 a 100, corte inclusivo 60, até 20 indicações após ordenação; participante recebe somente ordem e selo Super DaMatch a partir de 95. Implementação local e contrato no [guia 37](37-mentorship-matching.md); [adendo 1.1 do SRS para revisão](38-srs-matching-v1.1.md), preservando o PDF v1.0. CI/revisão/merge ainda necessários. Investimento continua em entrega própria; não aplicar esta regra automaticamente a investidores. A pontuação não é probabilidade estatística nem garantia de mentoria.
 
 ### 🔹 `US-16`: Receber recomendações de mentoria
 * **Como** startup que busca mentoria (ou mentor procurando startups),

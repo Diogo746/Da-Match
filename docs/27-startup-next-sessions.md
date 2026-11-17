@@ -4,6 +4,8 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 
 ## Onde paramos
 
+- Retomada em 17/11: main/origin `d14423e` conferidas, sem atualizações ou conflitos. Branch de cores `Front-End_paletas` avançou separadamente, sem integração automática. Migração concluída pela CI136/PR39. Matching implementado e validado localmente em `codex/mentorship-matching`: [contrato/evidências](37-mentorship-matching.md) e [adendo SRS 1.1 para revisão](38-srs-matching-v1.1.md). Conferir CI/gates e revisão antes do merge pelo usuário; depois confirmar salvos persistidos. Registros anteriores são históricos.
+
 - Estado atual em 11/11: PRs #34 (descoberta real), #37 (frontend/Lumen), #35 (JWT) e #38 integrados; main `fab053b`. Corte operacional para Vercel concluído e homologado na origem publicada/Chrome, somente Hobby, JWT + CSRF e Render preservado para retorno. A correção adicional do parser da CLI para os próximos deploys automáticos e as evidências estão no [guia 36](36-vercel-backend-jwt.md). Conversas reais foram adicionadas à etapa 8.1; matching continua sendo a próxima funcionalidade. Os registros anteriores abaixo são históricos.
 
 - Cadastro, sessão/CSRF, consulta e edição próprias com múltiplos projetos e questionário persistido já estão implementados.
@@ -50,7 +52,7 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | 3. Publicação no frontend | Integrada pelo PR #27 em `a847958`; CI pós-merge #98 aprovada | Publicar/pausar/retomar/voltar a rascunho e consultar pendências pela API |
 | 4. Integrantes | Integrada pelos PRs #29/#30/#31; main `dc66ec7`, CI pós-merge #108 aprovada; evidências locais no guia 32 | Equipe, convite/aceite, recuperação e permissões |
 | 5. Descoberta real | Contrato PR #32, backend PR #33 e interface PR #34 integrados; catálogo publicado conferido novamente no corte Vercel em 11/11 | Catálogo de perfis elegíveis pela API |
-| 6. Matching definitivo | Regra definida pelo usuário em 30/10 no [guia 29](29-matching-rule-decisions.md); implementação pendente | `damatch-mentoria-v1`, após as dependências; atualizar revisão formal do SRS |
+| 6. Matching definitivo | Implementado/validado localmente em 17/11; CI/revisão/merge pendentes. [Guia 37](37-mentorship-matching.md), adendo SRS no guia 38 | `damatch-mentoria-v1`, após as dependências; atualizar revisão formal do SRS |
 | 7. Salvos persistidos | Pendente; confirmar escopo | Favoritos por conta |
 | 8. Interesses e conexões | Pendente | Interesse e reciprocidade persistidos |
 | 8.1. Conversas reais | Incluída pelo usuário em 11/11; backend e integração API pendentes | Conversas e mensagens no banco, listagem/histórico paginados, envio e autorização dos participantes; depende das conexões |
@@ -184,6 +186,8 @@ Conclusão: catálogo real mostra somente perfis elegíveis e respeita a visibil
 
 ## Etapa 6 — Matching definitivo
 
+Implementação local concluída em 17/11: API nas duas direções, relatório ADMIN e `/recomendacoes` com seleção de projeto. Contratos, precisão, privacidade, testes e limitações no [guia 37](37-mentorship-matching.md). Os itens abaixo registram as decisões que esta entrega implementa; integração depende de CI/revisão/merge.
+
 - Questionário concluído a pedido do usuário em 30/10: 13 respostas e especificação normativa no [guia 29](29-matching-rule-decisions.md); histórico das alternativas no [guia 16](16-decisao-regra-matching.md). Versão `damatch-mentoria-v1`, independente do quiz e da demonstração.
 
 - Pesos: necessidades/setor/momento/público/agenda/formação 50/15/10/10/10/5; principal/secundária 70/30; prática 100% e conhecimento 70%. Pelo menos uma necessidade atendida. Sem agenda comum perde 10, não exclui; frequências fixas diferentes excluem salvo flexível. Modalidade/cidade precisam permitir encontro.
@@ -227,7 +231,7 @@ Conclusão: duas contas autorizadas trocam mensagens persistidas pela aplicaçã
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** concluir a preparação JWT/Vercel em `codex/vercel-backend-jwt`, conferir CI/Quality Gates, backup/schema do destino e condições do corte no guia 36. PR34 já integrado. Preservar Render até homologação real; usar somente recursos gratuitos. Depois retomar matching da etapa 6 conforme guia29, sem repetir decisões já respondidas.
+- **Próxima ação exata:** conferir CI e ambos os gates do head de `codex/mentorship-matching`, revisar/integrar pelo usuário e homologar a entrega publicada. Depois confirmar escopo de salvos persistidos (etapa 7); interesses/conexões → conversas reais → reuniões. Migração Vercel concluída, sem novo corte.
 - **Entrega da publicação:** backend/Postman no PR #25, main `2a5d321`, CI #94 aprovada; interface validada em 31/10 e integrada pelo PR #27 em `a847958`, CI pós-merge #98 aprovada.
 - **Entrega desta definição (30/10) e resolução (31/10):** somente documentação no PR #26, branch `codex/matching-rule-decision`; 13 respostas, fórmula e 14 casos de referência, US-16/18/19 alinhadas. Main `2a5d321` incorporada à branch para conciliar o roteiro e o índice. Nenhuma implementação de matching, alteração de aplicação além da main, mudança remota de banco ou deploy manual nesta entrega.
 - **Entrega de 04/11:** contrato de integrantes no guia 30 e continuidade atualizada, branch `codex/startup-team-contract`, base `de71fa5`. Sem mudanças de aplicação, schema ou banco remoto; verificar checks do PR documental, sem alegar novos testes/gates de aplicação quando dispensados.
