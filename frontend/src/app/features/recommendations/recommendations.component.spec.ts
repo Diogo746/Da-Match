@@ -87,6 +87,18 @@ it("ignores results from a previous project and discards previous cards immediat
   expect(component.result()?.perfilOrigemId).toBe(second);
 });
 
+it("ignores an old cancelled navigation after another project is selected", async () => {
+  startups.mine.mockReturnValue(of([project(), project(second)]));
+  const { harness, component } = await create();
+  let cancel!: (changed: boolean) => void;
+  vi.spyOn(TestBed.inject(Router), "navigate").mockImplementationOnce(() => new Promise(resolve => { cancel = resolve; }));
+  const old = component.select(first);
+  await component.select(second); await settle(harness);
+  cancel(false); await old; await settle(harness);
+  expect(component.error()).toBe("");
+  expect(component.result()?.perfilOrigemId).toBe(second);
+});
+
 it("ignores late results after logout and after a new actor takes over", async () => {
   const old = new Subject<Recommendations>(); api.list.mockReturnValue(old);
   const { harness, component, element } = await create();

@@ -1,6 +1,6 @@
 # Matching de mentoria — contrato e validação
 
-Implementação em `codex/mentorship-matching`, baseada na main `d14423e`, em 17/11/2026. Regra normativa: [guia 29](29-matching-rule-decisions.md), `damatch-mentoria-v1`. A entrega depende de revisão, CI e merge pelo usuário; não representa publicação em produção. Paleta/Lumen existentes preservados. A atualização formal dos requisitos está no [adendo 1.1](38-srs-matching-v1.1.md).
+Implementação em `codex/mentorship-matching`, baseada na main `d14423e`, em 17/11/2026. Regra normativa: [guia 29](29-matching-rule-decisions.md), `damatch-mentoria-v1`. [PR #40](https://github.com/Diogo746/Da-Match/pull/40). A entrega depende de revisão, CI e merge pelo usuário; não representa publicação em produção. Paleta/Lumen existentes preservados. A atualização formal dos requisitos está no [adendo 1.1](38-srs-matching-v1.1.md).
 
 ## Consultas HTTP
 
@@ -37,11 +37,11 @@ O catálogo continua acessível sem exigir publicação do leitor; recomendaçõ
 | Fronteira | Resultado |
 | --- | --- |
 | Domínio/HTTP/arquitetura/Checkstyle | 333 testes backend na suíte completa; 33 testes direcionados repetidos após ajuste final da consulta |
-| Frontend | 660 testes + 8 de configuração; 98,96% de linhas; lint e builds DEMO/API aprovados |
+| Frontend | 661 testes + 8 de configuração; 98,96% de linhas; lint e builds DEMO/API aprovados |
 | Proxy Angular → JWT/CSRF → PostgreSQL 18 | 12 cenários, 31 requisições: ordem/selo, dois projetos, direção mentor, privacidade, relatório ADMIN, recusas por papel/vínculo, parâmetros e CSRF |
 | Navegador local | Conta → recomendações → seleção de dois projetos → lista/detalhe → recarga → logout; selo e explicação de agenda confirmados, console sem erros/avisos |
 | Responsividade | 360 px, seleção, lista e diálogo; sem transbordamento horizontal do corpo. Navegação global mantém sua rolagem existente |
 
-Banco novo e exclusivo em loopback, com dois projetos, quatro mentores e um ADMIN fictícios; nenhum dado/configuração/banco remoto acessado. JWT e chaves exclusivos da QA. Evidências privadas/ignoradas em `backend/database/matching-20261117`; não publicar credenciais, logs ou fixtures. Não é uma homologação geral de acessibilidade, leitores de tela, todos os temas ou ambiente publicado. O ensaio com 130 candidatos em integração cobre classificação antes do limite, lotes, estabilidade e ausência de gravações; não é teste de carga nem SLA.
+Banco novo e exclusivo em loopback, com dois projetos, quatro mentores e um ADMIN fictícios; nenhum dado/configuração/banco remoto acessado. JWT e chaves exclusivos da QA. Evidências privadas/ignoradas em `backend/database/matching-20261117`; não publicar credenciais, logs ou fixtures. Encerramento: zero sessões JWT vigentes confirmado no banco fictício; API, frontend e contêiner exclusivos parados, dados/evidências preservados. Não é uma homologação geral de acessibilidade, leitores de tela, todos os temas ou ambiente publicado. O ensaio com 130 candidatos em integração cobre classificação antes do limite, lotes, estabilidade e ausência de gravações; não é teste de carga nem SLA.
 
 Próximo passo após CI/revisão/merge: confirmar salvos persistidos e seu escopo; depois interesses/conexões, conversas reais e reuniões conforme [roteiro](27-startup-next-sessions.md). A migração Vercel foi concluída na CI136; não repetir o corte.

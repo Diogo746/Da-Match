@@ -74,7 +74,7 @@ export class RecommendationsComponent implements OnInit {
 
   async select(id: string): Promise<void> {
     if (id === this.selectedId() && id === (this.params().get("startupId") ?? "")) return;
-    this.revision++;
+    const revision = ++this.revision;
     this.loading.set(true);
     this.selectedId.set(id);
     this.response.set(null);
@@ -82,12 +82,12 @@ export class RecommendationsComponent implements OnInit {
     const session = this.state.revision();
     try {
       const changed = await this.router.navigate([], { relativeTo: this.route, queryParams: id ? { startupId: id } : {} });
-      if (!changed && !this.destroyed && session === this.state.revision()) {
+      if (!changed && !this.destroyed && session === this.state.revision() && revision === this.revision) {
         this.loading.set(false);
         this.error.set("Não foi possível selecionar o projeto. Tente novamente.");
       }
     } catch {
-      if (!this.destroyed && session === this.state.revision()) {
+      if (!this.destroyed && session === this.state.revision() && revision === this.revision) {
         this.loading.set(false);
         this.error.set("Não foi possível selecionar o projeto. Tente novamente.");
       }
