@@ -13,6 +13,10 @@ import java.util.UUID;
 
 @Component
 public class ResourceAccess {
+    public void requireAdmin() {
+        requireRole(TipoUsuario.ADMIN);
+    }
+
     public UUID currentStartupUserId() {
         return requireRole(TipoUsuario.STARTUP).getId();
     }
