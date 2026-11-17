@@ -1,0 +1,61 @@
+<section class="catalog-page" aria-labelledby="recommendations-title">
+  <header class="catalog-hero"><div><p class="eyebrow">CONEXÕES PARA SEU MOMENTO</p>
+    <h1 id="recommendations-title">Suas recomendações</h1>
+    <p class="intro">Perfis indicados a partir das necessidades e preferências que vocês declararam.</p>
+    <a routerLink="/">Explorar o catálogo geral</a></div></header>
+  @if (!apiMode) {
+    <p class="catalog-notice">As recomendações reais estão disponíveis na versão conectada. A demonstração mantém sua regra experimental.</p>
+  } @else if (!kind()) {
+    <p class="catalog-notice">Entre com uma conta de startup ou mentor para consultar recomendações.</p><a routerLink="/conta">Minha conta</a>
+  } @else {
+    @if (kind() === 'STARTUP' && projects().length > 1) {
+      <label class="project-label" for="matching-project">Recomendações para qual startup?</label>
+      <select id="matching-project" [ngModel]="selectedId()" (ngModelChange)="select($event)">
+        <option value="">Selecione uma startup</option>
+        @for (project of projects(); track project.id) { <option [value]="project.id">{{ project.nomeProvisorio }}</option> }
+      </select>
+    }
+    <div class="results-heading"><a [routerLink]="profileLink()">Revisar meu perfil</a>
+      <button class="button button-secondary" type="button" (click)="reload()" [disabled]="loading()">Atualizar recomendações</button></div>
+    @if (loading()) { <output class="catalog-notice">Consultando os perfis atuais…</output> }
+    @if (error()) { <p class="catalog-notice" role="alert">{{ error() }}</p> }
+    @if (!loading() && !error() && !selectedId()) {
+      <p class="catalog-notice">{{ projects().length ? 'Selecione o projeto que precisa de mentoria.' : 'Sua conta ainda não possui vínculo com uma startup. Confira sua conta e seus convites.' }}</p>
+    }
+    @if (result(); as response) {
+      @if (!response.perfilElegivel) {
+        <div class="catalog-notice"><h2>Seu perfil precisa de alguns ajustes</h2>
+          <ul>@for (pending of response.pendencias; track $index) { <li>{{ pending.mensagem }}</li> }</ul>
+          <a [routerLink]="quizLink()">Revisar questionário</a></div>
+      } @else {
+        <p class="catalog-help">Regra de mentoria v1 · Atualizado em {{ date(response.calculadoEm) }} (horário de Brasília).</p>
+        <ol class="directory recommendations-list">
+          @for (item of response.itens; track item.perfil.id) {
+            <li class="recommendation-item">
+              @if (item.superDamatch) { <p class="super-badge">Super DaMatch</p> }
+              <app-discovery-card [profile]="item.perfil" [location]="format(item.perfil.formato) + (item.perfil.cidadeId ? ' · ' + cityLabel(item.perfil.cidadeId) : '')" (opened)="open(item, $event)" />
+              @if (!item.agendaEmComum) { <p class="schedule-note">Vocês ainda precisam combinar os horários. Não há um dia e período em comum declarado.</p> }
+            </li>
+          } @empty {
+            <li class="empty-state"><h2>Nenhuma indicação neste momento</h2><p>Revise suas necessidades e preferências no perfil. As indicações podem mudar quando novos perfis forem publicados ou atualizados.</p><a [routerLink]="quizLink()">Revisar questionário</a></li>
+          }
+        </ol>
+        <p class="catalog-help">Uma indicação não cria interesse, conexão ou reunião. Os encontros ainda precisam ser combinados.</p>
+      }
+    }
+  }
+</section>
+<dialog #profileDialog class="catalog-dialog" aria-labelledby="matching-detail" (close)="closed()">
+  <div class="dialog-top"><h2 id="matching-detail">Conhecer indicação</h2><button #closeButton type="button" class="text-button" (click)="dismiss()">Fechar</button></div>
+  @if (detailLoading()) { <output>Atualizando a indicação…</output> }
+  @if (detailError()) { <p role="alert">{{ detailError() }}</p> }
+  @if (detail(); as item) {
+    @if (item.superDamatch) { <p class="super-badge">Super DaMatch</p> }
+    <h3>{{ item.perfil.nome }}</h3><p class="presentation">{{ item.perfil.apresentacao }}</p>
+    <p>{{ format(item.perfil.formato) }}{{ item.perfil.cidadeId ? ' · ' + cityLabel(item.perfil.cidadeId) : '' }}</p>
+    <h4>Setores</h4><ul class="tags">@for (sector of item.perfil.setores; track sector) { <li>{{ sectorLabel(sector) }}</li> }</ul>
+    <h4>{{ item.perfil.tipo === 'MENTOR' ? 'Pode ajudar com' : 'Precisa de ajuda com' }}</h4>
+    <ol>@for (topic of item.perfil.topicos; track topic) { <li>{{ topicLabel(topic) }}</li> }</ol>
+    @if (!item.agendaEmComum) { <p class="schedule-note">Vocês ainda precisam combinar os horários. Não há um dia e período em comum declarado.</p> }
+  }
+</dialog>

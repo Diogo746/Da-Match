@@ -1298,6 +1298,92 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Matching de mentoria",
+      "description": "Implementado na etapa 6, guia 37. Somente GET, sem parâmetros; preservar cookies após login. Participantes recebem ordem/selo, sem nota. Não cria interesse/conexão/reunião. Requer backend desta entrega.",
+      "item": [
+        {
+          "name": "Recomendar mentores — sessão STARTUP",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/startups/{{startupId}}/recomendacoes",
+            "description": "Exige vínculo atual inclusive MEMBRO. Origem incompleta/não publicada retorna 200 com pendências e lista vazia. Se apta, até20 mentores ordenados, corte interno60. UUID é do projeto selecionado, nunca do ator."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta autorizada', () => pm.response.to.have.status(200));",
+                  "pm.test('Sem cache compartilhado', () => { pm.expect(pm.response.headers.get('Cache-Control')).to.include('private'); pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'); });",
+                  "if (pm.response.code === 200) {",
+                  "  const b=pm.response.json();",
+                  "  pm.test('Contrato mínimo e versão', () => { pm.expect(Object.keys(b)).to.have.members(['perfilOrigemId','tipoOrigem','versaoRegra','calculadoEm','perfilElegivel','pendencias','itens']); pm.expect(b.versaoRegra).to.equal('damatch-mentoria-v1'); pm.expect(b.itens.length).to.be.at.most(20); b.itens.forEach(i => { pm.expect(Object.keys(i)).to.have.members(['perfil','superDamatch','agendaEmComum']); pm.expect(Object.keys(i.perfil)).to.have.members(['id','tipo','nome','apresentacao','setores','topicos','formato','cidadeId']); }); });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Recomendar startups — sessão MENTOR",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/mentores/me/recomendacoes",
+            "description": "Mentor da sessão, sem ID do ator na URL/query. Origem deve estar publicada/completa/aceitando. Sem candidatos válidos, lista vazia; nunca retorna DEMO."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta autorizada', () => pm.response.to.have.status(200));",
+                  "pm.test('Sem cache compartilhado', () => { pm.expect(pm.response.headers.get('Cache-Control')).to.include('private'); pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'); });",
+                  "if (pm.response.code === 200) {",
+                  "  const b=pm.response.json();",
+                  "  pm.test('Contrato mínimo e versão', () => { pm.expect(Object.keys(b)).to.have.members(['perfilOrigemId','tipoOrigem','versaoRegra','calculadoEm','perfilElegivel','pendencias','itens']); pm.expect(b.versaoRegra).to.equal('damatch-mentoria-v1'); pm.expect(b.itens.length).to.be.at.most(20); b.itens.forEach(i => { pm.expect(Object.keys(i)).to.have.members(['perfil','superDamatch','agendaEmComum']); pm.expect(Object.keys(i.perfil)).to.have.members(['id','tipo','nome','apresentacao','setores','topicos','formato','cidadeId']); }); });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Relatório restrito — ADMIN",
+          "description": "Trocar explicitamente para uma sessão ADMIN antes de executar. STARTUP/MENTOR recebem403. Não disponibilizar o relatório a participantes nem registrar respostas com dados reais.",
+          "item": [
+            {
+              "name": "Inspecionar par atual — sessão ADMIN",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/admin/matching/startups/{{startupId}}/mentores/{{mentorId}}",
+                "description": "Ambos publicados/completos; caso contrário404. Retorna versões, revisões SHA256, inputs normativos e contribuições exatas. Par incompatível retorna impedimentos e nota nula. Não concede acesso às consultas próprias de STARTUP/MENTOR."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Somente ADMIN autorizado', () => pm.response.to.have.status(200));",
+                      "if (pm.response.code === 200) { const b=pm.response.json(); pm.test('Rastreabilidade normativa', () => { pm.expect(b.versaoRegra).to.equal('damatch-mentoria-v1'); pm.expect(b.startup.revisao).to.match(/^[a-f0-9]{64}$/); pm.expect(b.mentor.revisao).to.match(/^[a-f0-9]{64}$/); pm.expect(b.calculo).to.have.property('impedimentos'); }); }"
+                    ]
+                  }
+                }
+              ],
+              "response": []
+            }
+          ]
+        }
+      ]
     }
   ]
 }

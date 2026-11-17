@@ -6,6 +6,8 @@ import { authGuard, demoProfileGuard, mentorGuard, startupGuard } from "./core/a
 import { inject } from "@angular/core";
 import { REGISTRATION_MODE } from "./core/registration.config";
 export const routes: Routes = [
+  { path: "recomendacoes", title: "Recomendações | DaMatch", canActivate: [authGuard],
+    loadComponent: () => import("./features/recommendations/recommendations.component").then(m => m.RecommendationsComponent) },
   { path: "conversas", title: "Conversas | DaMatch", loadComponent: () => inject(REGISTRATION_MODE) === "DEMO"
     ? import("./features/conversations/conversations.component").then(m => m.ConversationsComponent)
     : import("./features/conversations/conversations-pending.component").then(m => m.ConversationsPendingComponent) },

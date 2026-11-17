@@ -1,5 +1,7 @@
 # 02 — Software Requirements Specification (SRS)
 
+> Modelo genérico legado do bootstrap; não define os contratos atuais DaMatch. A especificação formal é [DAMATCH-SRS-001 v1.0](DaMatch-Documentacao-de-Requisitos-v1.0.pdf), com [adendo de matching 1.1 para revisão](38-srs-matching-v1.1.md).
+
 **Padrão:** Estruturado conforme a norma **IEEE 29148-2018** (Systems and software engineering — Life cycle processes — Requirements engineering).  
 
 ---

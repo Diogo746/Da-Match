@@ -2,7 +2,7 @@
 
 Implementação inicial na branch `feature/security-configuration`: SESSION continua padrão, sem HTTP Basic ou formulário HTML do Spring. A preparação Vercel adiciona JWT em cookies HttpOnly com renovação/revogação no banco, mantendo CSRF; contrato e condições de publicação no [guia 36](36-vercel-backend-jwt.md). BCrypt e contas existentes permanecem compatíveis.
 
-Equipe/convites e descoberta real integrados pelos PRs #30–#34; contratos/evidências nos guias 30–35. O modo SESSION atual é preservado enquanto JWT/Vercel são preparados em branch separada.
+Equipe/convites e descoberta real integrados pelos PRs #30–#34; contratos/evidências nos guias 30–35. Vercel/JWT + CSRF foi publicado na CI136; SESSION permanece opção de compatibilidade com Render. Matching em revisão está documentado no [guia 37](37-mentorship-matching.md).
 
 ## Matriz de acesso
 
@@ -14,6 +14,9 @@ Equipe/convites e descoberta real integrados pelos PRs #30–#34; contratos/evid
 | `POST /api/v1/mentores` e `POST /api/v1/startups` | Visitante sem sessão autenticada, com CSRF |
 | `GET /api/v1/auth/me` | Autenticado |
 | `GET /api/v1/mentores/me` | MENTOR; consulta somente o perfil associado à sessão |
+| `GET /api/v1/startups/{startupId}/recomendacoes` | STARTUP membro atual, qualquer papel; exige origem apta para calcular |
+| `GET /api/v1/mentores/me/recomendacoes` | MENTOR da sessão; exige origem apta para calcular |
+| `GET /api/v1/admin/matching/startups/{startupId}/mentores/{mentorId}` | Somente ADMIN; relatório numérico separado, ambos os perfis publicados/aptos |
 | `GET /api/v1/startups/me` | STARTUP; consulta somente projetos vinculados à conta da sessão |
 | `GET /api/v1/descoberta/mentores` e `/{mentorId}` | STARTUP; somente publicados/completos/quiz válido e aceitando novas startups; DTO de descoberta mínimo |
 | `GET /api/v1/descoberta/startups` e `/{startupId}` | MENTOR; somente publicados/completos/quiz válido; sem integrantes ou textos privados |
@@ -72,7 +75,7 @@ O formato novo permanece interno ao banco; não retorna em DTOs nem logs. Para r
 
 ## Ambiente e topologia
 
-Os arquivos de CI apontam para frontend no Vercel e backend no Render; o domínio final e a configuração dos proxies não estão confirmados no repositório. Nenhuma infraestrutura remota foi alterada.
+A CI136 concluiu a migração: frontend e backend Vercel, proxy na mesma origem, JWT + CSRF, Hobby gratuito. Render permanece preservado para retorno. Configuração operacional e limites no guia 36; não versionar origens ou credenciais reais.
 
 | Configuração | Desenvolvimento | Produção |
 | --- | --- | --- |
@@ -110,7 +113,7 @@ A publicação de startup adiciona `Startup.status` textual obrigatório com ini
 
 O modo API oferece `/entrar` e `/conta`. A guarda consulta `/auth/me`, o estado da conta fica em memória e a senha do formulário de login é limpa ao enviar. O interceptor trata 401/403 e invalida o CSRF em memória, sem repetir automaticamente operações de escrita. Login/logout renovam CSRF antes de concluir o fluxo. A página de perfil demonstrativo continua separada; `/meu-perfil` no modo API encaminha para a conta.
 
-O cadastro Angular envia as disponibilidades obrigatórias. `/mentor/perfil` carrega o perfil por `GET /api/v1/mentores/me`, sem receber o identificador do ator do navegador, e usa os PATCH existentes para edição e publicação. Campos sociais omitidos são preservados; strings vazias permitem limpá-los. O questionário v3 persistido está documentado no guia 25; descoberta e matching continuam pendentes.
+O cadastro Angular envia as disponibilidades obrigatórias. `/mentor/perfil` carrega o perfil por `GET /api/v1/mentores/me`, sem receber o identificador do ator do navegador, e usa os PATCH existentes para edição e publicação. Campos sociais omitidos são preservados; strings vazias permitem limpá-los. O questionário v3 persistido está documentado no guia 25; descoberta real foi integrada; matching tem contrato/validação local no guia 37, aguardando integração.
 
 `GET /api/v1/startups/me` exige STARTUP e lista somente os projetos vinculados à conta da sessão. `PATCH /api/v1/startups/{startupId}` exige STARTUP, CSRF e vínculo atual de FUNDADOR/REPRESENTANTE, verificado no serviço sob bloqueio transacional. ADMIN não tem exceção. `/startup/perfil` permite selecionar projetos, consultar e editar os sete campos do perfil; não altera conta ou integrantes. Os GET gerais de startup anteriores preservam o contrato autenticado. Detalhes: [guia 22](22-startup-profile.md).
 

@@ -141,6 +141,8 @@ Consequências da regra: sem agenda o máximo é 90; com setor desconhecido, 85;
 
 ## Entrega desta decisão e próximos passos
 
+**Implementação em 17/11:** cálculo/backend, relatório ADMIN separado e interface API concluídos/validados localmente na branch `codex/mentorship-matching`. Contrato e evidências no [guia 37](37-mentorship-matching.md); adendo para revisão formal do SRS no [guia 38](38-srs-matching-v1.1.md). CI/revisão/merge ainda necessários; não está publicado. As 13 decisões acima permanecem vigentes, sem mudança de fórmula. O texto datado abaixo registra a entrega documental original.
+
 Questionário e especificação concluídos; implementar e validar na etapa 6, após publicação/frontend/integrantes/descoberta. Atualizar a próxima revisão formal do SRS com esta decisão, preservando o PDF anterior como histórico. O guia 16 e US-16/18/19 apontam para esta regra. O demonstrativo do frontend continua com sua versão experimental até uma entrega própria; não alegar que já executa esta fórmula. Não houve mudança de algoritmo, API, schema, banco remoto ou deploy nesta definição.
 
 Validação documental em 30/10: soma dos pesos igual a 100; fatores de experiência e 14 totais/exemplos conferidos com aritmética decimal exata; links relativos novos conferidos; `git diff --check` aprovado. Script e relatório locais ignorados em `backend/target/check-matching-decision.py` e `matching-decision-check.json`. Essa verificação dos exemplos não é teste de uma implementação de matching; suites de aplicação não foram repetidas porque esta entrega altera somente documentação.

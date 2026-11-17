@@ -24,6 +24,7 @@
     <div class="section-heading">
       <h2>{{ target() === 'MENTOR' ? 'Conheça os mentores' : 'Conheça as startups em ideação' }}</h2></div>
     <p class="catalog-help">Perfis completos e publicados{{ target() === 'MENTOR' ? ', aceitando novas startups' : '' }}. Explore por nome e interesses.</p>
+    <a class="button button-secondary" routerLink="/recomendacoes">Ver minhas recomendações</a>
     <form class="filter-panel" [formGroup]="form" (ngSubmit)="search()">
       <div class="search-field"><app-icon name="search" /><label class="sr-only" for="discovery-search">Buscar por nome ou apresentação</label>
         <input id="discovery-search" type="search" formControlName="busca" maxlength="100" placeholder="Nome ou apresentação" />
