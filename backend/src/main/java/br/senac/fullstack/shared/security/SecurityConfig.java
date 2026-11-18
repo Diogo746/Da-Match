@@ -95,6 +95,8 @@ public class SecurityConfig {
                             .hasRole(TipoUsuario.MENTOR.name())
                             .requestMatchers(HttpMethod.GET, "/api/v1/startups/*/recomendacoes")
                             .hasRole(TipoUsuario.STARTUP.name())
+                            .requestMatchers(HttpMethod.POST, "/api/v1/startups/*/recomendacoes/*/explicacao")
+                            .hasRole(TipoUsuario.STARTUP.name())
                             .requestMatchers(HttpMethod.GET, "/api/v1/mentores/me/recomendacoes")
                             .hasRole(TipoUsuario.MENTOR.name())
                             .requestMatchers(HttpMethod.GET, "/api/v1/admin/matching/startups/*/mentores/*")

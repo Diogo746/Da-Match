@@ -59,7 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:mem:matching;MODE=PostgreSQL;DB_CLOSE_DELAY=-1",
-        "spring.jpa.hibernate.ddl-auto=create-drop"})
+        "spring.jpa.hibernate.ddl-auto=create-drop", "OLLAMA_BASE_URL="})
 @AutoConfigureMockMvc
 @Transactional
 class MatchingIntegrationTest {
@@ -120,6 +120,22 @@ class MatchingIntegrationTest {
             mvc.perform(get(startupPath(source)).param(parameter, "forjado").with(as(actor))).andExpect(status().isBadRequest());
         }
         mvc.perform(post(startupPath(source)).with(as(actor)).with(csrf())).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void exigeVinculoCsrfEIndicacaoParaExplicar() throws Exception {
+        Usuario titular = account(TipoUsuario.STARTUP);
+        PerfilMatch source = startup(titular);
+        PerfilMatch target = mentor();
+        String path = startupPath(source) + "/" + target.getMentor().getId() + "/explicacao";
+        mvc.perform(post(path).with(as(titular))).andExpect(status().isForbidden());
+        mvc.perform(post(path).with(as(account(TipoUsuario.STARTUP))).with(csrf()))
+                .andExpect(status().isForbidden());
+        mvc.perform(post(path).with(as(titular)).with(csrf()))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, "private, no-store"));
+        target.setAccepting(false);
+        mvc.perform(post(path).with(as(titular)).with(csrf())).andExpect(status().isNotFound());
     }
 
     @Test

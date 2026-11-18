@@ -15,10 +15,15 @@
         @for (item of starters; track item) { <button type="button" (click)="send(item)">{{ item }}</button> }
       </div>
     }
-    <div role="log" aria-label="Mensagens" aria-live="polite" aria-relevant="additions">
+    <div role="log" aria-label="Mensagens" aria-live="polite" aria-relevant="additions text">
       @for (item of exchanges(); track item.id) {
         <div class="turn"><p class="question"><span class="sr-only">Você: </span>{{ item.question }}</p>
-          <div class="reply"><small>LUMEN</small><p>{{ item.answer }}</p></div></div>
+          <div class="reply"><small>{{ item.online ? 'LUMEN · RECOMENDAÇÃO' : 'LUMEN' }}</small><p>{{ item.answer }}</p>
+            @if (item.evidence?.length) {
+              <small>Evidências nas fichas</small>
+              <ul>@for (evidence of item.evidence; track evidence) { <li>{{ evidence }}</li> }</ul>
+            }
+          </div></div>
       }
     </div>
   </div>
@@ -27,7 +32,7 @@
       <input #field type="text" aria-label="Sua pergunta ao Lumen" maxlength="360" autocomplete="off" placeholder="Escreva sua dúvida…" [value]="draft()" (input)="draft.set(field.value)" />
       <button class="icon send" type="submit" aria-label="Enviar pergunta" [disabled]="!draft().trim()"><app-icon name="arrow" /></button>
     </form>
-    <div class="note"><span>Ajuda local · só neste navegador</span>
+    <div class="note"><span>{{ pending() ? 'Gerando explicação com IA' : 'Dúvidas gerais sobre o DaMatch' }}</span>
       @if (exchanges().length) { <button type="button" (click)="reset(); field.focus()">Limpar conversa</button> }</div>
   </footer>
   }

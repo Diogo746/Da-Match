@@ -34,6 +34,10 @@
             <li class="recommendation-item">
               @if (item.superDamatch) { <p class="super-badge">Super DaMatch</p> }
               <app-discovery-card [profile]="item.perfil" [location]="format(item.perfil.formato) + (item.perfil.cidadeId ? ' · ' + cityLabel(item.perfil.cidadeId) : '')" (opened)="open(item, $event)" />
+              @if (kind() === "STARTUP") {
+                <button class="button button-secondary" type="button" (click)="askLumen(item, $event)"
+                  [attr.aria-label]="'Perguntar ao Lumen sobre ' + item.perfil.nome">Perguntar ao Lumen</button>
+              }
               @if (!item.agendaEmComum) { <p class="schedule-note">Vocês ainda precisam combinar os horários. Não há um dia e período em comum declarado.</p> }
             </li>
           } @empty {
