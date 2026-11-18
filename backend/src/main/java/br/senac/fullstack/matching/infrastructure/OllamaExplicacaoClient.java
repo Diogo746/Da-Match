@@ -21,6 +21,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class OllamaExplicacaoClient {
+    private static final String CAMPO_CONTENT = "content";
+    private static final String CAMPO_TEXTO = "texto";
+    private static final String CAMPO_REFERENCIAS = "referencias";
+
     private static final String INSTRUCOES = """
             Escreva em português brasileiro uma explicação de até duas frases para uma startup
             que está avaliando uma indicação de mentoria. Relacione a necessidade da startup
@@ -93,8 +97,8 @@ public class OllamaExplicacaoClient {
                 chamada.header("CF-Access-Client-Id", clientId).header("CF-Access-Client-Secret", clientSecret);
             }
             JsonNode resposta = chamada.body(Map.of("model", modelo, "stream", false, "keep_alive", "30m",
-                            "messages", List.of(Map.of("role", "system", "content", INSTRUCOES),
-                                    Map.of("role", "user", "content", json.writeValueAsString(evidencias))),
+                            "messages", List.of(Map.of("role", "system", CAMPO_CONTENT, INSTRUCOES),
+                                    Map.of("role", "user", CAMPO_CONTENT, json.writeValueAsString(evidencias))),
                             "options", Map.of("temperature", 0, "num_ctx", 2048, "num_predict", 256),
                             "format", formato(evidencias)))
                     .retrieve().body(JsonNode.class);
@@ -102,26 +106,26 @@ public class OllamaExplicacaoClient {
                     || !resposta.path("done_reason").asText().equals("stop")) {
                 throw indisponivel();
             }
-            return lerExplicacao(json.readTree(resposta.path("message").path("content").asText()), evidencias);
+            return lerExplicacao(json.readTree(resposta.path("message").path(CAMPO_CONTENT).asText()), evidencias);
         } catch (RestClientException | JsonProcessingException ex) {
             throw indisponivel();
         }
     }
 
     private Map<String, Object> formato(Map<String, String> evidencias) {
-        return Map.of("type", "object", "additionalProperties", false, "required", List.of("texto", "referencias"),
-                "properties", Map.of("texto", Map.of("type", "string"),
-                        "referencias", Map.of("type", "array", "items",
+        return Map.of("type", "object", "additionalProperties", false, "required", List.of(CAMPO_TEXTO, CAMPO_REFERENCIAS),
+                "properties", Map.of(CAMPO_TEXTO, Map.of("type", "string"),
+                        CAMPO_REFERENCIAS, Map.of("type", "array", "items",
                                 Map.of("type", "string", "enum", List.copyOf(evidencias.keySet())))));
     }
 
     private Explicacao lerExplicacao(JsonNode resposta, Map<String, String> evidencias) {
-        if (resposta == null || !resposta.path("texto").isTextual() || !resposta.path("referencias").isArray()) {
+        if (resposta == null || !resposta.path(CAMPO_TEXTO).isTextual() || !resposta.path(CAMPO_REFERENCIAS).isArray()) {
             throw indisponivel();
         }
-        String texto = resposta.path("texto").asText().strip();
+        String texto = resposta.path(CAMPO_TEXTO).asText().strip();
         List<String> referencias = new ArrayList<>();
-        for (JsonNode referencia : resposta.path("referencias")) {
+        for (JsonNode referencia : resposta.path(CAMPO_REFERENCIAS)) {
             String id = referencia.asText();
             if (!evidencias.containsKey(id)) {
                 throw indisponivel();
