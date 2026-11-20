@@ -1,51 +1,63 @@
 @import "./app/shared/theme.css";
+@import "./app/shared/palettes.css";
+@import "./app/shared/rainbow.css";
 @import "./app/shared/profile-tones.css";
 @import "./app/features/profile/profile-choices.css";
 @import "./app/shared/motion.css";
+
 :root {
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
-  color:var(--text-primary);
+  color: var(--text-primary);
   background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
+
 * {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
   min-width: 320px;
 }
+
 button,
 input,
 select,
 textarea {
   font: inherit;
 }
+
 button,
 a,
 input,
 select {
   touch-action: manipulation;
 }
+
 button:disabled {
   opacity: 0.65;
   cursor: wait;
 }
+
 a {
   color: inherit;
 }
+
 :focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 4px;
 }
+
 h1,
 h2,
 h3,
 p {
   overflow-wrap: break-word;
 }
+
 .eyebrow {
   font-size: 10px;
   font-weight: 700;
@@ -53,6 +65,7 @@ p {
   color: var(--teal);
   margin: 0;
 }
+
 .button {
   display: inline-flex;
   gap: 12px;
@@ -67,36 +80,45 @@ p {
   cursor: pointer;
   line-height: 1.4;
 }
+
 .button app-icon {
   width: 16px;
   height: 16px;
 }
+
 .button-primary {
   background: var(--action-bg);
-  color:var(--action-text);
+  color: var(--action-text);
 }
+
 .button-primary:hover {
   background: var(--action-hover);
 }
+
 .button-secondary {
   background: var(--surface);
   border-color: var(--border);
-  color:var(--text-primary);
+  color: var(--text-primary);
 }
+
 .button-secondary:hover {
   background: var(--surface-hover);
 }
+
 .button-light {
   background: var(--button-soft-bg);
   color: var(--button-soft-text);
 }
+
 .button-light:hover {
   background: var(--button-soft-hover);
 }
+
 .button-small {
   font-size: 11px;
   padding: 10px 14px;
 }
+
 .text-button {
   display: inline-flex;
   align-items: center;
@@ -109,10 +131,12 @@ p {
   color: var(--teal);
   cursor: pointer;
 }
+
 .text-button app-icon {
   width: 13px;
   height: 13px;
 }
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -124,26 +148,31 @@ p {
   white-space: nowrap;
   border: 0;
 }
+
 .skip-link {
   position: fixed;
   left: 15px;
   top: -70px;
   background: var(--surface);
-  color:var(--text-primary);
+  color: var(--text-primary);
   padding: 12px 18px;
   z-index: 100;
   border: 2px solid var(--teal);
   border-radius: 8px;
 }
+
 .skip-link:focus {
   top: 15px;
 }
+
 dialog {
   overscroll-behavior: contain;
 }
+
 body:has(dialog[open]) {
   overflow: hidden;
 }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -162,11 +191,13 @@ body:has(dialog[open]) {
   font-weight: 600;
   margin: 21px 0 9px;
 }
+
 .field-label span {
   font-size: 9px;
   color: var(--muted);
   font-weight: 400;
 }
+
 .form-input {
   border: 1px solid var(--field-border);
   border-radius: 8px;
@@ -174,24 +205,28 @@ body:has(dialog[open]) {
   height: 43px;
   padding: 0 12px;
   font-size: 12px;
-  color:var(--text-primary);
+  color: var(--text-primary);
   background: var(--surface);
 }
+
 .form-input[aria-invalid="true"] {
   border-color: var(--error-border);
 }
+
 .field-error {
   color: var(--error-text);
   font-size: 10px;
   line-height: 1.6;
   margin: 8px 0;
 }
+
 .field-help {
   font-size: 10px;
   line-height: 1.7;
   color: var(--muted);
   margin: 8px 0;
 }
+
 .error-summary {
   border: 1px solid var(--error-border);
   background: var(--error-bg);
@@ -203,4 +238,6 @@ body:has(dialog[open]) {
   margin-bottom: 18px;
 }
 
-.app-layout .page-footer{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+.app-layout .page-footer {
+  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+}
