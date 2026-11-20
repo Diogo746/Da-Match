@@ -1,18 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TestBed } from "@angular/core/testing";
-import { THEME_STORAGE_KEY, ThemeStore } from "./theme.store";
+import { PALETTE_STORAGE_KEY, THEME_STORAGE_KEY, ThemeStore } from "./theme.store";
 
 beforeEach(() => {
   TestBed.resetTestingModule();
   localStorage.clear();
   vi.stubGlobal("matchMedia", vi.fn().mockReturnValue({ matches: false }));
 });
+
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   TestBed.resetTestingModule();
   localStorage.clear();
   document.documentElement.removeAttribute("data-theme");
+  document.documentElement.removeAttribute("data-palette");
   document.documentElement.style.removeProperty("color-scheme");
 });
 
@@ -61,5 +63,53 @@ describe("Preferência de tema", () => {
     restored.toggle();
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
     expect(document.documentElement.dataset["theme"]).toBe("light");
+  });
+
+  it("usa a paleta azul por padrão e aplica no documento", () => {
+    const theme = TestBed.inject(ThemeStore);
+    expect(theme.palette()).toBe("azul");
+    expect(document.documentElement.dataset["palette"]).toBe("azul");
+  });
+
+  it("troca e persiste a paleta sem alterar claro/escuro", () => {
+    const theme = TestBed.inject(ThemeStore);
+    theme.toggle();
+    theme.setPalette("verde");
+    expect(document.documentElement.dataset["palette"]).toBe("verde");
+    expect(theme.mode()).toBe("dark");
+    expect(localStorage.getItem(PALETTE_STORAGE_KEY)).toBe("verde");
+    TestBed.resetTestingModule();
+    expect(TestBed.inject(ThemeStore).palette()).toBe("verde");
+  });
+
+  it("ignora paleta salva inválida", () => {
+    localStorage.setItem(PALETTE_STORAGE_KEY, "laranja");
+    expect(TestBed.inject(ThemeStore).palette()).toBe("azul");
+  });
+
+  it("easter egg: o arco-íris liga e desliga sem salvar nada e volta à paleta escolhida", () => {
+    const theme = TestBed.inject(ThemeStore);
+    theme.setPalette("roxo");
+    theme.toggleRainbow();
+    expect(theme.palette()).toBe("arco");
+    expect(document.documentElement.dataset["palette"]).toBe("arco");
+    expect(localStorage.getItem(PALETTE_STORAGE_KEY)).toBe("roxo");
+    theme.toggleRainbow();
+    expect(theme.palette()).toBe("roxo");
+    expect(document.documentElement.dataset["palette"]).toBe("roxo");
+  });
+
+  it("easter egg: escolher uma paleta no seletor sai do arco-íris", () => {
+    const theme = TestBed.inject(ThemeStore);
+    theme.toggleRainbow();
+    theme.setPalette("verde");
+    expect(theme.palette()).toBe("verde");
+    expect(document.documentElement.dataset["palette"]).toBe("verde");
+  });
+
+  it("easter egg: o arco-íris não volta sozinho em uma nova sessão", () => {
+    TestBed.inject(ThemeStore).toggleRainbow();
+    TestBed.resetTestingModule();
+    expect(TestBed.inject(ThemeStore).palette()).toBe("azul");
   });
 });
