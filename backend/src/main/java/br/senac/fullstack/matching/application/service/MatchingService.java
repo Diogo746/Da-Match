@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -66,6 +67,19 @@ public class MatchingService {
         }
         aptidao.avaliar(startup, quiz).forEach(item -> pendencias.add(new Pendencia(item.campo(), item.mensagem())));
         return listar(id, TipoUsuario.STARTUP, origem, pendencias);
+    }
+
+    public Map<String, String> evidenciasIndicacao(UUID startupId, UUID mentorId) {
+        var indicacao = paraStartup(startupId, Map.of()).itens().stream()
+                .filter(item -> item.perfil().id().equals(mentorId)).findFirst().orElseThrow();
+        var startup = publicado(TipoUsuario.STARTUP, startupId).dados();
+        Map<String, String> evidencias = new LinkedHashMap<>();
+        startup.topicos().stream().filter(indicacao.perfil().topicos()::contains).forEach(topico ->
+                evidencias.put(topico.name(), "A startup procura mentoria neste tópico público do mentor: " + topico.name()));
+        if (indicacao.agendaEmComum()) {
+            evidencias.put("AGENDA", "As fichas declaram ao menos um dia e período em comum.");
+        }
+        return Map.copyOf(evidencias);
     }
 
     public RecomendacoesResponse paraMentor(Map<String, List<String>> parametros) {

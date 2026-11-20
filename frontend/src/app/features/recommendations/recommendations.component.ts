@@ -6,6 +6,7 @@ import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { AuthStateStore } from "../../core/auth-state.store";
+import { LumenChatTrigger } from "../../core/lumen-chat-trigger";
 import { MentorService } from "../../core/mentor.service";
 import { cityLabel, sectorLabel, topicLabel, ProfileKind } from "../../core/profile.models";
 import { Recommendation, Recommendations, RecommendationsService } from "../../core/recommendations.service";
@@ -22,6 +23,7 @@ import { DiscoveryCardComponent } from "../explore/discovery-card.component";
 })
 export class RecommendationsComponent implements OnInit {
   readonly state = inject(AuthStateStore);
+  private readonly lumen = inject(LumenChatTrigger);
   private readonly api = inject(RecommendationsService);
   private readonly startups = inject(StartupService);
   private readonly mentors = inject(MentorService);
@@ -125,6 +127,12 @@ export class RecommendationsComponent implements OnInit {
     this.projects.set(projects);
     if (requested && !projects.some(item => item.id === requested)) throw new Error("PROJECT");
     return requested ?? (projects.length === 1 ? projects[0].id : "");
+  }
+
+  askLumen(item: Recommendation, event: Event): void {
+    const startupId = this.selectedId();
+    if (!startupId || this.kind() !== "STARTUP") return;
+    this.lumen.open(event, { startupId, mentorId: item.perfil.id, mentorName: item.perfil.nome });
   }
 
   async open(item: Recommendation, event: Event): Promise<void> {
