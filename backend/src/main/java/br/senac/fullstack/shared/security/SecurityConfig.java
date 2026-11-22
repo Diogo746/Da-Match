@@ -10,6 +10,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -25,6 +26,7 @@ import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -79,7 +81,11 @@ public class SecurityConfig {
                     headers.frameOptions(frame -> frame.deny())
                             .contentSecurityPolicy(csp -> csp.policyDirectives("frame-ancestors 'none'"))
                             .referrerPolicy(referrer ->
-                                    referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER));
+                                    referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
+                            .addHeaderWriter(new DelegatingRequestMatcherHeaderWriter(request -> {
+                                String path = request.getRequestURI().substring(request.getContextPath().length());
+                                return path.equals("/api/v1/salvos") || path.startsWith("/api/v1/salvos/");
+                            }, (request, response) -> response.setHeader(HttpHeaders.CACHE_CONTROL, "private, no-store")));
                     if (!production) {
                         headers.httpStrictTransportSecurity(HstsConfig::disable);
                     }
@@ -91,6 +97,12 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.POST, "/api/v1/auth/refresh").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/v1/mentores", "/api/v1/startups").anonymous()
                             .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
+                            .requestMatchers(HttpMethod.GET, "/api/v1/salvos", "/api/v1/salvos/*")
+                                .hasAnyRole(TipoUsuario.STARTUP.name(), TipoUsuario.MENTOR.name())
+                            .requestMatchers(HttpMethod.PUT, "/api/v1/salvos/*")
+                                .hasAnyRole(TipoUsuario.STARTUP.name(), TipoUsuario.MENTOR.name())
+                            .requestMatchers(HttpMethod.DELETE, "/api/v1/salvos/*")
+                                .hasAnyRole(TipoUsuario.STARTUP.name(), TipoUsuario.MENTOR.name())
                             .requestMatchers(HttpMethod.GET, "/api/v1/mentores/me")
                             .hasRole(TipoUsuario.MENTOR.name())
                             .requestMatchers(HttpMethod.GET, "/api/v1/startups/*/recomendacoes")

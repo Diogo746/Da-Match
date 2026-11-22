@@ -30,6 +30,14 @@ public class DescobertaQueryRepository {
     }
 
     public List<PerfilMatch> consultar(TipoUsuario tipo, FiltrosDescoberta filtros, UUID id) {
+        return consultar(tipo, filtros, id == null ? null : List.of(id));
+    }
+
+    public List<PerfilMatch> consultarPorIds(TipoUsuario tipo, FiltrosDescoberta filtros, List<UUID> ids) {
+        return ids.isEmpty() ? List.of() : consultar(tipo, filtros, ids);
+    }
+
+    private List<PerfilMatch> consultar(TipoUsuario tipo, FiltrosDescoberta filtros, List<UUID> ids) {
         CriteriaBuilder builder = entities.getCriteriaBuilder();
         CriteriaQuery<PerfilMatch> query = builder.createQuery(PerfilMatch.class);
         Root<PerfilMatch> root = query.from(PerfilMatch.class);
@@ -44,8 +52,8 @@ public class DescobertaQueryRepository {
         List<Predicate> condicoes = new ArrayList<>();
         Object publicado = tipo == TipoUsuario.MENTOR ? StatusPerfilMentor.PUBLICADO : StatusPerfilStartup.PUBLICADO;
         condicoes.add(builder.equal(root.get(origem).get("status"), publicado));
-        if (id != null) {
-            condicoes.add(builder.equal(root.get(origem).get("id"), id));
+        if (ids != null) {
+            condicoes.add(root.get(origem).get("id").in(ids));
         }
         filtrar(builder, root, filtros, condicoes);
         query.select(root).distinct(true).where(condicoes.toArray(Predicate[]::new));

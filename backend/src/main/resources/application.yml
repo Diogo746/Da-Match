@@ -19,6 +19,7 @@ spring:
     properties:
       hibernate:
         format_sql: false
+        hbm2ddl.create_namespaces: true
 
 server:
   port: 8080
