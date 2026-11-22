@@ -4,6 +4,8 @@ Registrado a pedido do usuário em 28/10/2026 para retomar amanhã, sem iniciar 
 
 ## Onde paramos
 
+- Em 22/11, a main `ae791b1` já incluía matching (#40), paletas (#42) e a correção da CI das paletas (#43). A etapa de salvos foi iniciada em `codex/private-saved-profiles`. A lista privada pertence à conta, conforme decisão do usuário. O catálogo e as recomendações têm a ação nos detalhes dos perfis e a lista está disponível em `/salvos`.
+
 - Retomada em 17/11: main/origin `d14423e` conferidas, sem atualizações ou conflitos. Branch de cores `Front-End_paletas` avançou separadamente, sem integração automática. Migração concluída pela CI136/PR39. Matching implementado e validado localmente em `codex/mentorship-matching`: [contrato/evidências](37-mentorship-matching.md) e [adendo SRS 1.1 para revisão](38-srs-matching-v1.1.md). Conferir CI/gates e revisão antes do merge pelo usuário; depois confirmar salvos persistidos. Registros anteriores são históricos.
 
 - Estado atual em 11/11: PRs #34 (descoberta real), #37 (frontend/Lumen), #35 (JWT) e #38 integrados; main `fab053b`. Corte operacional para Vercel concluído e homologado na origem publicada/Chrome, somente Hobby, JWT + CSRF e Render preservado para retorno. A correção adicional do parser da CLI para os próximos deploys automáticos e as evidências estão no [guia 36](36-vercel-backend-jwt.md). Conversas reais foram adicionadas à etapa 8.1; matching continua sendo a próxima funcionalidade. Os registros anteriores abaixo são históricos.
@@ -53,7 +55,7 @@ Trabalhar uma etapa por vez. Cada etapa pode ocupar mais de uma sessão; não h�
 | 4. Integrantes | Integrada pelos PRs #29/#30/#31; main `dc66ec7`, CI pós-merge #108 aprovada; evidências locais no guia 32 | Equipe, convite/aceite, recuperação e permissões |
 | 5. Descoberta real | Contrato PR #32, backend PR #33 e interface PR #34 integrados; catálogo publicado conferido novamente no corte Vercel em 11/11 | Catálogo de perfis elegíveis pela API |
 | 6. Matching definitivo | Implementado/validado localmente em 17/11; CI/revisão/merge pendentes. [Guia 37](37-mentorship-matching.md), adendo SRS no guia 38 | `damatch-mentoria-v1`, após as dependências; atualizar revisão formal do SRS |
-| 7. Salvos persistidos | Pendente; confirmar escopo | Favoritos por conta |
+| 7. Salvos persistidos | Implementado e validado localmente em 22/11. CI e integração pendentes. | Favoritos privados por conta |
 | 8. Interesses e conexões | Pendente | Interesse e reciprocidade persistidos |
 | 8.1. Conversas reais | Incluída pelo usuário em 11/11; backend e integração API pendentes | Conversas e mensagens no banco, listagem/histórico paginados, envio e autorização dos participantes; depende das conexões |
 | 9. Reuniões | Pendente | Agendamento entre conexões |
@@ -201,11 +203,28 @@ Conclusão: casos de referência aprovados conferem com o cálculo e as permiss�
 
 ## Etapas 7 a 9 — Relacionamento, conversas e reuniões
 
-7. Confirmar salvos no escopo, persistir por conta e restaurar após novo acesso. Salvar não cria interesse/conexão.
+7. Salvos privados por conta, com ações no catálogo e nas recomendações e recuperação após novo acesso. O contrato está abaixo.
 8. Definir e implementar interesse enviado/recebido, conexão por reciprocidade, visibilidade de contato e proteção contra duplicidade/concorrência.
 9. Definir e implementar proposta, confirmação/recusa e demais ações de reunião aprovadas, dentro de conexão ativa, com instante/fuso explícitos (`America/Sao_Paulo` na interface).
 
 Conclusão de cada entrega: autorização, persistência, fluxo pela interface e documentação verificados separadamente.
+
+### Etapa 7 — Perfis salvos privados
+
+A partir do catálogo ou das recomendações, abra o detalhe de um perfil e use **Salvar perfil**. A página **Perfis salvos** fica disponível na navegação e em Minha conta. Todas as startups de que uma mesma pessoa participa usam a lista dessa pessoa. Cada integrante tem sua própria lista. No modo API, STARTUP salva mentores e MENTOR salva startups com visibilidade atual no catálogo. Um perfil que perdeu visibilidade aparece como **Perfil indisponível**, pode ser removido e volta a ser exibido se recuperar a publicação e elegibilidade. A tela usa somente dados públicos atuais. Favoritos são pessoais e independentes de interesses ou conexões.
+
+| Rota | Contrato |
+| --- | --- |
+| `GET /api/v1/salvos?pagina=0&tamanho=20` | Lista paginada privada, do mais recente para o mais antigo com desempate estável. `itens` contém `perfilId`, `salvoEm` e `perfil` com a projeção de descoberta ou `null`. Também retorna `pagina`, `tamanho`, `totalItens` e `totalPaginas`. Tamanho máximo 20. |
+| `GET /api/v1/salvos/{perfilId}` | Retorna `{ "salvo": true }` ou `false` para a conta da sessão. |
+| `PUT /api/v1/salvos/{perfilId}` | Exige CSRF, cria favorito idempotente e retorna 204. Alvo novo fora do catálogo retorna 404. |
+| `DELETE /api/v1/salvos/{perfilId}` | Exige CSRF, remove favorito da conta atual. Retorna 204 também se a conta já não o possui. |
+
+A API infere o titular e o tipo de destino da autenticação. Rejeita outros parâmetros de consulta. Respostas usam `private, no-store`. Visitantes recebem 401 e ADMIN recebe 403 nas consultas. A chave única por conta/tipo/perfil e o bloqueio da conta nas escritas preservam o resultado sob concorrência. A lista revalida o perfil em um snapshot do banco e carrega os dados públicos em lote. Se a resposta de uma escrita for incerta, a interface pede uma consulta antes de permitir outra tentativa.
+
+O Hibernate gerencia `damatch_private.perfil_salvo` em esquema separado do `public`. Na publicação, verificar que o esquema fica fora dos esquemas expostos pelo Supabase, que a conta do backend pode criar/usá-lo e que PUBLIC/anon/authenticated/service_role não têm acesso direto. A verificação deve considerar concessões padrão da conta efetiva de produção. Ensaiar sobre uma cópia isolada antes da primeira aplicação de DDL ao banco real. O modo DEMO segue com favoritos locais.
+
+Evidências locais de 22/11: 338 testes backend, 672 frontend + 8 de configuração, lint e builds DEMO/API. Ensaio JWT pelo proxy Angular e PostgreSQL 18 em banco fictício conferiu 14 cenários com 50 requisições, incluindo isolamento do esquema, persistência após novo login, papéis, CSRF, concorrência e perfil pausado. No navegador, salvar, listar, recarregar, remover e sair funcionaram com conta fictícia. A publicação desta etapa ainda depende de revisão, CI e homologação.
 
 ### Etapa 8.1 — Backend e integração das conversas reais
 
@@ -231,7 +250,7 @@ Conclusão: duas contas autorizadas trocam mensagens persistidas pela aplicaçã
 
 ## Registro para a próxima sessão
 
-- **Próxima ação exata:** conferir CI e ambos os gates do head de `codex/mentorship-matching`, revisar/integrar pelo usuário e homologar a entrega publicada. Depois confirmar escopo de salvos persistidos (etapa 7); interesses/conexões → conversas reais → reuniões. Migração Vercel concluída, sem novo corte.
+- **Próxima ação:** revisar a CI de `codex/private-saved-profiles` e conferir os acessos do novo esquema antes da homologação publicada. Em seguida, interesses/conexões → conversas reais → reuniões.
 - **Entrega da publicação:** backend/Postman no PR #25, main `2a5d321`, CI #94 aprovada; interface validada em 31/10 e integrada pelo PR #27 em `a847958`, CI pós-merge #98 aprovada.
 - **Entrega desta definição (30/10) e resolução (31/10):** somente documentação no PR #26, branch `codex/matching-rule-decision`; 13 respostas, fórmula e 14 casos de referência, US-16/18/19 alinhadas. Main `2a5d321` incorporada à branch para conciliar o roteiro e o índice. Nenhuma implementação de matching, alteração de aplicação além da main, mudança remota de banco ou deploy manual nesta entrega.
 - **Entrega de 04/11:** contrato de integrantes no guia 30 e continuidade atualizada, branch `codex/startup-team-contract`, base `de71fa5`. Sem mudanças de aplicação, schema ou banco remoto; verificar checks do PR documental, sem alegar novos testes/gates de aplicação quando dispensados.

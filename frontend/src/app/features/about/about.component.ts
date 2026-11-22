@@ -44,7 +44,7 @@ import { IconComponent } from "../../shared/icon.component";
       <h2>O que você pode experimentar agora</h2>
       @if (apiMode) {
         <p>Crie sua conta, complete o cadastro e o questionário e publique seu perfil. Após entrar, startups podem conhecer mentores que aceitam novas startups; mentores podem conhecer startups em ideação. O catálogo mostra somente perfis completos e publicados.</p>
-        <p>Recomendações personalizadas, perfis salvos, interesses, conexões e reuniões estarão disponíveis nas próximas etapas.</p>
+        <p>Consulte recomendações personalizadas e salve perfis para rever na sua lista privada. Interesses, conexões e reuniões estão previstos para as próximas etapas.</p>
       } @else { <p>
         Explore perfis fictícios, monte seu perfil em seis etapas com o Lumen e
         receba indicações ordenadas a partir das suas respostas. As combinações

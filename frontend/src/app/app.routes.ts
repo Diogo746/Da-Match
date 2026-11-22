@@ -16,7 +16,9 @@ export const routes: Routes = [
   { path: "", loadComponent: loadExploreComponent, title: "Descobrir | DaMatch" },
   {
     path: "salvos",
-    loadComponent: loadExploreComponent,
+    canActivate: [(route, state) => inject(REGISTRATION_MODE) === "DEMO" || authGuard(route, state)],
+    loadComponent: () => inject(REGISTRATION_MODE) === "DEMO" ? loadExploreComponent()
+      : import("./features/saved/saved-profiles.component").then(m => m.SavedProfilesComponent),
     data: { savedOnly: true },
     title: "Perfis salvos | DaMatch",
   },

@@ -13,9 +13,10 @@ import { REGISTRATION_MODE } from "../../core/registration.config";
 import { StartupProfile } from "../../core/startup.models";
 import { StartupService } from "../../core/startup.service";
 import { DiscoveryCardComponent } from "../explore/discovery-card.component";
+import { SavedProfileButtonComponent } from "../saved/saved-profile-button.component";
 
 @Component({
-  selector: "app-recommendations", standalone: true, imports: [RouterLink, FormsModule, DiscoveryCardComponent],
+  selector: "app-recommendations", standalone: true, imports: [RouterLink, FormsModule, DiscoveryCardComponent, SavedProfileButtonComponent],
   templateUrl: "./recommendations.component.html",
   styleUrls: ["../explore/api-discovery.component.css", "./recommendations.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -15,7 +15,7 @@
         ><app-icon name="compass" />Descobrir</a
       >
       <a routerLink="/conversas" routerLinkActive="active" ariaCurrentWhenActive="page"><app-icon name="message" />Conversas</a>
-      @if (!apiMode) { <a
+      @if (!apiMode || authState.user()?.tipoUsuario === 'STARTUP' || authState.user()?.tipoUsuario === 'MENTOR') { <a
         routerLink="/salvos"
         routerLinkActive="active"
         ariaCurrentWhenActive="page"

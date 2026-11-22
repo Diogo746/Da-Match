@@ -25,6 +25,14 @@ public class ResourceAccess {
         return requireRole(TipoUsuario.MENTOR).getId();
     }
 
+    public UsuarioPrincipal currentParticipant() {
+        UsuarioPrincipal principal = currentPrincipal();
+        if (principal.getTipoUsuario() != TipoUsuario.STARTUP && principal.getTipoUsuario() != TipoUsuario.MENTOR) {
+            throw new AccessDeniedException("Acesso negado.");
+        }
+        return principal;
+    }
+
     public void requireMentorOwner(Mentor mentor) {
         UsuarioPrincipal principal = requireRole(TipoUsuario.MENTOR);
         if (!principal.getId().equals(mentor.getUsuario().getId())) {
@@ -54,10 +62,17 @@ public class ResourceAccess {
     }
 
     private UsuarioPrincipal requireRole(TipoUsuario role) {
+        UsuarioPrincipal principal = currentPrincipal();
+        if (principal.getTipoUsuario() != role) {
+            throw new AccessDeniedException("Acesso negado.");
+        }
+        return principal;
+    }
+
+    private UsuarioPrincipal currentPrincipal() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()
-                || !(authentication.getPrincipal() instanceof UsuarioPrincipal principal)
-                || principal.getTipoUsuario() != role) {
+                || !(authentication.getPrincipal() instanceof UsuarioPrincipal principal)) {
             throw new AccessDeniedException("Acesso negado.");
         }
         return principal;

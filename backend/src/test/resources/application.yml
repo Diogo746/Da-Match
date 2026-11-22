@@ -10,6 +10,8 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
+    properties:
+      hibernate.hbm2ddl.create_namespaces: true
 
 app:
   environment: test

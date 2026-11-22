@@ -57,5 +57,6 @@
     <h4>{{ item.perfil.tipo === 'MENTOR' ? 'Pode ajudar com' : 'Precisa de ajuda com' }}</h4>
     <ol>@for (topic of item.perfil.topicos; track topic) { <li>{{ topicLabel(topic) }}</li> }</ol>
     @if (!item.agendaEmComum) { <p class="schedule-note">Vocês ainda precisam combinar os horários. Não há um dia e período em comum declarado.</p> }
+    <app-saved-profile-button [profileId]="item.perfil.id" />
   }
 </dialog>

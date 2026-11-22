@@ -19,6 +19,7 @@ import { AuthStateStore } from "../../core/auth-state.store";
     <div class="account-actions">
       @if (state.user()?.tipoUsuario === 'MENTOR' || state.user()?.tipoUsuario === 'STARTUP') {
         <a class="button button-secondary" routerLink="/recomendacoes">Ver minhas recomendações</a>
+        <a class="button button-secondary" routerLink="/salvos">Ver perfis salvos</a>
       }
       @if (state.user()?.tipoUsuario === 'MENTOR') {
         <a class="button button-primary" routerLink="/mentor/perfil">Abrir meu perfil de mentor</a>

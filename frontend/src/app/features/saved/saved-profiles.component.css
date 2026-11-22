@@ -1,0 +1,5 @@
+.saved-catalog { color: var(--accent-ink); }
+.saved-list { list-style: none; padding: 0; }
+.saved-item { min-width: 0; align-content: start; }
+.saved-item .button { margin-top: 12px; }
+.saved-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }

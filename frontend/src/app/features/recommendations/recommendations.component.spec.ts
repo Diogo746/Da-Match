@@ -10,6 +10,7 @@ import { ProfilesStore } from "../../core/profiles.store";
 import { ProfileKind } from "../../core/profile.models";
 import { Recommendations, RecommendationsService } from "../../core/recommendations.service";
 import { REGISTRATION_MODE } from "../../core/registration.config";
+import { SavedProfilesService } from "../../core/saved-profiles.service";
 import { StartupProfile } from "../../core/startup.models";
 import { StartupService } from "../../core/startup.service";
 import { RecommendationsComponent } from "./recommendations.component";
@@ -38,6 +39,7 @@ beforeEach(() => {
   TestBed.configureTestingModule({ providers: [provideHttpClient(), provideRouter([{ path: "", component: RecommendationsComponent }]),
     { provide: REGISTRATION_MODE, useValue: "API" }, { provide: RecommendationsService, useValue: api },
     { provide: StartupService, useValue: startups }, { provide: MentorService, useValue: mentors },
+    { provide: SavedProfilesService, useValue: { status: () => of(false) } },
     { provide: ProfilesStore, useFactory: () => { throw new Error("No demo store in recommendations"); } }] });
   state = TestBed.inject(AuthStateStore); state.setUser(user);
   vi.spyOn(HTMLDialogElement.prototype, "showModal").mockImplementation(function (this: HTMLDialogElement) { this.open = true; });

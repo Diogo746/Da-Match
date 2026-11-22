@@ -16,6 +16,8 @@ Equipe/convites e descoberta real integrados pelos PRs #30–#34; contratos/evid
 | `GET /api/v1/mentores/me` | MENTOR; consulta somente o perfil associado à sessão |
 | `GET /api/v1/startups/{startupId}/recomendacoes` | STARTUP membro atual, qualquer papel; exige origem apta para calcular |
 | `GET /api/v1/mentores/me/recomendacoes` | MENTOR da sessão; exige origem apta para calcular |
+| `GET /api/v1/salvos` e `/{perfilId}` | STARTUP ou MENTOR da sessão. Lista e estado privados por conta, sem acesso de ADMIN |
+| `PUT/DELETE /api/v1/salvos/{perfilId}` | STARTUP ou MENTOR da sessão com CSRF. Mudança idempotente da própria lista |
 | `GET /api/v1/admin/matching/startups/{startupId}/mentores/{mentorId}` | Somente ADMIN; relatório numérico separado, ambos os perfis publicados/aptos |
 | `GET /api/v1/startups/me` | STARTUP; consulta somente projetos vinculados à conta da sessão |
 | `GET /api/v1/descoberta/mentores` e `/{mentorId}` | STARTUP; somente publicados/completos/quiz válido e aceitando novas startups; DTO de descoberta mínimo |

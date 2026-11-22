@@ -15,6 +15,7 @@ import { IconComponent } from "../../shared/icon.component";
 
 import { LumenComponent } from "../../shared/lumen.component";
 import { DiscoveryCardComponent } from "./discovery-card.component";
+import { SavedProfileButtonComponent } from "../saved/saved-profile-button.component";
 
 interface CatalogResult { key: string; loading: boolean; error: string; page: DiscoveryPage | null; }
 interface DetailResult { key: string; loading: boolean; error: string; profile: DiscoveryProfile | null; }
@@ -22,7 +23,7 @@ interface DetailResult { key: string; loading: boolean; error: string; profile: 
 @Component({
   selector: "app-api-discovery",
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent, LumenComponent, DiscoveryCardComponent],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent, LumenComponent, DiscoveryCardComponent, SavedProfileButtonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./api-discovery.component.html",
   styleUrl: "./api-discovery.component.css",
@@ -35,7 +36,6 @@ export class ApiDiscoveryComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly params = signal(this.route.snapshot.queryParamMap);
-  readonly savedOnly = this.route.snapshot.data["savedOnly"] === true;
   readonly sessionStatus = signal<"loading" | "ready" | "error">("loading");
   private readonly restoreErrorSession = signal(-1);
   readonly target = computed(() => {
@@ -96,7 +96,7 @@ export class ApiDiscoveryComponent implements OnInit {
           this.sessionStatus.set("ready");
           return;
         }
-        if (status === "ready" && target && query && !this.savedOnly) void this.load(key);
+        if (status === "ready" && target && query) void this.load(key);
       });
     });
     this.destroyRef.onDestroy(() => {
@@ -108,8 +108,7 @@ export class ApiDiscoveryComponent implements OnInit {
   }
   ngOnInit(): void {
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => this.params.set(params));
-    if (this.savedOnly) this.sessionStatus.set("ready");
-    else void this.restoreSession();
+    void this.restoreSession();
   }
   async restoreSession(): Promise<void> {
     const revision = ++this.restoreRevision;
@@ -134,7 +133,7 @@ export class ApiDiscoveryComponent implements OnInit {
   async load(key = this.key()): Promise<void> {
     const target = this.target();
     const query = this.queryState().query;
-    if (this.destroyed || this.sessionStatus() !== "ready" || !target || !query || this.savedOnly) return;
+    if (this.destroyed || this.sessionStatus() !== "ready" || !target || !query) return;
     const revision = ++this.listRevision;
     this.invalidateDetail();
     this.result.set({ key, loading: true, error: "", page: null });
