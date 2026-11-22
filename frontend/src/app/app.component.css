@@ -26,8 +26,6 @@
   font-weight: 750;
   letter-spacing: -1.4px;
   text-decoration: none;
-  visibility: visible;
-  opacity: 1;
 }
 
 .brand-dot {
@@ -40,8 +38,6 @@
   position: relative;
   display: inline-block;
   flex-shrink: 0;
-  visibility: visible;
-  opacity: 1;
 }
 
 .brand-mark i {
