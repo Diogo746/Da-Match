@@ -8,7 +8,7 @@ import { routes } from "./app.routes";
 import { RegistrationGateway, RegistrationRequest } from "./core/registration.gateway";
 import { ProfileKind, ProfileDraft } from "./core/profile.models";
 import { ProfileSessionStore } from "./core/profile-session.store";
-import { THEME_STORAGE_KEY } from "./core/theme.store";
+import { PALETTE_STORAGE_KEY, THEME_STORAGE_KEY } from "./core/theme.store";
 
 let fixture: ComponentFixture<AppComponent>;
 let root: HTMLElement;
@@ -56,7 +56,9 @@ async function goHomeFromCompletion() {
 afterEach(() => {
   vi.restoreAllMocks();
   localStorage.removeItem(THEME_STORAGE_KEY);
+  localStorage.removeItem(PALETTE_STORAGE_KEY);
   document.documentElement.removeAttribute("data-theme");
+  document.documentElement.removeAttribute("data-palette");
   document.documentElement.style.removeProperty("color-scheme");
 });
 
@@ -216,13 +218,84 @@ it("limpa o perfil pela interface e mantém acessíveis o cadastro e a explicaç
   expect(root.querySelector('.topbar-actions a')?.textContent).toContain("Criar perfil");
 });
 
-it("easter egg: clicar em Ecossistema de inovação liga e desliga o tema arco-íris", async () => {
+it("seleciona uma das três paletas no menu e fecha ao clicar fora", async () => {
+  await render("/");
+  const trigger = root.querySelector<HTMLButtonElement>(".palette-trigger")!;
+  trigger.click(); await settle();
+  expect(trigger.getAttribute("aria-expanded")).toBe("true");
+  const options = Array.from(root.querySelectorAll<HTMLButtonElement>(".palette-swatch"));
+  expect(options.map(option => option.getAttribute("aria-label"))).toEqual([
+    "Paleta Azul", "Paleta Roxo", "Paleta Verde",
+  ]);
+  options[2].click(); await settle();
+  expect(document.documentElement.dataset["palette"]).toBe("verde");
+  expect(localStorage.getItem(PALETTE_STORAGE_KEY)).toBe("verde");
+  expect(trigger.getAttribute("aria-expanded")).toBe("false");
+  trigger.click(); await settle();
+  expect(root.querySelector('[aria-label="Paleta Verde"]')?.getAttribute("aria-pressed")).toBe("true");
+  root.querySelector<HTMLElement>("main")!.click(); await settle();
+  expect(trigger.getAttribute("aria-expanded")).toBe("false");
+});
+
+it("easter egg: cinco cliques no título alternam o arco-íris e recuperam a paleta escolhida", async () => {
+  localStorage.setItem(PALETTE_STORAGE_KEY, "roxo");
   await render("/");
   const title = root.querySelector<HTMLElement>(".workspace-name")!;
-  title.click(); await settle();
+  const subtitle = title.querySelector<HTMLElement>("span")!;
+  for (let count = 0; count < 4; count++) title.click();
+  await settle();
+  expect(document.documentElement.dataset["palette"]).toBe("roxo");
+  subtitle.click(); await settle();
   expect(document.documentElement.dataset["palette"]).toBe("arco");
-  title.click(); await settle();
-  expect(document.documentElement.dataset["palette"]).toBe("azul");
-  title.querySelector<HTMLElement>("span")!.click(); await settle();
-  expect(document.documentElement.dataset["palette"]).toBe("azul");
+  expect(localStorage.getItem(PALETTE_STORAGE_KEY)).toBe("roxo");
+  for (let count = 0; count < 5; count++) title.click();
+  await settle();
+  expect(document.documentElement.dataset["palette"]).toBe("roxo");
+});
+
+it("abre a prévia pelo cadastro, permite testar os dois papéis e preserva o perfil da sessão", async () => {
+  await render("/");
+  const clickLink = async (label: string) => {
+    const link = [...root.querySelectorAll("a")].find(a => a.textContent?.trim() === label);
+    expect(link).toBeDefined(); link!.click(); await settle();
+  };
+  await clickLink("Criar perfil");
+  await clickLink("Testar questionário sem cadastro");
+  await click("Testar como startup");
+  await click("Um problema que quero entender");
+  expect(root.querySelector(".lumen-message [data-pose]")?.getAttribute("data-pose")).toBe("confirmed");
+  await click("Continuar");
+  expect(root.querySelector(".speech h2")?.textContent).toBe("Em que universo sua ideia vive?");
+  await click("Trocar perfil de teste");
+  await click("Testar como mentor");
+  await click("Descoberta do problema");
+  expect(root.querySelector(".speech-text")?.textContent).toContain("fase");
+  expect(TestBed.inject(ProfileSessionStore).profile()).toBeNull();
+});
+
+it("abre o contato pelo card e apresenta a mesma mensagem no histórico da mentora", async () => {
+  localStorage.removeItem("damatch:conversas:persona:v1");
+  localStorage.removeItem("damatch:conversas:demo:v1");
+  await render("/");
+  expect(root.querySelector('a[aria-label="Conversar com Camila Duarte"]')).toBeNull();
+  root.querySelector<HTMLAnchorElement>('a[aria-label="Conversar com Marina Albuquerque"]')!.click();
+  await settle();
+  expect(root.querySelector(".thread header")?.textContent).toContain("Marina");
+  fill("send-text","Vamos falar sobre validação?");
+  await click("Enviar");
+  const select = root.querySelector("select")!;
+  select.value = "mentor-1"; select.dispatchEvent(new Event("change")); await settle();
+  expect(root.querySelector(".thread header")?.textContent).toContain("Semente");
+  expect(root.querySelector(".bubble:not(.mine)")?.textContent).toContain("Vamos falar sobre validação?");
+  await TestBed.inject(Router).navigateByUrl("/conversas?com=mentor-3"); await settle();
+  expect(root.querySelector("#send-text")).toBeNull();
+  localStorage.removeItem("damatch:conversas:persona:v1");
+  localStorage.removeItem("damatch:conversas:demo:v1");
+});
+it("repete e alterna as sete poses originais do Lumen no estúdio", async () => {
+  await render("/demo/lumen");
+  for (const [label,pose] of [["Pensar","thinking"],["Comemorar","complete"],["Receber","welcome"],["Perguntar","curious"],["Apresentar","presenting"],["Confirmar","confirmed"],["Acenar","waving"]]) {
+    await click(label);
+    expect(root.querySelector(".stage [data-pose]")?.getAttribute("data-pose")).toBe(pose);
+  }
 });
