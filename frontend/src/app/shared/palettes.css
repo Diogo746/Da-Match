@@ -69,6 +69,7 @@ html[data-palette="roxo"]:not([data-theme="dark"]) {
   --lumen-halo-blur: 5px;
   --lumen-core-shadow: #d3f1e199;
   --texto-lateral: #ffffff;
+  --sidebar-accent: #65DCC5;
 }
 
 html[data-palette="roxo"][data-theme="dark"] {
@@ -233,9 +234,7 @@ html[data-palette="verde"][data-theme="dark"] {
    Nos temas claros do azul e do roxo o menu lateral é escuro, mas --teal foi escolhido para fundos claros.
    Estas cores claras mantêm logo e detalhes legíveis. As demais combinações usam --teal direto. */
 html[data-palette="azul"]:not([data-theme="dark"]) { --sidebar-accent: #9adebf; }
-html[data-palette="roxo"]:not([data-theme="dark"]) { --sidebar-accent: #65DCC5; }
 
-/* ===================== SELETOR DE PALETA ===================== */
 /* ===================== SELETOR DE PALETA ===================== */
 
 .palette-control {
@@ -295,6 +294,7 @@ html[data-palette="roxo"]:not([data-theme="dark"]) { --sidebar-accent: #65DCC5; 
   gap: 10px;
 
   min-width: 46px;
+  margin: 0;
   padding: 10px 8px;
 
   border: 1px solid var(--field-border);
