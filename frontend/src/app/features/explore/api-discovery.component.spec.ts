@@ -12,6 +12,7 @@ import { ProfileKind } from "../../core/profile.models";
 import { ProfilesStore } from "../../core/profiles.store";
 import { ProfileSessionStore } from "../../core/profile-session.store";
 import { REGISTRATION_MODE } from "../../core/registration.config";
+import { SavedProfilesService } from "../../core/saved-profiles.service";
 import { ApiDiscoveryComponent } from "./api-discovery.component";
 import { loadExploreComponent } from "./explore.entry";
 
@@ -28,10 +29,11 @@ beforeEach(() => {
   api = { list: vi.fn((kind: ProfileKind, query) => of(page(kind, query.pagina))), detail: vi.fn(() => of(profile)) };
   auth = { me: vi.fn(() => of(user)) };
   TestBed.configureTestingModule({ providers: [provideHttpClient(), provideRouter([
-    { path: "", component: ApiDiscoveryComponent }, { path: "salvos", component: ApiDiscoveryComponent, data: { savedOnly: true } },
+    { path: "", component: ApiDiscoveryComponent },
     { path: "other", loadComponent: loadExploreComponent },
   ]), { provide: REGISTRATION_MODE, useValue: "API" }, { provide: DiscoveryService, useValue: api },
   { provide: AuthService, useValue: auth },
+  { provide: SavedProfilesService, useValue: { status: () => of(false) } },
   { provide: ProfilesStore, useFactory: () => { throw new Error("DEMO store must not be constructed"); } },
   { provide: ProfileSessionStore, useFactory: () => { throw new Error("DEMO session must not be constructed"); } }] });
   state = TestBed.inject(AuthStateStore); state.setUser(user);
@@ -178,10 +180,6 @@ it("discards closed and superseded detail responses, including after account cha
   expect(component.detail()).toBeNull(); await settle(harness); late.error(new Error("stale")); await pending;
   expect(component.detail()).toBeNull();
   await component.open({ ...profile, id: "not-in-list" }); expect(api.detail).toHaveBeenCalledTimes(2);
-});
-it("keeps saved profiles unavailable in API mode instead of showing fictitious saved items", async () => {
-  const { element } = await create("/salvos");
-  expect(element.textContent).toContain("próxima etapa"); expect(api.list).not.toHaveBeenCalled(); expect(auth.me).not.toHaveBeenCalled();
 });
 it("the route entry constructs only the API view in API mode", async () => {
   const harness = await RouterTestingHarness.create();

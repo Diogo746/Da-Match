@@ -1,0 +1,57 @@
+<section class="catalog-page" aria-labelledby="saved-title">
+  <header class="catalog-hero">
+    <div>
+      <h1 id="saved-title">Perfis salvos</h1>
+      <p class="intro">Sua lista privada de favoritos.</p>
+      <a class="saved-catalog" routerLink="/">Explorar o catálogo</a>
+    </div>
+  </header>
+  @if (!target()) {
+    <p class="catalog-notice">Entre com uma conta de startup ou mentor para consultar seus salvos.</p>
+  } @else if (current(); as view) {
+    @if (view.busy) { <output class="catalog-notice">Atualizando seus salvos…</output> }
+    @if (view.error) {
+      <div class="catalog-notice">
+        <p role="alert">{{ view.error }}</p>
+        <button class="button button-secondary" type="button" (click)="load(view.page)">Atualizar lista</button>
+      </div>
+    }
+    @if (view.data; as data) {
+      @if (data.itens.length === 0) {
+        <p class="catalog-notice">Você ainda não salvou nenhum perfil. Abra um perfil no catálogo ou nas recomendações para salvá-lo.</p>
+      } @else {
+        <ul class="directory saved-list">
+          @for (item of data.itens; track item.perfilId) {
+            <li class="catalog-notice saved-item">
+              @if (item.perfil; as profile) {
+                <h2>{{ profile.nome }}</h2>
+                <p>{{ profile.apresentacao }}</p>
+                @if (profile.cidadeId) { <p>{{ cityLabel(profile.cidadeId) }}</p> }
+                <ul class="tags" aria-label="Setores e temas">
+                  @for (sector of profile.setores; track sector) { <li>{{ sectorLabel(sector) }}</li> }
+                  @for (topic of profile.topicos; track topic) { <li>{{ topicLabel(topic) }}</li> }
+                </ul>
+              } @else {
+                <h2>Perfil indisponível</h2>
+                <p>Você pode remover este favorito da lista.</p>
+              }
+              <button class="button button-secondary" type="button" [disabled]="view.busy" (click)="remove(item.perfilId)"
+                [attr.aria-label]="item.perfil ? 'Remover dos salvos: ' + item.perfil.nome : null">Remover dos salvos</button>
+            </li>
+          }
+        </ul>
+      }
+      @if (data.totalPaginas > 1) {
+        <nav class="saved-pagination" aria-label="Páginas de perfis salvos">
+          <button class="button button-secondary" type="button" [disabled]="view.busy || data.pagina === 0"
+            (click)="load(data.pagina - 1)">Anterior</button>
+          <span>Página {{ data.pagina + 1 }} de {{ data.totalPaginas }}</span>
+          <button class="button button-secondary" type="button" [disabled]="view.busy || data.pagina + 1 >= data.totalPaginas"
+            (click)="load(data.pagina + 1)">Próxima</button>
+        </nav>
+      }
+    }
+  } @else {
+    <output class="catalog-notice">Consultando seus salvos…</output>
+  }
+</section>

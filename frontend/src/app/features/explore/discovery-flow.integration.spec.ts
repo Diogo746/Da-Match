@@ -29,12 +29,15 @@ it("restores the session before catalog requests, follows filters and fresh deta
   expect(catalog.request.withCredentials).toBe(true); expect(catalog.request.params.get("busca")).toBe("Ágata");
   catalog.flush({ itens: [profile], pagina: 0, tamanho: 6, totalItens: 1, totalPaginas: 1 });
   await fixture.whenStable(); fixture.detectChanges();
-  expect(root.textContent).toContain(profile.nome); expect(root.querySelector('.main-nav a[href="/salvos"]')).toBeNull();
+  expect(root.textContent).toContain(profile.nome); expect(root.querySelector('.main-nav a[href="/salvos"]')).not.toBeNull();
   expect(root.querySelector(".topbar-actions a")?.getAttribute("href")).toBe("/conta");
   root.querySelector<HTMLButtonElement>(".profile-link")!.click(); fixture.detectChanges();
   expect(root.querySelector("dialog .presentation")).toBeNull();
   http.expectOne("/api/v1/descoberta/mentores/" + profile.id).flush(profile);
   await fixture.whenStable(); fixture.detectChanges(); expect(root.querySelector("dialog")?.textContent).toContain(profile.apresentacao);
+  http.expectOne("/api/v1/salvos/" + profile.id).flush({ salvo: false });
+  await fixture.whenStable(); fixture.detectChanges();
+  expect(root.querySelector("app-saved-profile-button button")?.textContent).toContain("Salvar perfil");
   root.querySelector<HTMLButtonElement>('[aria-label="Fechar detalhe"]')!.click();
   const field = root.querySelector<HTMLInputElement>("#discovery-search")!;
   field.value = "Sem resultado"; field.dispatchEvent(new Event("input", { bubbles: true }));
