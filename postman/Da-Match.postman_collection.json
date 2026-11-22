@@ -1384,6 +1384,106 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Salvos",
+      "description": "Favoritos privados na sessão STARTUP ou MENTOR. Use o UUID de perfil da descoberta. A pasta assume sessão STARTUP e mentor publicado. MENTOR substitui mentorId por startupId nas operações individuais. Consulte /csrf após o login para escritas.",
+      "item": [
+        {
+          "name": "Listar meus perfis salvos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/salvos?pagina=0&tamanho=20",
+            "description": "Itens mais recentes primeiro. Perfil indisponível aparece com perfil=null."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status esperado', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Consultar estado do favorito",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/salvos/{{mentorId}}",
+            "description": "Retorna salvo=true ou false para a própria conta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status esperado', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Salvar perfil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/salvos/{{mentorId}}",
+            "description": "Sem corpo. Retorna 204 inclusive se já está salvo. Perfil novo deve estar visível no catálogo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status esperado', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Remover perfil salvo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/salvos/{{mentorId}}",
+            "description": "Sem corpo. Remove da lista da sessão e retorna 204 também se já estiver ausente."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status esperado', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
     }
   ]
 }
