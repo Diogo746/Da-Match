@@ -40,6 +40,9 @@ import java.util.List;
 @EnableWebSecurity
 @EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityConfig {
+    private static final String SALVOS = "/api/v1/salvos";
+    private static final String PERFIL_SALVO = SALVOS + "/*";
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http, CookieCsrfTokenRepository csrfRepository,
@@ -84,7 +87,7 @@ public class SecurityConfig {
                                     referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
                             .addHeaderWriter(new DelegatingRequestMatcherHeaderWriter(request -> {
                                 String path = request.getRequestURI().substring(request.getContextPath().length());
-                                return path.equals("/api/v1/salvos") || path.startsWith("/api/v1/salvos/");
+                                return path.equals(SALVOS) || path.startsWith(SALVOS + "/");
                             }, (request, response) -> response.setHeader(HttpHeaders.CACHE_CONTROL, "private, no-store")));
                     if (!production) {
                         headers.httpStrictTransportSecurity(HstsConfig::disable);
@@ -97,11 +100,11 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.POST, "/api/v1/auth/refresh").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/v1/mentores", "/api/v1/startups").anonymous()
                             .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
-                            .requestMatchers(HttpMethod.GET, "/api/v1/salvos", "/api/v1/salvos/*")
+                            .requestMatchers(HttpMethod.GET, SALVOS, PERFIL_SALVO)
                                 .hasAnyRole(TipoUsuario.STARTUP.name(), TipoUsuario.MENTOR.name())
-                            .requestMatchers(HttpMethod.PUT, "/api/v1/salvos/*")
+                            .requestMatchers(HttpMethod.PUT, PERFIL_SALVO)
                                 .hasAnyRole(TipoUsuario.STARTUP.name(), TipoUsuario.MENTOR.name())
-                            .requestMatchers(HttpMethod.DELETE, "/api/v1/salvos/*")
+                            .requestMatchers(HttpMethod.DELETE, PERFIL_SALVO)
                                 .hasAnyRole(TipoUsuario.STARTUP.name(), TipoUsuario.MENTOR.name())
                             .requestMatchers(HttpMethod.GET, "/api/v1/mentores/me")
                             .hasRole(TipoUsuario.MENTOR.name())

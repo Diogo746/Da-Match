@@ -63,7 +63,7 @@ export class SavedProfileButtonComponent {
 
   async toggle(): Promise<void> {
     const status = this.current();
-    if (!status || status.saved === null || status.waiting) return;
+    if (typeof status?.saved !== "boolean" || status.waiting) return;
     const id = this.profileId();
     const revision = ++this.revision;
     const saved = !status.saved;
