@@ -1,3 +1,5 @@
+import { provideHttpClient } from "@angular/common/http";
+import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
 import { TestBed } from "@angular/core/testing";
 import { it, expect } from "vitest";
 import { LumenChatComponent } from "./lumen-chat.component";
@@ -51,4 +53,26 @@ it("abre também pelo mascote e descarta a conversa quando a conta muda", () => 
   button.click();
   fixture.componentInstance.send("  ");
   expect(fixture.componentInstance.exchanges()).toHaveLength(0);
+});
+
+it("consulta o backend e exibe a justificativa e as evidências da indicação", () => {
+  TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+  const { fixture, root } = setup();
+  const trigger = TestBed.inject(LumenChatTrigger);
+  const http = TestBed.inject(HttpTestingController);
+  const card = document.createElement("button");
+  card.addEventListener("click", event => trigger.open(event, {
+    startupId: "startup", mentorId: "mentor", mentorName: "Aline",
+  }));
+  card.click();
+  fixture.detectChanges();
+  expect(root.querySelector(".question")?.textContent).toContain("Aline");
+  expect(root.querySelector(".reply")?.textContent).toContain("Consultando as fichas");
+  const request = http.expectOne("/api/v1/startups/startup/recomendacoes/mentor/explicacao");
+  expect(request.request.method).toBe("POST");
+  request.flush({ texto: "O perfil apoia a necessidade declarada.", referencias: ["AGENDA"] });
+  fixture.detectChanges();
+  expect(root.querySelector(".reply")?.textContent).toContain("O perfil apoia a necessidade declarada.");
+  expect(root.querySelector(".reply li")?.textContent).toContain("Agenda declarada em comum");
+  http.verify();
 });

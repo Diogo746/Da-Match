@@ -25,6 +25,7 @@ public class MatchingCacheFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI().substring(request.getContextPath().length());
-        return !path.endsWith("/recomendacoes") && !path.startsWith("/api/v1/admin/matching/");
+        return !path.endsWith("/recomendacoes") && !path.startsWith("/api/v1/admin/matching/")
+                && !(path.startsWith("/api/v1/startups/") && path.endsWith("/explicacao"));
     }
 }
